@@ -3,7 +3,30 @@
     <h1>{{ .Title }}</h1>
     <div class="post-meta">
         <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+        {{ if .Section }}
+            {{ if eq .Section "tutorial" }}
+                <span class="tutorial-series">Tutorial Series</span>
+            {{ end }}
+        {{ end }}
     </div>
     {{ .Content }}
+    
+    {{ if .Section }}
+        {{ if eq .Section "tutorial" }}
+            <nav class="tutorial-nav">
+                <div class="nav-links">
+                    {{ if .Params.prev }}
+                        <a href="{{ .Params.prev }}" class="prev-link">← Previous</a>
+                    {{ end }}
+                    
+                    <a href="/tutorial/" class="index-link">Tutorial Index</a>
+                    
+                    {{ if .Params.next }}
+                        <a href="{{ .Params.next }}" class="next-link">Next →</a>
+                    {{ end }}
+                </div>
+            </nav>
+        {{ end }}
+    {{ end }}
 </article>
 {{ end }}
