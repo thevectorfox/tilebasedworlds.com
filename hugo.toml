@@ -1,0 +1,8 @@
+baseURL = 'https://example.org/'
+languageCode = 'en-us'
+title = 'Tile Based Worlds'
+
+[params]
+  description = 'Techniques and processes to build tile based games or effects'
+  show_reading_time = true
+  recent_posts_number = 5
