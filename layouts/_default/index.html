@@ -6,10 +6,10 @@
 
 <section>
     <h2>Recent Tutorials</h2>
-    {{ $posts := where site.RegularPages "Type" "posts" | first 5 }}
-    {{ if $posts }}
+    {{ $tutorials := where site.RegularPages "Section" "tutorial" | first 5 }}
+    {{ if $tutorials }}
     <ul class="post-list">
-        {{ range $posts }}
+        {{ range $tutorials }}
         <li>
             <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
             <div class="post-meta">
