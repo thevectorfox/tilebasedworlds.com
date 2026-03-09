@@ -8,13 +8,13 @@ next = "/tutorial/08-open-the-door/"
 prev = "/tutorial/06-keys-to-move/"
 +++
 
-Its no fun having hero that can walk, but cant hit the wall. We will make our hero to feel the power of solid brick wall. Or any other tile we decide to be not walkable:
+It's no fun having hero that can walk, but can't hit the wall. We will make our hero feel the power of solid brick wall. Or any other tile we decide to be not walkable:
 
 ```
 EXAMPLE HERE
 ```
 
-In the first chapter we did set our tiles to have property "walkable". When object representing tile in current position has property walkable set to "false", hero cant go there. But then again, if the walkable property is "true", then hero can walk there (thats called "logic", people learn it in the school, some even in the university, poor, poor devils).
+In the first chapter we did set our tiles to have property "walkable". When object representing tile in current position has property walkable set to "false", hero cant go there. But then again, if the walkable property is "true", then hero can walk there (that's called "logic", people learn it in school, some even in the university, poor, poor devils).
 
 In order this magic to work, we will do following: after arrow key has been pressed, we check if the tile, where char will walk, is walkable. If it is, we will move the hero. If the tile is not walkable (the hard brick wall type), then we will ignore the arrow keys pressed.
 
@@ -22,7 +22,7 @@ This is perfect collision with wall:
 
 ![](p08_2.gif)
 
-Hero stands next to wall and in next step he would be inside the wall. We cant let it happen, so we wont. No moving, man! But world is not perfect, what if only part of hero would be colliding:
+Hero stands next to wall and in next step he would be inside the wall. We can't let it happen, so we won't. No moving, man! But world is not perfect, what if only part of hero would be colliding:
 
 ![](p08_3.gif)
 
@@ -36,7 +36,7 @@ We will have to place hero by the wall:
 
 ![](p08_5.gif)
 
-"Oh, no!" you might cry, "All this is impossible to do!" Not to worry, its not actually very hard.
+"Oh, no!" you might cry, "All this is impossible to do!" Not to worry, it's not actually very hard.
 
 
 ## GIVE ME MY CORNERS
@@ -61,7 +61,7 @@ function getMyCorners (x, y, ob)
 	ob.downright = game["t_" + ob.downY + "_" + ob.rightX].walkable;
 }
 ```
-This function accepts 3 arguments: x/y position of the center point of object on stage (pixels) and name of the object. Wait, we already know x/y position of the object, we have it saved inside the char object, you may wonder. Thats true, but we have saved the CURRENT position of the char, here we are dealing with the position char WOULD BE if it would move.
+This function accepts 3 arguments: x/y position of the center point of object on stage (pixels) and name of the object. Wait, we already know x/y position of the object, we have it saved inside the char object, you may wonder. That's true, but we have saved the CURRENT position of the char, here we are dealing with the position char WOULD BE if it would move.
 
 First we calculate the tiles where character extends. Its center might be on one tile, but its left side might be on other tile, its highest point might be on third tile. Adding variable y with the height of hero and dividing it with height of tile, we will get the number of tile where objects lowest point (downY) will stand.
 
@@ -70,7 +70,7 @@ Last 4 lines use points we calculated to get the value of walkable property in e
 
 ## MOVE
 
-When we know the types of tile each corner of character will be on, we can easily write movement for the char: if all the corners are walkable, then move, else dont move. More work is needed to place the hero right next to wall if the collision would happen. Our modified moveChar function to handle all 4 possible directions might look a bit confusing, but most of it is written 4 times over for each direction. Lets look at the function:
+When we know the types of tile each corner of character will be on, we can easily write movement for the char: if all the corners are walkable, then move, else don't move. More work is needed to place the hero right next to wall if the collision would happen. Our modified moveChar function to handle all 4 possible directions might look a bit confusing, but most of it is written 4 times over for each direction. Let's look at the function:
 
 ```
 function moveChar(ob, dirx, diry)
@@ -149,7 +149,7 @@ if (diry == -1)
 	}
 }
 ```
-This block of code works for up movement. When up arrow key was pressed, value for diry = -1. We use values of ob.upleft and ob.upright calculated in the getMyCorners function, if they are both "true" meaning both tiles are walkabale, we let char move like we did before adding speed*diry to char's y property.
+This block of code works for up movement. When up arrow key was pressed, value for diry = -1. We use values of ob.upleft and ob.upright calculated in the getMyCorners function, if they are both "true" meaning both tiles are walkable, we let char move like we did before adding speed*diry to char's y property.
 
 But if one of corners happens to be inside the wall and so value of ob.upleft or ob.upright is "false", we place object near the wall. For char to be next to wall above it, its center point must be placed below the current tiles upper border by char.height.
 

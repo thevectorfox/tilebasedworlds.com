@@ -8,15 +8,15 @@ next = "/tutorial/16-moving-tiles/"
 prev = "/tutorial/14-shoot-him/"
 +++
 
-In this chapter we will look how to make our hero to pick up some items from the ground. You know the stuff: crystals, coins, dead spiders, healing potions, ammunition:
+In this chapter we will look how to make our hero pick up some items from the ground. You know the stuff: crystals, coins, dead spiders, healing potions, ammunition:
 
 ```
 EXAMPLE HERE
 ```
 
-Items are different in what they actually do. Some items increase your score, some increase your health or give you more bullets. In this example all items do only one thing - they give you more points. Its up to you to create other kind of items.
+Items are different in what they actually do. Some items increase your score, some increase your health or give you more bullets. In this example all items do only one thing - they give you more points. It's up to you to create other kind of items.
 
-We will start with the movie from page 9 Open the door so we don't have too much code to make things hard to understand.
+We will start with the movie from the Open the Door tutorial so we don't have too much code to make things hard to understand.
 
 First draw your items movie clip. Place graphics of different items in the frames inside it. Like hero and enemies, all items should be aligned in the center. In the first frame add "Stop" action to prevent mc from playing all the lovely graphics. Make sure this mc linkage is set to "Export this symbol" and its identifier is "items". Having items in the separate movie clip allows us to place same item on any background tile without the need to draw tiles again.
 
@@ -55,9 +55,9 @@ game.Item2.prototype.points = 10;
 
 myItems array is built same way as enemies array (page 13 ). It has array for each of the maps. We havent used map0 so first array is empty. For map1 we have set 3 items: [1,1,1],[1,1,2],[2,1,3]. Each item has 3 numbers, first number is the type of item (1 or 2 here) and it is also the number of frame to be shown in the attached items movie clip. Second and third number determine tile it will be placed. Lets look at the last item: we know it is type 2 and it will be placed on the tile x=1, y=3.
 
-Last part of code declares two types of items. Currently they only have one property "points". Thats how much points player gets for picking the item. Type1 item will add 1 to the players score, type2 item gives whopping 10 points.
+Last part of code declares two types of items. Currently they only have one property "points". That's how much points player gets for picking the item. Type1 item will add 1 to the players score, type2 item gives whopping 10 points.
 
-Now lets modify the buildMap function to add items when map is created. Add this code before char creation:
+Now let's modify the buildMap function to add items when map is created. Add this code before char creation:
 
 ```
 game.items = myItems[game.currentMap];
@@ -85,7 +85,7 @@ var name = "item" + game.items[i][2] + "_" + game.items[i][1];
 
 we will get name for new item. Its name will follow the same rules as names of our tiles, item on the tile x=1, y=3 will be named "item3_1".
 
-After creating new item object from the templates we made earlier, we save position into that new object. What position is that? Its counter "i" and by saving it in the item object we will know which item in the items array this object represents. This will be very handy when we start to pick up items. Lets see: when we make map1 and i=1, we are creating item from the data [1,1,2], thats second element for the map1 items array. Item will be named "item2_1" and we can access its position in the array with item2_1.position. More about this when we remove items.
+After creating new item object from the templates we made earlier, we save position into that new object. What position is that? Its counter "i" and by saving it in the item object we will know which item in the items array this object represents. This will be very handy when we start to pick up items. Let's see: when we make map1 and i=1, we are creating item from the data [1,1,2], thats second element for the map1 items array. Item will be named "item2_1" and we can access its position in the array with item2_1.position. More about this when we remove items.
 
 After that we place new instance of items movie clip on stage and place it in the correct coordinates. Last line in the loop sends new movie clip to the frame equal with the type of item. All type1 items will show frame 1 for example.
 
@@ -112,7 +112,7 @@ The variable itemname will have value based on the current position of hero. Whe
 
 If we have found item object and we are moving hero, we will first add points from the item object to the game.points and then update variable _root.points too to show them.
 
-Now its time to remove item from the stage. Each item has to be removed from 3 places: its movie clip, from items array and its object. Currently we dont delete it from the items array, we just set 0 in the position of this item. And dont forget, items array is only copy of myItems array, if we leave the map and return, all items would appear again. For prevent such bad idea, we will update the changeMap function.
+Now it's time to remove item from the stage. Each item has to be removed from 3 places: its movie clip, from items array and its object. Currently we don't delete it from the items array, we just set 0 in the position of this item. And don't forget, items array is only copy of myItems array, if we leave the map and return, all items would appear again. For prevent such bad idea, we will update the changeMap function.
 
 Add to the beginning of changeMap function:
 

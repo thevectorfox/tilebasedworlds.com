@@ -12,9 +12,9 @@ Before we start to scroll, we must make one thing very clear. Flash is slow. Fla
 
 "What?" you might wonder, "no scrolling? And how did snail fall to sleep?".
 
-You can make scrolling tiles, but you should be careful not to make scrolling area too big and not to scroll too many tiles. How big is too big and how many is too many, those answers you have to find out yourself. Remember, that Flash games are played mostly on the browser, probably many windows are opened same time, many programs are running on background and players doesnt always have latest power computers. Test your game in old crappy computers and if it feels slowing down, make it smaller.
+You can make scrolling tiles, but you should be careful not to make scrolling area too big and not to scroll too many tiles. How big is too big and how many is too many, those answers you have to find out yourself. Remember, that Flash games are played mostly on the browser, probably many windows are opened same time, many programs are running on background and players don't always have the latest powerful computers. Test your game in old crappy computers and if it feels slowing down, make it smaller.
 
-Lets look what we will be making:
+Let's look at what we will be making:
 
 
 ```
@@ -33,22 +33,22 @@ Time for example. Scrolling game. Hero is suppose to move 10 pixels right. First
 
 Easiest way to scroll tiles, is to place all the tiles on screen, but to show only small portion of them, then we simply move them all around. This might make your game very slow, since thousands of tiles outside visible area still need resources. Next idea is to remove tiles when they go off from visible area and attach tiles when they come visible again. Thats better, but Flash spends too much time removing/attaching movie clips.
 
-Our last hope is to place only visible tiles on stage and when they go off, we move the same tiles to the opposite side, rename them and reuse same movie clips. Thats called "gotoAndStop" scrolling engine:
+Our last hope is to place only visible tiles on stage and when they go off, we move the same tiles to the opposite side, rename them and reuse same movie clips. That's called "gotoAndStop" scrolling engine:
 
 ![](p18_3.gif)
 
-Like seen on the picture, when tile goes off from right, we move the tile to the left. We also have to rename the movie clip, since all our movie clips have names like "t_3_4" which means it is placed in the y=3, x=4. And tile in the new position probably has to show different frame (graphic), that why we need to send it to correct frame with correct graphics and thats why this method is called "gotoAndStop".
+Like seen on the picture, when tile goes off from right, we move the tile to the left. We also have to rename the movie clip, since all our movie clips have names like "t_3_4" which means it is placed in the y=3, x=4. And tile in the new position probably has to show different frame (graphic), that's why we need to send it to correct frame with correct graphics and that's why this method is called "gotoAndStop".
 
 
 ## PREPARING TO SCROLL
 
-In most scrolling games, hero is always staying on the center of screen.
+In most scrolling games, hero is always in the center of the screen.
 
 ![](p17_4.gif)
 
-You can see how number of tiles left from hero is equal to the number of tiles right from him. That means your number of columns is 3,5,7,9,11 etc, but never 2,4,6,8. Same goes for rows too.
+You can see how number of tiles left from hero is equal to the number of tiles right from him. That means your number of columns is 3, 5, 7, 9, 11 etc, but never 2, 4, 6, 8. Same goes for rows too.
 
-Lets declare game object:
+Let's declare game object:
 
 ```
 game = {tileW:30, tileH:30, currentMap:1, visx:7, visy:5, centerx:120, centery:90};
@@ -69,7 +69,7 @@ You might also want to cover some tiles partly ouside of visible area. For that 
 
 ## BUILD THE WORLD OF SCROLL
 
-Lets start with buildMap function.
+Let's start with buildMap function.
 
 ```
 function buildMap (map)
@@ -109,7 +109,7 @@ for (var y = char.ytile - game.halfvisy; y <= char.ytile + game.halfvisy + 1; ++
 	}
 }
 ```
-This loop creates all the visible tile objects and also attaches movie clips for the tiles. As you can see, the loop doesnt start from 0 anymore, it starts from the ytile-halfvisy. Same way it doesnt run until the end of map array, it runs until ytile+halfvisy+1. The if condition then checks if the tile to be created is in the map array. If it falls outside the map, we use empty tile from the tile4 template.
+This loop creates all the visible tile objects and also attaches movie clips for the tiles. As you can see, the loop doesn't start from 0 anymore, it starts from the ytile-halfvisy. Same way it doesn't run until the end of map array, it runs until ytile+halfvisy+1. The if condition then checks if the tile to be created is in the map array. If it falls outside the map, we use empty tile from the tile4 template.
 
 In order to create seamless scroll, we have to use one extra row and one extra column of tiles in the right and bottom edge. Those tiles ensure, that even when we move half of tile to the other side, there wont be any empty space.
 
@@ -217,6 +217,6 @@ So, we will receive 2 old coordinates and 2 new for our tile. To check if tile i
 game.clip[nameold]._name = namenew;
 ```
 
-renames tiles movie clip. When new movie clip is empty, then we dont need to place it to the new _x/_y, it can remain in its old position.
+renames tiles movie clip. When new movie clip is empty, then we don't need to place it to the new _x/_y, it can remain in its old position.
 
 You can download the source fla with all the code and movie set up here.

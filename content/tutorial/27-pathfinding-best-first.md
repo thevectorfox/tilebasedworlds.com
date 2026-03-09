@@ -8,7 +8,7 @@ next = "/tutorial/28-slopes/"
 prev = "/tutorial/26-pathfinding-breadth-first/"
 +++
 
-The breath-first search we created in last chapter, is not too fast. Thats why this time we look into faster algorithm, that would allow usage of larger maps without slowing down the game:
+The breadth-first search we created in last chapter, is not too fast. That's why this time we look into faster algorithm, that would allow usage of larger maps without slowing down the game:
 
 ```
 EXAMPLE HERE

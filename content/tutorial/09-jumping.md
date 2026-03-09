@@ -5,10 +5,10 @@ weight = 9
 draft = false
 tags = ["intermediate", "gameplay", "tutorial"]
 next = "/tutorial/10-clouds/"
-prev = "/tutorial/08-*/"
+prev = "/tutorial/08-open-the-door/"
 +++
 
-Lets turn our game from up view to the side view so we can add jumping. In this example we are looking to the game from side and our hero can walk left and right with arrow keys. He will also be able to jump with space key. Like this:
+Let's turn our game from up view to the side view so we can add jumping. In this example we are looking to the game from side and our hero can walk left and right with arrow keys. He will also be able to jump with space key. Like this:
 
 ```
 EXAMPLE HERE
@@ -19,15 +19,15 @@ EXAMPLE HERE
 
 Any jump begins with push up. As you remember, up in the Flash stage means y coordinate will decrease. So, we calculate new_y=current_y-jumpspeed. If we do it only once, then hero moves up by jumpspeed and stops there. Yes, we have to continue calculating new y position as long the hero jumps, but we also have to change the jumpspeed or our hero will just fly away to the sky and never returns.
 
-For changing jumpspeed we will declare new variable "gravity". Gravity is pulling hero back to the ground, thats down. In every step we add gravity to the jumpspeed: jumpspeed=jumpspeed+gravity. You can change the value of gravity, when you make less gravity, hero will fly higher (balloon-type), when you increase gravity, hero will pop down sooner (stone-type). As we have lotsa objects and character is also an object, you can actually give different gravity to different objects.
+For changing jumpspeed we will declare new variable "gravity". Gravity is pulling hero back to the ground, that's down. In every step we add gravity to the jumpspeed: jumpspeed=jumpspeed+gravity. You can change the value of gravity, when you make less gravity, hero will fly higher (balloon-type), when you increase gravity, hero will pop down sooner (stone-type). As we have lotsa objects and character is also an object, you can actually give different gravity to different objects.
 
-Lets look at one example. Jumpspeed starting value is -10 and gravity is 2. First step, hero is moved up by 10 pixels and jumpspeed gets value of 8. Next step, moving up by 8, speed=6. After couple of steps, jumpspeed gets value of 0, meaning hero wont move up anymore. Next step jumpspeed has positive value and hero starts to move down.
+Let's look at one example. Jumpspeed starting value is -10 and gravity is 2. First step, hero is moved up by 10 pixels and jumpspeed gets value of 8. Next step, moving up by 8, speed=6. After couple of steps, jumpspeed gets value of 0, meaning hero won't move up anymore. Next step jumpspeed has positive value and hero starts to move down.
 
 But what to do when hero hits the solid tile (wall) while jumping. If hero is jumping up and hits wall above, we will set the jumpspeed to 0 and hero starts to fall down. If hero hits solid tile below, then he has landed and jump is over.
 
-In tile based game its always important not to let speed get bigger then size of tile. If hero has too high speed, he will not check the next tile, and might move through walls. While some magicians can move through walls, in normal game thats just a bug.
+In tile based game its always important not to let speed get bigger then size of tile. If hero has too high speed, he will not check the next tile, and might move through walls. While some magicians can move through walls, in normal game that's just a bug.
 
-As you can see, jumping wont affect horisontal movement. Its still done exactly same way as before. We only have to check after moving hero left/right, if he has walked off the solid tile below and might start to fall down.
+As you can see, jumping won't affect horizontal movement. Its still done exactly same way as before. We only have to check after moving hero left/right, if he has walked off the solid tile below and might start to fall down.
 
 
 ## BE MY HERO
@@ -39,17 +39,17 @@ char = {xtile:2, ytile:1, speed:4, jumpstart:-18, gravity:2, jump:false};
 ```
 The property speed will set the speed when moving left or right. Jumpstart is the starting value of jumpspeed. Gravity will pull hero back to the ground and property "jump" will be used to check if hero is currently jumping (then jump=true) or standing/walking/running/sitting/fighting on solid ground (jump=false).
 
-Next line to change is in the buildmap function, when we set the starting position of hero. In examples before we did put hero in the center of tile, but that will look weird since hero will always start falling down after new map is created. We will make hero stand in the bottom of its starting tile (dont forget to move that line after the line declaring char.height):
+Next line to change is in the buildmap function, when we set the starting position of hero. In examples before we did put hero in the center of tile, but that will look weird since hero will always start falling down after new map is created. We will make hero stand in the bottom of its starting tile (don't forget to move that line after the line declaring char.height):
 
 ```
 char.y = ((char.ytile + 1) * game.tileW) - char.height;
 ```
-Functions changeMap and getMyCorners doesnt need any change.
+Functions changeMap and getMyCorners don't need any changes.
 
 
 ## GIVE ME THE WINGS
 
-Lets starts with detectKeys function. We need to add code to check for space key and we can remove up/down arrow keys.
+Let's start with detectKeys function. We need to add code to check for space key and we can remove up/down arrow keys.
 
 ```
 function detectKeys()
@@ -83,7 +83,7 @@ function detectKeys()
 	}
 }
 ```
-Note how we wont let character to jump again while he is already jumping (!ob.jump). Space key will be counted for starting new jump only if variable jump is false. But if space key is pressed and hero was not yet jumping, we will set variable jump to true and give hero starting speed.
+Note how we won't let character to jump again while he is already jumping (!ob.jump). Space key will be counted for starting new jump only if variable jump is false. But if space key is pressed and hero was not yet jumping, we will set variable jump to true and give hero starting speed.
 
 After left/right arrow keys we will check if variable jump is true and if it is, we will call new "jump" function (function "jump" is not same thing as variable "jump", bad choice of names from me, sorry). This function will be called every step until variable jump is true, so our hero continues jumping even after the space key is released.
 
@@ -159,7 +159,7 @@ function fall (ob)
 	}
 }
 ```
-We cant start falling down if we already are jumping, so first we check if variable jump is false (hero currently stands). If we are standing, we will call the getMyCorners function to get corner points of hero. We use coordinate ob.y+1 to check if point 1 pixel lower then characters current position is walkable. If both corner points below hero (downleft and downright) are walkable (have value of true) that will mean our dear hero is standing on the air.
+We can't start falling down if we already are jumping, so first we check if variable jump is false (hero currently stands). If we are standing, we will call the getMyCorners function to get corner points of hero. We use coordinate ob.y+1 to check if point 1 pixel lower then characters current position is walkable. If both corner points below hero (downleft and downright) are walkable (have value of true) that will mean our dear hero is standing on the air.
 
 To correct the "thou-shall-not-stand-in-the-air" situation, we will force hero to jump by setting variable jump=true. But unlike when space key was pressed, we will set the starting speed of jump to 0, so hero will start to fall down.
 

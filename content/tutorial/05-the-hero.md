@@ -8,14 +8,14 @@ next = "/tutorial/06-keys-to-move/"
 prev = "/tutorial/04-rendering-a-map/"
 +++
 
-No game can exist without the hero. The hero will save the world, rescue the love interest and beat up the bad guys. We will add a hero to our game. They wont save the world yet, they wont do anything useful, but they'll be appear on the world.
+No game can exist without the hero. The hero will save the world, rescue the love interest and beat up the bad guys. We will add a hero to our game. They won't save the world yet, they won't do anything useful, but they'll appear on the world.
 
 ```
 EXAMPLE HERE
 ```
 
 
-The hero is red square :) What, he doesnt look mighty? You can draw your own hero. His movie clip is in the library named "char" and its also been set up to be exported as "char". You should not make the hero movie clip larger then tiles.
+The hero is red square :) What, he doesn't look mighty? You can draw your own hero. His movie clip is in the library named "char" and it's also been set up to be exported as "char". You should not make the hero movie clip larger than tiles.
 
 Also note, how hero movie clip (red square) has registration point centered and tiles movie clip has registration point in the upper left corner:
 
@@ -48,11 +48,11 @@ First line does attach new movie clip from the library in the game.clip (you rem
 
 Then we save the path to the char movie clip into char object, so every time we want to access the movie clip, we can use simpler char.clip instead of typing this movie clip's full path _root.tiles.char. It also saves us from going through all the code if we might need to move char movie clip to somewhere else.
 
-Next we will calculate two properties in the char object: x and y. You may wonder, what for we need more properties, we already have xtile and ytile. Remember, xtile/ytile count the number of tiles, not actual pixels. The x/y properties will hold the pixel coordinates of our char movie clip. Its good idea to have coordinates in the variables before placing movie clip, you may need to change position because hero has hit the wall or has lost the balance and changing variables is easier then changing _x/_y properties.
+Next we will calculate two properties in the char object: x and y. You may wonder, what for we need more properties, we already have xtile and ytile. Remember, xtile/ytile count the number of tiles, not actual pixels. The x/y properties will hold the pixel coordinates of our char movie clip. It's a good idea to have coordinates in the variables before placing movie clip, you may need to change position because hero has hit the wall or has lost the balance and changing variables is easier than changing _x/_y properties.
 
-We will calculate the actual position of our hero by multiplying the tile number he stand on with size of the tiles and adding half the tile size to place char on the center of tile. So, char.xtile * game.tileW gives us tiles number on horisontal multiplied by width of tile taken from the game object.
+We will calculate the actual position of our hero by multiplying the tile number he stand on with size of the tiles and adding half the tile size to place char on the center of tile. So, char.xtile * game.tileW gives us tiles number on horizontal multiplied by width of tile taken from the game object.
 
-Next we save the half the width and height of our hero movie clip into char object. Those will become very useful, when calculating where are the boundaries of hero. Note that you can create your own boundaries, you dont have to use width and height of movie clip. Some heros might have long puffy hair which can collide with walls, then declare your own width and height variables.
+Next we save the half the width and height of our hero movie clip into char object. Those will become very useful, when calculating where are the boundaries of hero. Note that you can create your own boundaries, you don't have to use width and height of movie clip. Some heroes might have long puffy hair which can collide with walls, then declare your own width and height variables.
 
 Last two lines place the char movie clip char.clip to the coordinates we calculated earlier as x and y.
 

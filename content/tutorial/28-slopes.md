@@ -60,7 +60,7 @@ game.Tile5.prototype.frame = 5;
 
 Tile4 has slope moving upward (/) and tile5 has slope moving down (\). Draw the slopes in frames you have set with frame property.
 
-New functions are such nice things. They are fresh, smell good and do things you never new could be done. Lets make checkForSlopes function:
+New functions are such nice things. They are fresh, smell good and do things you never knew could be done. Let's make checkForSlopes function:
 
 ```
 function checkForSlopes (ob, diry, dirx)

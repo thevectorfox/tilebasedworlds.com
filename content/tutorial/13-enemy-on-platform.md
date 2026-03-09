@@ -23,7 +23,7 @@ if (!ob.downleft and !ob.downright)
 	...
 ```
 
-Important number to notice here, is 1 in the ob.y+ob.speed*ob.yMove+1. That will check for wall below next tile. Also note how if statement will be tru only if both upleft and upright corner are walls, if one of them is walkable tile, enemy would walk into air.
+Important number to notice here, is 1 in the ob.y+ob.speed*ob.yMove+1. That will check for wall below next tile. Also note how if statement will be true only if both upleft and upright corner are walls, if one of them is walkable tile, enemy would walk into air.
 
 You can download the source fla with all the code and movie set up here.
 
@@ -37,7 +37,7 @@ EXAMPLE HERE
 ```
 
 
-Lets modify enemyBrain function. When we last time just reversed ob.xMove and ob.yMove, now we will choose randomly new direction to move:
+Let's modify enemyBrain function. When we last time just reversed ob.xMove and ob.yMove, now we will choose randomly new direction to move:
 
 ```
 	...
@@ -69,7 +69,7 @@ You can download the source fla with all the code and movie set up here.
 
  
 
-Thats much nicer, but if we want to make enemy better, we should avoid reversing the last direction.
+That's much nicer, but if we want to make enemy better, we should avoid reversing the last direction.
 
 ```
 EXAMPLE HERE
@@ -105,21 +105,21 @@ else
 }
 ```
 
-This time we first check the current direction. If for example we moved vertically (xMove==0) then we choose randomly 1 or -1 for xMove and set yMove to 0. But if enemy moves into corner, his new direction might send him again into wall. Thats why we get the corner points with new direction and if we detect wall, we reverse the new direction.
+This time we first check the current direction. If for example we moved vertically (xMove==0) then we choose randomly 1 or -1 for xMove and set yMove to 0. But if enemy moves into corner, his new direction might send him again into wall. That's why we get the corner points with new direction and if we detect wall, we reverse the new direction.
 
 You can download the source fla with all the code and movie set up here.
 
  
 
-Ok, enemy moves better since player cant predict where enemy is going to step next. But as you can notice, enemy keeps hugging the walls, he always moves until hitting the wall, then and only then choose another direction. If your map contains large empty areas, player can be sure enemy never comes there. Good example is second room, until hero stays in the center, enemy will never catch him.
+Ok, enemy moves better since player can't predict where enemy is going to step next. But as you can notice, enemy keeps hugging the walls, he always moves until hitting the wall, then and only then choose another direction. If your map contains large empty areas, player can be sure enemy never comes there. Good example is second room, until hero stays in the center, enemy will never catch him.
 
-We will add a chance for enemy to change direction even when he doesnt hit the wall.
+We will add a chance for enemy to change direction even when he doesn't hit the wall.
 
 ```
 EXAMPLE HERE
 ```
 
-I havent figured good description for ability to change direction while walking, so lets add each enemy new property called "turning":
+I haven't figured out a good description for ability to change direction while walking, so let's add each enemy new property called "turning":
 
 ```
 game.Enemy1.prototype.turning = 5;
@@ -137,7 +137,7 @@ if (ob.downleft and ob.upleft and ob.downright and ob.upright and random(100)
 	...
 ```
 
-In case random(100) will have value less then value of ob.turning, we will choose new direction even when we could continue same way.
+In case random(100) will have value less than value of ob.turning, we will choose new direction even when we could continue same way.
 
 You can download the source fla with all the code and movie set up here.
 

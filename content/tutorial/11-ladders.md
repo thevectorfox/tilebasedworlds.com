@@ -8,46 +8,46 @@ next = "/tutorial/12-stupid-enemy/"
 prev = "/tutorial/10-clouds/"
 +++
 
-Ladders are common form of movement in platform games. Hero can use ladders to climb up or down (I bet you didnt know that). We will make character climb when up or down arrow key is pressed and character stands near the ladder:
+Ladders are common form of movement in platform games. Hero can use ladders to climb up or down (I bet you didn't know that). We will make character climb when up or down arrow key is pressed and character stands near the ladder:
 
 ```
 EXAMPLE HERE
 ```
 
-While ladders seam to be easy enough, there are some things to consider. First, what kind of ladders are there?
+While ladders seem to be easy enough, there are some things to consider. First, what kind of ladders are there?
 
 ![](p12_2.gif)
 
-In the picture, there are 4 different types of ladders. In tile A ladder is inside wall tile, which normally is not walkable. What can hero do in tile A? He can climb up and down, but he shouldnt be able to walk left or right or he will be stuck in the wall. Ask anyone, who has been stuck in the wall and they all say it doesnt feel good.
+In the picture, there are 4 different types of ladders. In tile A ladder is inside wall tile, which normally is not walkable. What can hero do in tile A? He can climb up and down, but he shouldn't be able to walk left or right or he will be stuck in the wall. Ask anyone, who has been stuck in the wall and they all say it doesn't feel good.
 
 In tile B ladder tile itself is walkable and tile above it also have ladder, so hero should be able to climb up and down. Hero can also move left or right, but when he does, he should fall down after leaving the ladder.
 
-In tile C there isnt ladder below and hero shouldnt climb down, he can only climb up or walk left/right.
+In tile C there isn't ladder below and hero shouldn't climb down, he can only climb up or walk left/right.
 
-Tile D is not available in all games. Some think thats just a bad level design, ladder doesnt lead anywhere, it ends in the air. Should hero be able to climb above it and stand on the ladder? Can he walk then to the right on the solid tile next to ladder?
+Tile D is not available in all games. Some think that's just a bad level design, ladder doesn't lead anywhere, it ends in the air. Should hero be able to climb above it and stand on the ladder? Can he walk then to the right on the solid tile next to ladder?
 
 Those are just couple of examples, there are many more possible types of ladders, but I hope you can see how important it is to have strict definition before attempting to write code. As games are not all similar, then something fitting perfectly in one game, is waste of time, energy and world peace in other game.
 
 
 ## THE RULES
 
-Lets write down our rules for ladders and movement for hero:
+Let's write down our rules for ladders and movement for hero:
 
 1. Hero can climb on the ladder using up and down arrow keys
 2. Hero can climb up if there is ladder at his current up or down center points
 3. Hero can climb down if the tile his down center point ends up, has ladder
 4. Hero can move left/right from the ladder if none of his corner points will end up in the wall
-5. Hero cant jump from the ladder
+5. Hero can't jump from the ladder
 
 That should do it.
 
 ## ONE LADDER, PLEASE
 
-We will use separate movie clip with ladder graphics that will be attached in the tile when tile has ladder. That way we dont have to draw different graphics for every ladder on different backgrounds. Make sure your ladder movie clip has "Export this movie" checked and it is linked as "ladder".
+We will use separate movie clip with ladder graphics that will be attached in the tile when tile has ladder. That way we don't have to draw different graphics for every ladder on different backgrounds. Make sure your ladder movie clip has "Export this movie" checked and it is linked as "ladder".
 
 ![](p12_3.gif)
 
-In the ladder movie clip draw ladder graphics same height as tile and place them in the center of tile horisontally.
+In the ladder movie clip draw ladder graphics same height as tile and place them in the center of tile horizontally.
 
 As with every other tile, we will declare new type of tile for ladders:
 
@@ -77,9 +77,9 @@ if (game[name].item != "")
 }
 ```
 
-This code checks if property "item" in the current tile has non-empty value. If "item" has value, then we attach movie clip linked with the name as value of "item" property to the current tile and it will have instance name "item". You can attach any other items same way, just dont try to put many items in the same tile.
+This code checks if property "item" in the current tile has non-empty value. If "item" has value, then we attach movie clip linked with the name as value of "item" property to the current tile and it will have instance name "item". You can attach any other items same way, just don't try to put many items in the same tile.
 
-For not typing same code twice, lets move end of moveChar function and make separate function of it naming this new function updateChar. moveChar function will end with:
+For not typing same code twice, let's move end of moveChar function and make separate function of it naming this new function updateChar. moveChar function will end with:
 
 ```
 updateChar (ob, dirx, diry);
@@ -171,7 +171,7 @@ function checkUpLadder (ob)
 }
 ```
 
-This code calculates first up and down center points of our hero. If one of the tiles in those points has ladder property set to true, we can climb up. If there isnt ladder up or down, we check if hero should fall.
+This code calculates first up and down center points of our hero. If one of the tiles in those points has ladder property set to true, we can climb up. If there isn't ladder up or down, we check if hero should fall.
 
 ```
 function checkDownLadder (ob)
@@ -203,9 +203,9 @@ function climb (ob, diry)
 }
 ```
 
-In the climb function we first set the flags climb to true and jump to false. Then we calculate new y position for the hero. Next we will position the hero horisontally in the center of ladder:
+In the climb function we first set the flags climb to true and jump to false. Then we calculate new y position for the hero. Next we will position the hero horizontally in the center of ladder:
 
-ob.x = (ob.xtile * game.tileW) + game.tileW / 2;
+`ob.x = (ob.xtile * game.tileW) + game.tileW / 2;`
 Hero can start climbing as long his center is in the tile with ladder, but it would look weird if he would climb in the left or right side of the ladder.
 
 Last we update the actual position of character using same updateChar function.

@@ -33,38 +33,38 @@ char.x = (char.xtile * game.tileW) + game.tileW / 2;
 char.y = (char.ytile * game.tileW) + game.tileW / 2;
 ```
 
-Don't be shy, look at the two pairs. I can even rewrite the lines for clarity. Lets take the code with char.x, if we replace strange names with simple letters, it says:
+Don't be shy, look at the two pairs. I can even rewrite the lines for clarity. Let's take the code with char.x, if we replace strange names with simple letters, it says:
 
-a = b * c + d
+`a = b * c + d`
 
 now for us to find mouse coordinates, we need to get letter "b" from that equation:
 
-b = (a - d) / c
+`b = (a - d) / c`
 
 and this is exactly, what we have used for mouse. OK, but we were here to talk about isometric. In isometric view we cant get the tile clicked with mouse using same code because we have placed tiles in different way. All the tiles are placed in isometric using code:
 
-xiso = x - y
-yiso = (x + y) / 2
+`xiso = x - y`
+`yiso = (x + y) / 2`
 
-In order to find out, what tile has been clicked, we need to find variables "x" and "y" from those equations. Lets rewrite first line:
+In order to find out, what tile has been clicked, we need to find variables "x" and "y" from those equations. Let's rewrite first line:
 
-x = xiso + y
+`x = xiso + y`
 
 now replace the equation for x into second line:
 
-yiso = (xiso + y + y) / 2
+`yiso = (xiso + y + y) / 2`
 
 which can be rewritten couple of times:
 
-yiso = (xiso + 2 * y) / 2
-2 * yiso = xiso + 2*y
-2 * y = 2 * yiso - xiso
-y = (2 * yiso - xiso) / 2
+`yiso = (xiso + 2 * y) / 2`
+`2 * yiso = xiso + 2*y`
+`2 * y = 2 * yiso - xiso`
+`y = (2 * yiso - xiso) / 2`
 
 And we have created two lines to calculate tile in isometric space from the screen coordinates:
 
-y = (2 * yiso - xiso) / 2
-x = xiso + y
+`y = (2 * yiso - xiso) / 2`
+`x = xiso + y`
 
 ## ACTUAL CODE
 

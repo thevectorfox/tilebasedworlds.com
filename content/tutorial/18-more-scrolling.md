@@ -8,7 +8,7 @@ next = "/tutorial/19-depth/"
 prev = "/tutorial/17-scrolling/"
 +++
 
-Keeping the hero in the center is all fine until we move at the border of map, then we start to see some ugly background outside of the map. You can make this problem disappear, if you build wall tiles inside your map, preventing heros approaches to the edge. But that will need additional planning in the maps, and it adds unnecessary empty area around them. Much better idea is to scroll the background only when hero is not near the edge. Like this:
+Keeping the hero in the center is all fine until we move at the border of map, then we start to see some ugly background outside of the map. You can make this problem disappear, if you build wall tiles inside your map, preventing hero's approaches to the edge. But that will need additional planning in the maps, and it adds unnecessary empty area around them. Much better idea is to scroll the background only when hero is not near the edge. Like this:
 
 ```
 EXAMPLE HERE
@@ -17,11 +17,11 @@ EXAMPLE HERE
 
 ## HOW FAR IS TOO FAR?
 
-Hero will always move, only difference is, that when he reaches the edge of map, we wont scroll the background tiles anymore, making it not scroll. In the left picture hero is from the left edge "halfvisx" number of tiles away. If hero would move more left and the map would scroll, it would reveal an area not covered by the map and the tiles:
+Hero will always move, only difference is, that when he reaches the edge of map, we won't scroll the background tiles anymore, making it not scroll. In the left picture hero is from the left edge "halfvisx" number of tiles away. If hero would move more left and the map would scroll, it would reveal an area not covered by the map and the tiles:
 
 ![](p19_2.gif)
 
-In the right ricture hero is from the bottom edge "halfvisy" number of tiles away. No more scrolling should happen when hero moves down.
+In the right picture hero is from the bottom edge "halfvisy" number of tiles away. No more scrolling should happen when hero moves down.
 
 We have to consider the new positions of hero also when we first build the map. If hero starts near the map edge, he cant be placed in the center. What actually happens, is that we will shift all the tiles, included hero by certain amount when placing them with buildMap function.
 
@@ -32,7 +32,7 @@ game.mapwidth = map[0].length;
 game.mapheight = map.length;
 ```
 
-game.mapwidth will have be the number of horisontal tiles on current map and game.mapheight is number of vertical tiles. We will use those to determine, if hero is near the right or bottom edge of map. Now lets calculate how much we have to move tiles when hero starts near the edge:
+game.mapwidth will be the number of horizontal tiles on current map and game.mapheight is number of vertical tiles. We will use those to determine, if hero is near the right or bottom edge of map. Now let's calculate how much we have to move tiles when hero starts near the edge:
 
 ```
 if(char.xtile < game.halfvisx)
@@ -53,7 +53,7 @@ else if(char.ytile > game.mapheight - game.halfvisy - 1)
 }
 ```
 
-fixx and fixy will have value of number of tiles needed to shift everything to make hero appear in the correct poistion. First line checks if hero is near the left edge, it happens only when xtile is less then halfvisx and then we move tiles by the amount of xtile-halfvisx. In the right edge hero stands only if xtile is more then mapwidth-halfvisx.
+fixx and fixy will have value of number of tiles needed to shift everything to make hero appear in the correct position. First line checks if hero is near the left edge, it happens only when xtile is less than halfvisx and then we move tiles by the amount of xtile-halfvisx. In the right edge hero stands only if xtile is more then mapwidth-halfvisx.
 
 Now we add fixx/fixy to the position of tile:
 
@@ -73,7 +73,7 @@ for (var y = char.ytile - game.halfvisy - fixy; y <= char.ytile
 	{
 		...
 ```
-Thats about building the map. Now lets move on to move the hero.
+That's about building the map. Now let's move on to move the hero.
 
 
 ## MOVING ON THE EDGE
@@ -114,7 +114,7 @@ if(ob.x > game.halfvisx * game.tileW + game.tileW / 2)
 }
 ```
 
-Its the same thing as before, only we first check if hero has moved near the edge. Also for the loop moving tiles from one side to the other work correctly, we have to use our friends fixy/fixx again. Notice that unlike in the buildmap function, we use actual pixel coordinates here because our hero can move not only by whole tile, but also by fraction of tile.
+It's the same thing as before, only we first check if hero has moved near the edge. Also for the loop moving tiles from one side to the other work correctly, we have to use our friends fixy/fixx again. Notice that unlike in the buildMap function, we use actual pixel coordinates here because our hero can move not only by whole tile, but also by fraction of tile.
 
 Same way we modify vertical movement too:
 
@@ -151,7 +151,7 @@ if(ob.y > game.halfvisy * game.tileH + game.tileH / 2)
 }
 ```
 
-Thats all from the scrolling department, next we will look at the depth of movie clips and something very scary called "z-sorting".
+That's all from the scrolling department, next we will look at the depth of movie clips and something very scary called "z-sorting".
 
 You can download the source fla with all the code and movie set up here.
 

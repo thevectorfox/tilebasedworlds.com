@@ -8,7 +8,7 @@ next = "/tutorial/22-isometric-mouse/"
 prev = "/tutorial/20-mouse-to-move/"
 +++
 
-Isometric view is great to add depth into your game. Many famous games use this vie, because its simple to do, but looks good. And best thing about isometric view is how easy it is to create based same old tile based approach. Like this:
+Isometric view is great to add depth into your game. Many famous games use this view, because it's simple to do, but looks good. And best thing about isometric view is how easy it is to create based same old tile based approach. Like this:
 
 ```
 EXAMPLE HERE
@@ -21,11 +21,11 @@ First you should know, that actual isometric view (from the mathematics) is litt
 
 ![](p21_2.gif)
 
-First we rotate the square by 45 degrees and then we make its height half the width. That was simple. Now lets create our tiles and hero:
+First we rotate the square by 45 degrees and then we make its height half the width. That was simple. Now let's create our tiles and hero:
 
 ![](p21_3.gif)
 
-Its important to place graphics to the registration point (little cross, where Flash starts to count coordinates from) like shown in the picture. The wall tile you can draw as high as you want. For the hero, I have left the tile in the picture so you hopefully understand its position better, dont place that rectangle in the final graphics of hero. It would only look strange, if hero walks around, rectangle around him.
+It's important to place graphics to the registration point (little cross, where Flash starts to count coordinates from) like shown in the picture. The wall tile you can draw as high as you want. For the hero, I have left the tile in the picture so you hopefully understand its position better, don't place that rectangle in the final graphics of hero. It would only look strange, if hero walks around, rectangle around him.
 
 
 ## CHANGES TO THE CODE
@@ -77,7 +77,7 @@ ob.clip._x = ob.xiso;
 ob.clip._y = ob.yiso;
 ```
 
-As you can see, new properties xiso and yiso will hold the coordinates of char in the isometri view, but we still have properties x/y. Variable depthshift is needed since our char is not drawn on the center of the tile (look the picture with char), it is shifted up.
+As you can see, new properties xiso and yiso will hold the coordinates of char in the isometric view, but we still have properties x/y. Variable depthshift is needed since our char is not drawn on the center of the tile (look the picture with char), it is shifted up.
 
 **All the collision and movements are calculated in normal way, but in the end position of movie clip is converted into isometric view**. In the end of moveChar function change the char placement same way:
 

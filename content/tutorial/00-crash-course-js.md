@@ -12,7 +12,7 @@ Beginner
 
 So you might be here because you're interested in code or fearful of it. Hopefully, this little read will empower you with some basics. And we'll discover it's really not too scary and kind of exciting what we can do with very little.
 
-These a some foundational concepts. You don't *have* to read or understand this to begin. But if you're unfamiliar with code you might have a better time if you do. I know it's boring and a little hard to relate to these ideas without all the context of what you'll be doing later.
+These are some foundational concepts. You don't *have* to read or understand this to begin. But if you're unfamiliar with code you might have a better time if you do. I know it's boring and a little hard to relate to these ideas without all the context of what you'll be doing later.
 
 You'll see some words in brackets (hello). These are academic terms next to a layman's term. Whoa, that was quite an academic way of saying the brackets contain a technical term. Don't worry too much about these to begin with. Let these words wash over you. In the future, you may be doing more reading about programming or talking with people that do. Sometimes you'll hear or see them and they are a little daunting but really they're just fancy ways of describing something quite basic.
 
@@ -36,7 +36,7 @@ In technical speak, we've combined two values with an operator. This is an expre
 ## Doing something with a thing
 (variables)
 
-That previous example was a complete program. But not very useful. Its a calculator and we have lots of calculators on phones and computers these days. Programs become more interesting when they don't have fixed values. That's where variables come in. Variables are things that are not fixed, they vary.
+That previous example was a complete program. But not very useful. It's a calculator and we have lots of calculators on phones and computers these days. Programs become more interesting when they don't have fixed values. That's where variables come in. Variables are things that are not fixed, they vary.
 
 ```js
 const MyValue = 1
@@ -55,7 +55,7 @@ const age = 123123123123123
 MyValue + MyOtherValue
 ```
 
-So we can store values to a variable and reuse them later in expressions! This is pretty powerful stuff. It's an organisational tool for us to be able to define things.
+So we can store values to a variable and reuse them later in expressions! This is pretty powerful stuff. It's an organizational tool for us to be able to define things.
 
 ## Kinds of things
 (Primitive types)
@@ -86,7 +86,7 @@ For some technical jargon, we call words `string` and number `integer`. It helps
 ## Grouping things
 (Composite types)
 
-So far we've learnt about expressions and types which help us ask the computer to do something. And we've learnt about an organisational tool the `variable`. The next two sections are about more organisational tools. A lot of programming is just trying to keep track of things we ask computers. As humans, we can only think a few things at one time. When the number of things we ask the computer gets bigger, our capacity to think about them melts down. We started struggling to remember what we were asking the computer. (for a more technical summary we would describe this as losing our ability to reason with the program).
+So far we've learnt about expressions and types which help us ask the computer to do something. And we've learnt about an organizational tool the `variable`. The next two sections are about more organizational tools. A lot of programming is just trying to keep track of things we ask computers. As humans, we can only think a few things at one time. When the number of things we ask the computer gets bigger, our capacity to think about them melts down. We started struggling to remember what we were asking the computer. (for a more technical summary we would describe this as losing our ability to reason with the program).
 
 So we defined some variables earlier that kind of looked like information about a Person.
 
@@ -95,7 +95,7 @@ const MyAgeValue = 89
 const MyNameValue = "John"
 ```
 
-This is easy enough for us to digest as at the moment. But if the number of things we trying to keep track of grows it starts to become unmanageable.
+This is easy enough for us to digest as at the moment. But if the number of things we are trying to keep track of grows it starts to become unmanageable.
 
 ```js
 const MyAgeValue = 89
@@ -143,13 +143,13 @@ As your program grows (and it likely will) so will the demands of the types of i
 
 ### The Object
 
-An object is describing one thing with many properties (or many variables). An object looks just like any other variable except we wrap the value with curly brackets `{}`. Lets looks an example.
+An object is describing one thing with many properties (or many variables). An object looks just like any other variable except we wrap the value with curly brackets `{}`. Let's look at an example.
 
 ```js
 const MyFirstObject = {}
 ```
 
-Thats it... except its empty and not very useful when it's empty. So lets make it useful by defining things on it. Things on an object are called `properties`. They act like variables in that we get to name them and assign whatever we like to them. So lets define a person as an object.
+That's it... except it's empty and not very useful when it's empty. So let's make it useful by defining things on it. Things on an object are called `properties`. They act like variables in that we get to name them and assign whatever we like to them. So let's define a person as an object.
 
 ```js
 const Person = {
@@ -158,7 +158,7 @@ const Person = {
 }
 ```
 
-It looks a bit different with those curly brackets. And rather than using the equal character `=` we're using a colon character `:` it might not be obvious right now but we're actually only doing one assignment with the first `Person = {` because these other things are properties of the object they need a different character to make the computer happy. Its a way of declaring many little values as one big value.
+It looks a bit different with those curly brackets. And rather than using the equal character `=` we're using a colon character `:` it might not be obvious right now but we're actually only doing one assignment with the first `Person = {` because these other things are properties of the object they need a different character to make the computer happy. It's a way of declaring many little values as one big value.
 
 Now to get a value from an object it'll look like this.
 
@@ -174,7 +174,7 @@ We can write expressions with objects
 Person1.age + Person2.age
 ```
 
-For reference here are people we define earlier wrapped up in objects. We'll move on for now and take another look at them in the grande finale (you're almost there)
+For reference here are people we define earlier wrapped up in objects. We'll move on for now and take another look at them in the grand finale (you're almost there)
 
 ```js
 const Person1 = {
@@ -268,7 +268,7 @@ So far we've just done simple things. But if I wanted to say hello to person 1 a
 "hello " + Person2.name 
 ```
 
-That's not too bad, but let now let's say I want to say hello to everyone like Yindi and Freyja.
+That's not too bad, but let's say I want to say hello to everyone like Yindi and Freyja.
 
 ```js
 "hello " + Person1.name 
@@ -296,7 +296,7 @@ const SayHelloToSomeone = function(person) {
 
 Ok, this is new, lots of new syntax here. Let me break this down.
 
-We start wit a variable like normal `const SayHelloToSomeone =` then we use the keyword `function` wrapping up the parameter variables in brackets `function(person)`. The parameter `person` acts like a variable inside the function. Functions can optionally return a value with the special keyword `return`.
+We start with a variable like normal `const SayHelloToSomeone =` then we use the keyword `function` wrapping up the parameter variables in brackets `function(person)`. The parameter `person` acts like a variable inside the function. Functions can optionally return a value with the special keyword `return`.
 
 To use our function we would "call" it like this:
 
@@ -306,7 +306,7 @@ SayHelloToSomeone(Person2)
 SayHelloToSomeone(Person3)
 ```
 
-All the messiness is wrapped up in the function. And if we want to chance the greeting, there's only one place to change it. Also if we add more people we can just call the function!
+All the messiness is wrapped up in the function. And if we want to change the greeting, there's only one place to change it. Also if we add more people we can just call the function!
 
 ## Grande finale
 
@@ -354,7 +354,7 @@ const SumAllTheAges = function(peoples) {
 }
 ```
 
-This it quite a challenging problem if it's your first time. There are many different ways to solve it. Here are two possible solutions. But i'd strongly recommend you have a crack at it yourself before looking.
+This is quite a challenging problem if it's your first time. There are many different ways to solve it. Here are two possible solutions. But I'd strongly recommend you have a crack at it yourself before looking.
 
 **Solution 1:**
 

@@ -58,7 +58,7 @@ else if (Key.isDown(Key.DOWN))
 }
 ```
 
-When up or down arrow keys are pressed, we first calculate the x and y movement values and then we call the moveChar function using those. Since we are now passing both values to the moveChar function, we also have to change some code in that function. So far our moveChar function has always got only 0, 1 or -1 in the x or y directions (refresh your memory from tutorial 4).
+When up or down arrow keys are pressed, we first calculate the x and y movement values and then we call the moveChar function using those. Since we are now passing both values to the moveChar function, we also have to change some code in that function. So far our moveChar function has always got only 0, 1 or -1 in the x or y directions (refresh your memory from tutorial 6).
 
 The number 5 here is only as an example, you can use other numbers to change the rotation. Try to use numbers that create full circle in the end (360 degrees). So 2, 4, 6, 12 and 90 are good, but 13.5 and 7 would be bad choice.
 
@@ -121,7 +121,7 @@ function moveChar (ob, dirx, diry)
 }
 ```
 
-I have added check for each movement value to be at least 0.5 pixels. When calculating speedx and speedy using sin and cos functions, Flash will return very small values instead of 0. Something like 0.00000000000000001255. You cant detect so small movement on the screen so we will ignore it.
+I have added check for each movement value to be at least 0.5 pixels. When calculating speedx and speedy using sin and cos functions, Flash will return very small values instead of 0. Something like 0.00000000000000001255. You can't detect so small movement on the screen so we will ignore it.
 
 As you can see, when the hero is rotated, it can move its corners by small amount into the wall tiles. This is happening because we are not taking into account its rotation when calculating the corner points. As long your hero is shaped like a square the corners won't go too much into walls, but when you use very tall rectangle for the hero the bug becomes obvious.
 

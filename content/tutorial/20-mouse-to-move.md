@@ -8,13 +8,13 @@ next = "/tutorial/21-isometric-view/"
 prev = "/tutorial/19-depth/"
 +++
 
-Its time to let go the keyboard and grab that little furry thing on your desk. Not that, the computer mouse. While moving hero around with the keys is fine and has been happening for a long time, we should also understand why mouse is so popular. Mouse is so damn convenient, click here, click there:
+It's time to let go of the keyboard and grab that little furry thing on your desk. Not that, the computer mouse. While moving hero around with the keys is fine and has been happening for a long time, we should also understand why mouse is so popular. Mouse is so convenient, click here, click there:
 
 ```
 EXAMPLE HERE
 ```
 
-Before we jump on the mouse, one thing should be made clear. So far our hero was able to move pixel perfect, not so with the mouse. Mouse control also means hero will be stepping from center of one tile to the center of next and he cant stop somewhere between two tile, look around, whistle nice tune. Moving from one tile another is much simpler the pixel perfect positioning. We dont need collision detection for example, when we want to walk on next tile, we only check if its walkable and then its all happy walking until we reach the center.
+Before we jump on the mouse, one thing should be made clear. So far our hero was able to move pixel perfect, but that is not the case with the mouse. Mouse control also means hero will be stepping from center of one tile to the center of next and he can't stop somewhere between two tiles, look around, whistle nice tune. Moving from one tile to another is much simpler than pixel perfect positioning. We don't need collision detection for example, when we want to walk on next tile, we only check if its walkable and then its all happy walking until we reach the center.
 
 
 ## MAKING THE MOUSE
@@ -29,7 +29,7 @@ Now attach mouse to the stage, above all the tiles. In the buildMap function wri
 _root.attachMovie("mouse", "mouse", 2);
 ```
 
-Everything else in the buildMap function remains the same, so Im not going to go over it again. For mouse cursor to update its position correctly, lets create new function, called work:
+Everything else in the buildMap function remains the same, so I'm not going to go over it again. For mouse cursor to update its position correctly, let's create new function, called work:
 
 ```
 function work()
@@ -52,7 +52,7 @@ onClipEvent (enterFrame)
 }
 ```
 
-As we dont use keys, you can delete detectKeys function in case you have it left over from earlier chapter.
+As we don't use keys, you can delete detectKeys function in case you have it left over from earlier chapter.
 
 Now that we have mouse moving like it should, we add a way to click on stage. Write this to the controller mc:
 
@@ -82,7 +82,7 @@ Here we make sure player actually clicks on walkable tile. You know how players 
 
 ## MOVING THE HERO TO RIGHT TILE
 
-In the getTarget function we did set variable "moving" to true and as long that variable is true, our hero tries to move. Since we dont want the hero to move when game starts, set the moving variable to false in char object:
+In the getTarget function we did set variable "moving" to true and as long that variable is true, our hero tries to move. Since we don't want the hero to move when game starts, set the moving variable to false in char object:
 
 ```
 char = {xtile:2, ytile:1, speed:2, moving:false};
@@ -103,7 +103,7 @@ else
 }
 ```
 
-Until moving variable is false, hero stands still and doesnt play any animations. But when moving is true, we play the walking animation and call function to move the char. Dont worry, for the movement from tile-to-tile our moveChar function is much simpler:
+Until moving variable is false, hero stands still and doesn't play any animations. But when moving is true, we play the walking animation and call function to move the char. Don't worry, for the movement from tile-to-tile our moveChar function is much simpler:
 
 ```
 function moveChar(ob)
@@ -152,9 +152,9 @@ function moveChar(ob)
 
 First line in the function checks if hero is currently standing in the center of tile and that would mean he is ready to move, if he only knew where to go and why to go there. The x position and y position are checked using modulo "%". This basically checks the remainder of dividing chars position by tile size. When x and y are in the center of tile, then dividing them with tileW gives remainder 0 and we start to pick new direction.
 
-Advanced pathfinding algorithms are available for Flash too, mainly A*. Most of them are going to take a lot of time to calculate path from point A to point B. Our method here is very basic and doesnt find any paths, hero moves in one direction until it reaches the target coordinate or wall. Then he moves vertically same way.
+Advanced pathfinding algorithms are available for Flash too, mainly A*. Most of them are going to take a lot of time to calculate path from point A to point B. Our method here is very basic and doesn't find any paths, hero moves in one direction until it reaches the target coordinate or wall. Then he moves vertically same way.
 
-To know which way to turn, lets look at the going right decision:
+To know which way to turn, let's look at the going right decision:
 
 ```
 if(game["t_" + ob.ytile + "_" + (ob.xtile+1)].walkable and game.targetx > ob.xtile)
@@ -162,9 +162,9 @@ if(game["t_" + ob.ytile + "_" + (ob.xtile+1)].walkable and game.targetx > ob.xti
 	...
 ```
 
-We check if the tile 1 step right from the heros current tile, has walkable property set to true. And we also check if the mouse was clicked right from the hero.
+We check if the tile 1 step right from the hero's current tile, has walkable property set to true. And we also check if the mouse was clicked right from the hero.
 
-Thats all for today about controlling the hero with mouse.
+That's all for today about controlling the hero with mouse.
 
 You can download the source fla with all the code and movie set up here.
 

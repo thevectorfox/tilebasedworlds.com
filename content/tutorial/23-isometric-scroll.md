@@ -8,13 +8,13 @@ next = "/tutorial/24-rotate-hero/"
 prev = "/tutorial/22-isometric-mouse/"
 +++
 
-Isometric scrolling is no different from the normal top-down view. With very little trouble we can easily combine scrolling engine (chapter 13) with isometric (chapter 16). This will result into isometric scrolling with diamond shaped view:
+Isometric scrolling is no different from the normal top-down view. With very little trouble we can easily combine scrolling engine (chapter 17) with isometric (chapter 21). This will result into isometric scrolling with diamond shaped view:
 
 ```
 EXAMPLE HERE
 ```
 
-We will count the movement of the char exactly like in the normal scroll and when tile has gone too far, we will move it to th other side. And after all the calculations are done and positions found, we convert it to the isometric view. I'm not going into exact code here, as the idea is explained before and you can look it up from the fla too.
+We will count the movement of the char exactly like in the normal scroll and when tile has gone too far, we will move it to the other side. And after all the calculations are done and positions found, we convert it to the isometric view. I'm not going into exact code here, as the idea is explained before and you can look it up from the fla too.
 
 You can download the source fla with all the code and movie set up here.
 
@@ -22,7 +22,7 @@ Diamond view has 1 big flaw: its shaped like diamond. Yes, diamonds are girls be
 
 ![](p24_2.gif)
 
-It doesn't look bad in the picture, but it will get worse when you make your game bigger. More extra tiles will be around to eat away those precious CPU cycles. If your game is small enough and you don't want to bother too much with the more complex system, use simple isometric scroll. Rest of us, lets move on.
+It doesn't look bad in the picture, but it will get worse when you make your game bigger. More extra tiles will be around to eat away those precious CPU cycles. If your game is small enough and you don't want to bother too much with the more complex system, use simple isometric scroll. Rest of us, let's move on.
 
 
 ## SHAPE IT LIKE RECTANGLE
@@ -56,7 +56,7 @@ else
 }
 ```
 
-var noisoy = y * game.tileW / 2 + ob.yiso;
+`var noisoy = y * game.tileW / 2 + ob.yiso;`
 Because we want the isometric tiles to tile up nicely, we have to shift every other row to the right by half the actual tile width.
 
 Next we will use the formulas from the iso mouse tutorial to find out which tile in isometric space should be shown it that position.

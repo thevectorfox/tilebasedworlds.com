@@ -39,9 +39,9 @@ game.Tile1.prototype.walkable = false;
 game.Tile1.prototype.frame = 2;
 ```
 
-So, we have our map in the variable myMap. Next line after the map declares object called "game". We will use this object to hold all the stuff needed, we could hold all the stuff in the _root or anywhere, but its cleaner to put stuff in one certain place so we always know where it is.
+So, we have our map in the variable myMap. Next line after the map declares object called "game". We will use this object to hold all the stuff needed, we could hold all the stuff in the _root or anywhere, but it's cleaner to put stuff in one certain place so we always know where it is.
 
-Notice how we also give that game object two properties tileW=30 and tileH=30. Thats how wide and how tall all our tiles will be. Tiles dont have to be squares, you could also use wide or tall rectangles. Whenever we want to know width or height of any tile, we can write:
+Notice how we also give that game object two properties tileW=30 and tileH=30. That's how wide and how tall all our tiles will be. Tiles don't have to be squares, you could also use wide or tall rectangles. Whenever we want to know width or height of any tile, we can write:
 
 ```
 game.tileW;
@@ -67,12 +67,13 @@ Next 2 lines give that Tile0 object and every object created with Tile0 prototyp
 
 Are you ready to make some tiles? We will make function buildMap that will handle all the tiles placement. If you want to create more levels, you can use same function with different map array. buildMap function will do following:
 
-attach container movie clip
-loop through map array
-create new object for each tile
-attach all the tiles clips
-place the tiles in correct position
-show correct frame in each tile
+- attach container movie clip
+- loop through map array
+- create new object for each tile
+- attach all the tiles clips
+- place the tiles in correct position
+- show correct frame in each tile
+
 Here is the code for it:
 
 ```
@@ -105,13 +106,13 @@ Next line does attach container movie clip on the stage:
 _root.attachMovie("empty", "tiles", ++d);
 ```
 
-You will need empty movie clip (no graphics inside it) in the library. Right click on that movie clip in the library, choose "Linkage..." check "Export this symbol" and write "empty" in the Identifier box. Now the attachMovie command will look for movie clip with linkage name "empty" in the library. It will then make new instance of this movie clip on the stage and give this new mc name "tiles". That movie clip will hold all the tiles we place on stage. Nice thing about using container movie, is that when we want to remove our tiles (like when game ends), we only have to remove "tiles" movie clip and all the tiles will disappear. If you attach all the tiles directly into _root level, and you go to next frame (like game end frame) then the attached tiles wont disappear, you have to delete all of them with actionscript.
+You will need empty movie clip (no graphics inside it) in the library. Right click on that movie clip in the library, choose "Linkage..." check "Export this symbol" and write "empty" in the Identifier box. Now the attachMovie command will look for movie clip with linkage name "empty" in the library. It will then make new instance of this movie clip on the stage and give this new mc name "tiles". That movie clip will hold all the tiles we place on stage. Nice thing about using container movie, is that when we want to remove our tiles (like when game ends), we only have to remove "tiles" movie clip and all the tiles will disappear. If you attach all the tiles directly into _root level, and you go to next frame (like game end frame) then the attached tiles won't disappear, you have to delete all of them with actionscript.
 
-Once we have movie clip for all the tiles, we also link it to our game object game.clip = _root.tiles. Now when we need to access tiles movie clip, we can use game.clip. Thats handy, if we ever need to place tiles somewhere else, we only have to rename this line and not go through all the code.
+Once we have movie clip for all the tiles, we also link it to our game object game.clip = _root.tiles. Now when we need to access tiles movie clip, we can use game.clip. That's handy, if we ever need to place tiles somewhere else, we only have to rename this line and not go through all the code.
 
 Then we make two new variables mapWidth and mapHeight. Those we will use in the loop to step through map array. mapWidth has value of length of first element in the map array map[0].length. Look back in the "Map format" chapter if you forgot how the map array looks like. First element of map array is another array [1, 1, 1, 1, 1, 1, 1, 1] and mapWidth will have the value of its length or number of elements. We now know how wide will our map be.
 
-Same way mapHeight will have value of map.length, thats number of rows in the map array. And thats how many rows we will need to make.
+Same way mapHeight will have value of map.length, that's number of rows in the map array. And that's how many rows we will need to make.
 
 We will loop through the map array using lines:
 
@@ -125,20 +126,20 @@ for (var i = 0; i < mapHeight; ++i)
 }
 ```
 
-We start variable i from 0 and will add +1 to it until it is less then height of our map. Variable j loops from 0 to width of our map.
+We start variable i from 0 and will add +1 to it until it is less than height of our map. Variable j loops from 0 to width of our map.
 
-Variable "name" from the line var name = "t_"+i+"_"+j gives us name of out new tile object. Lets suppose i=0 and j=1, then name = "t_0_1". If i=34 and j=78, then name has value "t_34_78".
+Variable "name" from the line var name = "t_"+i+"_"+j gives us name of our new tile object. Let's suppose i=0 and j=1, then name = "t_0_1". If i=34 and j=78, then name has value "t_34_78".
 
 Now we create new tile object:
 
 ```
 game[name] = new game["Tile"+map[i][j]]
 ```
-In the left side game[name] will show that new tile object is placed inside game object, like all our stuff. Value of map[i][j] gives us number from map array depending what are i and j values. We then use keyword "new" to create new tile object from the prorotypes we declared earlier. Now we have new object in the game object representing current tile.
+In the left side game[name] will show that new tile object is placed inside game object, like all our stuff. Value of map[i][j] gives us number from map array depending what are i and j values. We then use keyword "new" to create new tile object from the prototypes we declared earlier. Now we have new object in the game object representing current tile.
 
 In next lines we attach new movie clip on stage and use game.clip[name] to access it. Movie clip will be placed on correct x/y position using j and i variables multiplied by width or height of tiles. As our new tile object inherited "frame" property from its prototype, we use it to go to correct frame with gotoAndStop command.
 
-When we want to create tiles from map, we call out buildmap function like this:
+When we want to create tiles from map, we call our buildMap function like this:
 
 ```
 buildMap(myMap);

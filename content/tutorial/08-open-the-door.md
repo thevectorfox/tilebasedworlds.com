@@ -68,9 +68,9 @@ As you probably already guessed, door tile can be stepped on, it shows frame 3 a
 
 The doors use something called "inheritance", which may sound terrible, but is actually a good thing. The "doors" objects are all created using "Doors" template and all the tiles containing doors inherit all the properties of "door" object, for example they all are walkable and show frame 3.
 
-Every door we crate must have following information: what number of map to show next, what is the new x and y position of our character. If you dont move the character to new position, then tiles will be changed, but hero stays at the same spot and this doesnt look correct. Word of caution about new coordinates for the hero. You should avoid placing hero in the next map also on the door tile as if he just stepped in from the wall. If new x/y position is also door, then as soon player moves, this next door in new map is detected and hero is sent back. Remember, place your hero next to door tile in new map!
+Every door we create must have the following information: what number of map to show next, what is the new x and y position of our character. If you don't move the character to new position, then tiles will be changed, but hero stays at the same spot and this doesn't look correct. Word of caution about new coordinates for the hero. You should avoid placing hero in the next map also on the door tile as if he just stepped in from the wall. If new x/y position is also door, then as soon player moves, this next door in new map is detected and hero is sent back. Remember, place your hero next to door tile in new map!
 
-When new door object is made, we pass 3 variables to it: newmap, newcharx, newchary. And new door object will have those values attached to its properties. So, when number 2 is set in the map array, we know its going to be made from Tile2 template and since Tile2 objects are created from Doors templates, it will have all the properties of Doors object. Tile2 object passes newmap=2 to the Doors template, so all the Tile2 objects will send hero to the map2. You can have more then 1 similar door in the game. You may want to put Tile2 type doors in several maps, and they all send hero to the map2.
+When new door object is made, we pass 3 variables to it: newmap, newcharx, newchary. And new door object will have those values attached to its properties. So, when number 2 is set in the map array, we know its going to be made from Tile2 template and since Tile2 objects are created from Doors templates, it will have all the properties of Doors object. Tile2 object passes newmap=2 to the Doors template, so all the Tile2 objects will send hero to the map2. You can have more than 1 similar door in the game. You may want to put Tile2 type doors in several maps, and they all send hero to the map2.
 
 ## MORE ACTIONS
 
@@ -82,7 +82,7 @@ if (game["t_" + ob.ytile + "_" + ob.xtile].door and ob == _root.char)
 	changeMap(ob);
 }
 ```
-Here after we have moved the char (or some other moving object) we will check if the tile char is standing now, is door. As we dont want map to change when bullet or enemy steps on the door tile, we will also check if current object is the hero. We will use changeMap function for the map change:
+Here after we have moved the char (or some other moving object) we will check if the tile char is standing now, is door. As we don't want map to change when bullet or enemy steps on the door tile, we will also check if current object is the hero. We will use changeMap function for the map change:
 
 ```
 function changeMap(ob)
@@ -100,4 +100,4 @@ This code should be pretty obvious, get the values from the door tile and update
 ```
 char.clip.gotoAndStop(char.frame);
 ```
-Thats it, make some maps and play with doors.
+That's it, make some maps and play with doors.
