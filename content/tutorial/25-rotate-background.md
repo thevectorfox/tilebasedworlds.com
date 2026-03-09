@@ -8,8 +8,6 @@ next = "/tutorial/26-pathfinding-breadth-first/"
 prev = "/tutorial/24-rotate-hero/"
 +++
 
-# ROTATE THE THE BACKGROUND
-
 In the last chapter our hero gained the ability to rotate and walk in any angle. While the hero is surely very thankful for it (and lets be honest, who wouldn't) we can make more interesting by scrolling and rotating the background. The hero will stay in place, but the background is rotated with left/right arrow keys and like rotatable background isnt enough to make human race happier, the background will also scroll with up/down arrow keys.
 
 ```

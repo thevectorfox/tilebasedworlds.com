@@ -8,9 +8,6 @@ next = "/tutorial/08-open-the-door/"
 prev = "/tutorial/06-keys-to-move/"
 +++
 
-# HIT THE WALL
-# HIT THE WALL
-
 Its no fun having hero that can walk, but cant hit the wall. We will make our hero to feel the power of solid brick wall. Or any other tile we decide to be not walkable:
 
 ```

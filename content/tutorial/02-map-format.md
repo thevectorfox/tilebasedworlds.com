@@ -8,9 +8,6 @@ next = "/tutorial/03-more-maps/"
 prev = "/tutorial/01-why-tiles/"
 +++
 
-# MAP FORMAT
-# MAP FORMAT
-
 Maps are a type of 
 
 

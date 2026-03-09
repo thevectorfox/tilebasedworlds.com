@@ -8,8 +8,6 @@ next = "/tutorial/11-ladders/"
 prev = "/tutorial/09-jumping/"
 +++
 
-# CLOUDS
-
 So far we have hit our hero against the wall. And that was fun. But the brick wall is not the only type of wall we could make. Many games have "cloud" type of walls, they allow hero to move through them from left or right and also jump up, but when hero is falling down, he will stand on it. Look at the example:
 
 ```

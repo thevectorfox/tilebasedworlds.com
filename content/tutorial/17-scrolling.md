@@ -8,8 +8,6 @@ next = "/tutorial/18-more-scrolling/"
 prev = "/tutorial/16-moving-tiles/"
 +++
 
-# SCROLLING
-
 Before we start to scroll, we must make one thing very clear. Flash is slow. Flash is extremely slow. Scrolling means moving hundreds of tiles on screen and it should happen 20-30 times in second. Too many scrolling tiles means Flash cant draw them in time and slows down. Your game will crawl like a sleeping snail.
 
 "What?" you might wonder, "no scrolling? And how did snail fall to sleep?".

@@ -8,8 +8,6 @@ next = "/tutorial/14-shoot-him/"
 prev = "/tutorial/12-stupid-enemy/"
 +++
 
-# ENEMY ON PLATFORM
-
 If you want to have enemies in the side view jumping game like this (in the second room):
 
 ```

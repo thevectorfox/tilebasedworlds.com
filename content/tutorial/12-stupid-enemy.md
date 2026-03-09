@@ -8,8 +8,6 @@ next = "/tutorial/13-enemy-on-platform/"
 prev = "/tutorial/11-ladders/"
 +++
 
-# STUPID ENEMY
-
 We have worked hard to get our hero moving, but he has no challenge. We need something more. No, we dont need food and drinks and pretty girls, what we need, is some enemies. Enemies are like salt in the soup, without it everything tastes lame. Good games have smart enemies, but we will start with simple dumb enemies. All they do, is walk back and worth and check if they have touched the hero:
 
 ```

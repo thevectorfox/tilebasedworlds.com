@@ -8,8 +8,6 @@ next = "/tutorial/09-jumping/"
 prev = "/tutorial/07-hit-the-wall/"
 +++
 
-# OPEN THE DOOR
-
 How long can you stay in one room? How long will you look at same picture? Yep, we need more rooms to explore. That means a way to change the map, create new room from tiles and place the hero in correct position.
 
 ```

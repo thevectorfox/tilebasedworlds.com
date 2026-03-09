@@ -8,9 +8,6 @@ next = "/tutorial/06-keys-to-move/"
 prev = "/tutorial/04-rendering-a-map/"
 +++
 
-# THE HERO
-# THE HERO
-
 No game can exist without the hero. The hero will save the world, rescue the love interest and beat up the bad guys. We will add a hero to our game. They wont save the world yet, they wont do anything useful, but they'll be appear on the world.
 
 ```

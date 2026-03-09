@@ -8,8 +8,6 @@ next = "/tutorial/24-rotate-hero/"
 prev = "/tutorial/22-isometric-mouse/"
 +++
 
-# ISOMETRIC SCROLL
-
 Isometric scrolling is no different from the normal top-down view. With very little trouble we can easily combine scrolling engine (chapter 13) with isometric (chapter 16). This will result into isometric scrolling with diamond shaped view:
 
 ```

@@ -8,9 +8,6 @@ next = "/tutorial/05-the-hero/"
 prev = "/tutorial/03-more-maps/"
 +++
 
-# Rending a map
-# Rending a map
-
 As you saw in the chapter "Map format", we will have our map in a two-dimensional array. Now we will make the tiles appear on the screen by rendering the structure to view.
 
 The result should look like this:

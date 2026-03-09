@@ -8,8 +8,6 @@ next = "/tutorial/10-clouds/"
 prev = "/tutorial/08-*/"
 +++
 
-# JUMPING
-
 Lets turn our game from up view to the side view so we can add jumping. In this example we are looking to the game from side and our hero can walk left and right with arrow keys. He will also be able to jump with space key. Like this:
 
 ```

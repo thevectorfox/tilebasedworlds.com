@@ -1,11 +1,9 @@
 +++
-title = "Tutorial Series"
+title = "Tile Based Worlds Tutorial Series"
 date = 2026-03-08T19:30:00+11:00
 weight = -1
 draft = false
 +++
-
-# Tile Based Worlds Tutorial Series
 
 A comprehensive guide to building tile-based games using JavaScript and p5.js. This series covers everything from basic programming concepts to advanced techniques like pathfinding and isometric graphics.
 

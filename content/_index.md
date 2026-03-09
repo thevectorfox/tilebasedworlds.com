@@ -4,8 +4,6 @@ date = 2026-03-08T19:54:58+11:00
 draft = false
 +++
 
-# Tile Based Worlds
-
 Explore the fun and beauty of ordered tile worlds! This site teaches techniques and processes to build tile-based games or effects using [p5.js](https://p5js.org/).
 
 ## Start Your Journey

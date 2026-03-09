@@ -8,8 +8,6 @@ next = "/tutorial/19-depth/"
 prev = "/tutorial/17-scrolling/"
 +++
 
-# MORE SCROLLING
-
 Keeping the hero in the center is all fine until we move at the border of map, then we start to see some ugly background outside of the map. You can make this problem disappear, if you build wall tiles inside your map, preventing heros approaches to the edge. But that will need additional planning in the maps, and it adds unnecessary empty area around them. Much better idea is to scroll the background only when hero is not near the edge. Like this:
 
 ```

@@ -8,8 +8,6 @@ next = "/tutorial/12-stupid-enemy/"
 prev = "/tutorial/10-clouds/"
 +++
 
-# LADDERS
-
 Ladders are common form of movement in platform games. Hero can use ladders to climb up or down (I bet you didnt know that). We will make character climb when up or down arrow key is pressed and character stands near the ladder:
 
 ```

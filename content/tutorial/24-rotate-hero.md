@@ -8,8 +8,6 @@ next = "/tutorial/25-rotate-background/"
 prev = "/tutorial/23-isometric-scroll/"
 +++
 
-# ROTATE THE HERO
-
 Hopefully you have noticed how our hero has been so far walking straight. He could walk straight to the left or straight to the right, but not in any angle. Now we will allow player to rotate the hero and walk in any direction. Play with this example, left and right arrow keys to rotate, up and down arrow keys to move:
 
 ```

@@ -8,8 +8,6 @@ next = "/tutorial/17-scrolling/"
 prev = "/tutorial/15-getting-items/"
 +++
 
-# MOVING TILES
-
 Gather up, boys and girls, for today I am going to tell you a little story about moving tiles. Some of you may know it already by the name "moving platform", dont be fooled by the name, its still same cute thing.
 
 Once, long time ago, in the land of tile based games, lived a young tile. He was a happy tile. One fine day a hero came to him and asked: "Young tile, why dont you move?"

@@ -8,8 +8,6 @@ next = "/tutorial/23-isometric-scroll/"
 prev = "/tutorial/21-isometric-view/"
 +++
 
-# ISOMETRIC MOUSE
-
 Now that we know how to make isometric view and how to control the hero with mouse, we should go to sleep and forget all about those... Wait, no, I wanted to say we should now combine isometrics and mouse. Hey, wake up!
 
 ```

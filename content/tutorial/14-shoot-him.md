@@ -8,8 +8,6 @@ next = "/tutorial/15-getting-items/"
 prev = "/tutorial/13-enemy-on-platform/"
 +++
 
-# SHOOT HIM
-
 You can kill the enemies in many ways. You can use sword, gun or words (extremely powerful weapon that takes long time to master). Lets see how we can shoot the enemy (use SHIFT key to shoot):
 
 ```

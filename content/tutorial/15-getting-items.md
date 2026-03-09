@@ -8,8 +8,6 @@ next = "/tutorial/16-moving-tiles/"
 prev = "/tutorial/14-shoot-him/"
 +++
 
-# GETTING ITEMS
-
 In this chapter we will look how to make our hero to pick up some items from the ground. You know the stuff: crystals, coins, dead spiders, healing potions, ammunition:
 
 ```

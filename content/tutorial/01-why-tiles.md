@@ -8,9 +8,6 @@ next = "/tutorial/02-map-format/"
 prev = "/tutorial/00-crash-course-js/"
 +++
 
-# WHY TILES?
-# WHY TILES?
-
 Before diving into coding games, lets talk little about tile based games. Why would you want to use tiles anyway? Are tile based games easier to make or perhaps they are more complex then art based games?
 
 Tiles have been used for making games for a long time. When computers didn't have speeds of GHz and hundreds of MB memory. Slow speed and limited amount of memory forced game makers to use clever ways to make games look better and run faster.

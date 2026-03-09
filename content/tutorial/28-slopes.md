@@ -8,8 +8,6 @@ next = ""
 prev = "/tutorial/27-pathfinding-best-first/"
 +++
 
-# SLOPES
-
 This time we will see how to add slopes:
 
 ```

@@ -8,8 +8,6 @@ next = "/tutorial/27-pathfinding-best-first/"
 prev = "/tutorial/25-rotate-background/"
 +++
 
-# PATHFINDING
-
 One thing common so far with all our examples is how the hero is dumb. If you tell him to move left, he would go left. Surely being dumb is nice when you are in the army, but our hero should have some sort of brains to find its way through the dangers of the world. So, lets put in some pathfinding.
 
 Before we do, perhaps it would be good idea to say out loud and clear, what is pathfinding. Pathfinding is finding the path from tile A to the tile B. Phew, that went well. And didn't take days.

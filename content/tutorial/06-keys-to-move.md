@@ -8,8 +8,6 @@ next = "/tutorial/07-hit-the-wall/"
 prev = "/tutorial/05-the-hero/"
 +++
 
-# KEYS TO MOVE
-# KEYS TO MOVE
 
 In this chapter we are going to move our hero using arrow keys in 4 direction. He will face in the direction of movement and show walking animation while moving. Animation is stopped when standing still. Try it here:
 

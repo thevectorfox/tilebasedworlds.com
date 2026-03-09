@@ -8,8 +8,6 @@ next = "/tutorial/21-isometric-view/"
 prev = "/tutorial/19-depth/"
 +++
 
-# MOUSE TO MOVE
-
 Its time to let go the keyboard and grab that little furry thing on your desk. Not that, the computer mouse. While moving hero around with the keys is fine and has been happening for a long time, we should also understand why mouse is so popular. Mouse is so damn convenient, click here, click there:
 
 ```

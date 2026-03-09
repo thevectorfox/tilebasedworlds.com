@@ -8,8 +8,6 @@ next = "/tutorial/20-mouse-to-move/"
 prev = "/tutorial/18-more-scrolling/"
 +++
 
-# DEPTH
-
 So far we have kept our game stricktly two-dimensional. That means if some tile is in front of other tile, it will remain in front no matter what happens in the game. And for those poor unhappy tiles placed in the background will never make it to the front row. Luckily for the tiles on back and maybe not so luckily for the tiles currently in front, we can change the situation. To make our game look better, we will bring in the "depth", creating illusion of objects being closer or further. Here is an example (move the hero below and above same black wall tile):
 
 

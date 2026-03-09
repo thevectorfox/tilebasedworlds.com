@@ -8,9 +8,6 @@ next = "/tutorial/04-rendering-a-map/"
 prev = "/tutorial/02-map-format/"
 +++
 
-# MORE MAPS
-# MORE MAPS
-
 You might wonder, why exactly have I chosen this kind of map format. I cant say this is absolutely best way to go, I cant say this map format creates maps fastest or creates smallest file size. I can only say that after couple years of messing with tile based games, I have found this format to suit best my needs. But lets look at other possible ways to hold your map data.
 
 

@@ -8,8 +8,6 @@ next = "/tutorial/01-why-tiles/"
 prev = ""
 +++
 
-# Crash Course
-
 Beginner
 
 So you might be here because you're interested in code or fearful of it. Hopefully, this little read will empower you with some basics. And we'll discover it's really not too scary and kind of exciting what we can do with very little.
