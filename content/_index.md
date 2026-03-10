@@ -4,34 +4,54 @@ date = 2026-03-08T19:54:58+11:00
 draft = false
 +++
 
-Explore the fun and beauty of ordered tile worlds! This site teaches techniques and processes to build tile-based games or effects using [p5.js](https://p5js.org/).
+Ever dreamed of creating your own games? 🎮 You're about to discover the secret behind some of gaming's greatest hits - from Super Mario Bros to Stardew Valley, from classic Zelda to modern indies like Celeste. They all share one powerful technique: **TILE-BASED WORLDS!**
 
-## Start Your Journey
+Transform from complete beginner to confident game developer with hands-on tutorials that'll have you building playable games from day one. No boring theory - just pure, creative game-making magic! ✨
 
-Ready to dive into tile-based game development? Begin with our comprehensive tutorial series:
+## Start Your Epic Journey 🚀
 
-**[🎮 Start Tutorial Series](/tutorial/)** - A complete guide from programming basics to advanced techniques
+Ready to build the games you've always imagined? Jump into our interactive tutorial series:
 
-### What You'll Learn
+**[🎮 Start Tutorial Series](/tutorial/)** - From zero to game developer in one epic adventure!
 
-- **Programming Fundamentals** - JavaScript crash course for beginners  
-- **Tile Basics** - Why tiles? Map formats and rendering
-- **Character Control** - Movement, collision detection, and jumping
-- **Game Mechanics** - Doors, enemies, shooting, and items
-- **Advanced Graphics** - Scrolling, depth, and isometric views
-- **AI & Pathfinding** - Smart enemies and navigation algorithms
+### What You'll CREATE 🛠️
 
-### About This Site
+**By the end of this series, you'll have built:**
 
-This work is inspired by Tonypa's original tile-based tutorials for ActionScript, modernized for JavaScript and the web. The tutorials use [Pixi](https://pixijs.com/), an approachable library that is well suited for rendering graphics in the web.
+- **🕹️ Your First Interactive World** - Complete with a hero you control and solid walls that feel real
+- **🏃 Platform Game Mechanics** - Jumping, moving platforms, and smooth character movement  
+- **🤖 Smart Enemies** - AI that hunts you down using professional pathfinding algorithms
+- **💥 Combat System** - Shooting, item collection, and interactive game objects
+- **🌍 Epic Game Levels** - Scrolling worlds, multiple layers, and isometric 3D-style maps
+- **🎯 Complete Games** - From simple demos to full playable experiences you'll be proud to share!
 
-No programming experience required - we start from the very beginning and build up to advanced concepts step by step.
+**Plus you'll master:**
+- Modern JavaScript that powers the web 💻
+- PixiJS graphics that run smoothly everywhere 🚀
+- Professional game development patterns 📚
+- Problem-solving skills that transfer to any coding project 🧠
+
+### Why This Works ⚡
+
+**Interactive Learning That Actually Sticks:**
+- 🎯 **Hands-on from day one** - Build real games, not boring exercises
+- 🔥 **Modern web tech** - Learn JavaScript & PixiJS that powers today's games  
+- 🚀 **Beginner-friendly progression** - Start simple, build complexity naturally
+- 💡 **Professional techniques** - Same methods used in indie hits and AAA games
+
+*Inspired by the legendary Tonypa tutorials, completely modernized for today's web developers and game creators.*
+
+**Zero experience needed** - We start from absolute basics and build your confidence with every chapter! 💪
 
 ---
 
-**Ready to start?**
+## Ready to Build Something AMAZING? 🎮
 
-→ **[Begin with the JavaScript Crash Course](/tutorial/00-crash-course-js/)**
+**Choose your adventure:**
 
-→ **[Or jump ahead to rending a map](/tutorial/01-why-tiles/)**
+🚀 **[Complete Beginner? Start Here!](/tutorial/00-crash-course-js/)** - JavaScript crash course designed for future game developers
+
+🎯 **[Know Some Code? Jump to Game Building!](/tutorial/01-why-tiles/)** - Dive straight into creating tile-based worlds
+
+**Your journey begins NOW! Pick a path and let's create something incredible together!** ✨
 
