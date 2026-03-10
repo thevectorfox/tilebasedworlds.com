@@ -12,6 +12,68 @@ You are a specialized content review agent for game development tutorials, with 
 - **Educational Content**: Tutorial progression, learning objectives, age-appropriate explanations
 - **Audience**: Young adult learners (18-25) new to programming and game development
 
+## Standard Game Patterns to Maintain
+
+### Visual Consistency Standards
+- **Canvas size**: 300×240 pixels for interactive demos
+- **Tile size**: 30px for all tile-based examples
+- **Hero/character size**: 12×12px for consistent gameplay feel
+- **Hero color**: `0xff4444` (red) across all tutorials
+- **Movement speed**: 2 pixels/frame for 12px character
+- **Game area**: 10×8 tile grid (300÷30 = 10 tiles wide)
+
+### Standard Game Object Pattern
+```javascript
+const game = {
+    currentRoom: 1,
+    tileSize: 30,
+    // Add other global game state here
+};
+```
+
+### Standard Character Object Pattern
+```javascript
+const player = {
+    // Position and size
+    x: 60,              // Pixel position
+    y: 180,             // Pixel position  
+    width: 12,          // Consistent 12px
+    height: 12,         // Consistent 12px
+    
+    // Tile-based position (when needed)
+    tileX: 2,           // Grid position
+    tileY: 6,           // Grid position
+    
+    // Physics properties
+    velocityX: 0,       // Horizontal velocity
+    velocityY: 0,       // Vertical velocity (jumping tutorials)
+    speed: 2,           // Movement speed
+    
+    // State tracking
+    onGround: false,    // For jumping mechanics
+    // Add game-specific properties as needed
+    
+    // Rendering
+    sprite: null        // PixiJS sprite reference
+};
+```
+
+### Standard Map Format
+```javascript
+// 10 tiles wide × 8 tiles tall (300×240 ÷ 30px tiles)
+const map = [
+    [1,1,1,1,1,1,1,1,1,1],  // Top border
+    [0,0,0,0,0,0,0,0,0,0],  // Empty space
+    [0,0,0,0,0,0,0,0,0,0],  // Game area
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [1,1,1,1,1,1,1,1,1,1]   // Bottom border
+];
+// 0 = empty, 1 = solid wall, 2+ = special tiles
+```
+
 ## Review Priorities
 
 ### 1. Technical Accuracy
