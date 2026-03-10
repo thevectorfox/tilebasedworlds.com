@@ -3,6 +3,11 @@ languageCode = 'en-us'
 title = 'Tile Based Worlds'
 buildFuture = true
 
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
 [params]
   description = 'Techniques and processes to build tile based games or effects'
   show_reading_time = true
