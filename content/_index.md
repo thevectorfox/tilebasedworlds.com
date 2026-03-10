@@ -23,10 +23,15 @@ Ready to dive into tile-based game development? Begin with our comprehensive tut
 
 ### About This Site
 
-This work is inspired by Tonypa's original tile-based tutorials for ActionScript, modernized for JavaScript and the web. The tutorials use [p5.js](https://p5js.org/), an approachable library supported by the Processing Foundation.
+This work is inspired by Tonypa's original tile-based tutorials for ActionScript, modernized for JavaScript and the web. The tutorials use [Pixi](https://pixijs.com/), an approachable library that is well suited for rendering graphics in the web.
 
 No programming experience required - we start from the very beginning and build up to advanced concepts step by step.
 
 ---
 
-**Ready to start?** → **[Begin with the JavaScript Crash Course](/tutorial/00-crash-course-js/)**
+**Ready to start?**
+
+→ **[Begin with the JavaScript Crash Course](/tutorial/00-crash-course-js/)**
+
+→ **[Or jump ahead to rending a map](/tutorial/01-why-tiles/)**
+
