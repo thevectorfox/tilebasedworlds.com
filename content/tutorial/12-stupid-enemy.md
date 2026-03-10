@@ -8,144 +8,532 @@ next = "/tutorial/13-enemy-on-platform/"
 prev = "/tutorial/11-ladders/"
 +++
 
-We have worked hard to get our hero moving, but he has no challenge. We need something more. No, we don't need food and drinks and pretty girls, what we need, is some enemies. Enemies are like salt in the soup, without it everything tastes lame. Good games have smart enemies, but we will start with simple dumb enemies. All they do, is walk back and forth and check if they have touched the hero:
+Time to add some DANGER to your world! 👾 A game without enemies is like a movie without conflict - technically possible, but nowhere near as exciting! You're about to breathe life into your levels with patrolling enemies that turn peaceful exploration into heart-pounding challenge. Even "stupid" enemies can create incredible tension and satisfaction!
 
-```
-EXAMPLE HERE
-```
+<div id="enemyDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="enemyCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Arrow Keys to move, avoid the purple and turquoise enemies!<br>
+        <strong>Try this:</strong> Watch how enemies patrol back and forth - simple but effective!
+    </div>
+</div>
 
-So far we have had two types of objects: hero and tiles. Hero is moved by the player, tiles wont move. The enemies will be like hero, only player cant move them, we will give them brains for moving. We will make two different enemies, first will walk up and down, second will walk left and right. They both will turn around when they hit the wall.
+<script type="module">
+import { Application, Sprite, Container, Graphics, Ticker } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
 
-Before you start to think your game needs very-very complex enemies, think again. Many games don't actually use smart enemies, or if they do, not all of them are too bright. You don't have unlimited resources with Flash, so your 100 smart enemies using complex A* pathfinding will slow down your game too much. If you can, make some enemies dumb and some smarter, in the end player might not even notice the difference. Beside, we all know how we like to be smarter than others, so let the player feel that joy too. :)
+const canvas = document.getElementById('enemyCanvas');
+const app = new Application();
 
+await app.init({
+    canvas: canvas,
+    width: 300,
+    height: 240,
+    backgroundColor: 0x87CEEB
+});
 
-## PREPARE THE ENEMY
+// Game constants
+const TILE_SIZE = 30;
 
-Create enemy movie clips same way you made hero (look at the tutorial "The Hero" if you forgot). They should have 4 keyframes with left/up/down/right animations. They should also be set exported as "enemy1" and "enemy2". Now let's add enemies array:
-
-```
-myEnemies = [
-[0],
-[[1, 6, 1]],
-[[2, 1, 3]]
+// Create a map with platforms for enemies to patrol
+const map = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,0,0,1,1,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,1,0,0,0,0,0,0,1,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1]
 ];
+
+// Enemy definitions - different types with different behaviors
+const enemyTypes = {
+    HORIZONTAL: {
+        color: 0x8A2BE2,
+        moveX: 1,
+        moveY: 0,
+        speed: 1
+    },
+    VERTICAL: {
+        color: 0x8A2BE2,
+        moveX: 0,
+        moveY: 1,
+        speed: 1
+    }
+};
+
+// Enemy spawn data for this level
+const enemySpawns = [
+    { type: 'HORIZONTAL', x: 2, y: 3 },
+    { type: 'VERTICAL', x: 8, y: 1 },
+    { type: 'HORIZONTAL', x: 1, y: 5 }
+];
+
+// Create map display
+const mapContainer = new Container();
+app.stage.addChild(mapContainer);
+
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        if (map[row][col] === 1) {
+            const tile = new Graphics()
+                .rect(0, 0, TILE_SIZE, TILE_SIZE)
+                .fill(0x8B4513);
+            tile.x = col * TILE_SIZE;
+            tile.y = row * TILE_SIZE;
+            mapContainer.addChild(tile);
+        }
+    }
+}
+
+// Create hero
+const hero = new Graphics()
+    .rect(0, 0, 12, 12)
+    .fill(0xff4444);
+hero.x = 60;
+hero.y = 180;
+app.stage.addChild(hero);
+
+// Hero object
+const player = {
+    sprite: hero,
+    x: 60,
+    y: 180,
+    width: 12,
+    height: 12,
+    speed: 2,
+    alive: true
+};
+
+// Enemy system
+const enemies = [];
+
+// Create enemies from spawn data
+function createEnemies() {
+    enemySpawns.forEach((spawn, index) => {
+        const type = enemyTypes[spawn.type];
+        const enemySprite = new Graphics()
+            .rect(0, 0, 10, 10)
+            .fill(type.color);
+        
+        const enemy = {
+            id: index,
+            sprite: enemySprite,
+            x: spawn.x * TILE_SIZE + TILE_SIZE/2 - 5,
+            y: spawn.y * TILE_SIZE + TILE_SIZE/2 - 5,
+            width: 10,
+            height: 10,
+            moveX: type.moveX,
+            moveY: type.moveY,
+            speed: type.speed,
+            type: spawn.type
+        };
+        
+        enemy.sprite.x = enemy.x;
+        enemy.sprite.y = enemy.y;
+        app.stage.addChild(enemy.sprite);
+        enemies.push(enemy);
+    });
+}
+
+// Input handling
+const keys = {};
+window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+// Collision detection
+function isSolid(x, y) {
+    const col = Math.floor(x / TILE_SIZE);
+    const row = Math.floor(y / TILE_SIZE);
+    
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) {
+        return true; // Treat out of bounds as solid
+    }
+    
+    return map[row][col] === 1;
+}
+
+// Check if moving to position would hit wall
+function wouldHitWall(x, y, width, height) {
+    return isSolid(x, y) || isSolid(x + width, y) ||
+           isSolid(x, y + height) || isSolid(x + width, y + height);
+}
+
+// Distance between two points
+function distance(obj1, obj2) {
+    const dx = obj1.x - obj2.x;
+    const dy = obj1.y - obj2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+// Update player
+function updatePlayer() {
+    if (!player.alive) return;
+    
+    let newX = player.x;
+    let newY = player.y;
+    
+    if (keys['ArrowLeft']) newX -= player.speed;
+    if (keys['ArrowRight']) newX += player.speed;
+    if (keys['ArrowUp']) newY -= player.speed;
+    if (keys['ArrowDown']) newY += player.speed;
+    
+    // Check wall collisions
+    if (!wouldHitWall(newX, player.y, player.width, player.height)) {
+        player.x = newX;
+    }
+    if (!wouldHitWall(player.x, newY, player.width, player.height)) {
+        player.y = newY;
+    }
+    
+    // Keep in bounds
+    player.x = Math.max(0, Math.min(player.x, 300 - player.width));
+    player.y = Math.max(0, Math.min(player.y, 240 - player.height));
+    
+    player.sprite.x = player.x;
+    player.sprite.y = player.y;
+}
+
+// Enemy AI - simple but effective!
+function updateEnemies() {
+    enemies.forEach(enemy => {
+        // Calculate next position
+        const nextX = enemy.x + enemy.moveX * enemy.speed;
+        const nextY = enemy.y + enemy.moveY * enemy.speed;
+        
+        // Check if next position hits wall
+        if (wouldHitWall(nextX, nextY, enemy.width, enemy.height)) {
+            // Hit wall - reverse direction!
+            enemy.moveX = -enemy.moveX;
+            enemy.moveY = -enemy.moveY;
+        } else {
+            // Safe to move
+            enemy.x = nextX;
+            enemy.y = nextY;
+        }
+        
+        // Update sprite position
+        enemy.sprite.x = enemy.x;
+        enemy.sprite.y = enemy.y;
+        
+        // Check collision with player
+        if (player.alive && distance(enemy, player) < (enemy.width + player.width) / 2 + 2) {
+            playerDie();
+        }
+    });
+}
+
+// Game over
+function playerDie() {
+    player.alive = false;
+    player.sprite.tint = 0x666666; // Gray out dead player
+    
+    // Show game over message
+    setTimeout(() => {
+        player.alive = true;
+        player.sprite.tint = 0xFFFFFF;
+        player.x = 60;
+        player.y = 180;
+    }, 2000);
+}
+
+// Game loop
+function gameLoop() {
+    updatePlayer();
+    updateEnemies();
+}
+
+// Initialize and start
+createEnemies();
+app.ticker.add(gameLoop);
+</script>
+
+## Why "Stupid" Enemies Are Actually Genius! 🧠
+
+Before you think your game needs super-intelligent AI, let's talk strategy! Many legendary games use beautifully simple enemy patterns:
+
+**🔴 Pac-Man ghosts**: Simple chase/scatter patterns that create complex emergent gameplay
+**🦔 Sonic badniks**: Basic back-and-forth patrolling that's predictable yet challenging  
+**🍄 Mario Goombas**: Walk in straight lines, but placement makes them deadly
+**👾 Space Invaders**: Move in formation - simple rules, intense gameplay
+
+**Why simple enemies work:**
+- 🎯 **Predictable = Fair**: Players can learn patterns and improve
+- ⚡ **Performance friendly**: Hundreds of simple enemies > few complex ones
+- 🎭 **Personality through movement**: Each pattern creates different feelings
+- 🧩 **Placement matters more than AI**: Smart level design beats smart AI
+
+**The wisdom**: Players don't need enemies to surprise them with complex decisions. They need enemies that create interesting spatial puzzles, timing challenges, and satisfying patterns to overcome!
+
+### Our Enemy Types
+
+We'll create two fundamental enemy archetypes:
+
+**🔄 Horizontal Patroller**
+- Walks left ↔ right between walls
+- Creates timing-based challenges
+- Perfect for corridor and platform sections
+
+**⬆⬇ Vertical Patroller**  
+- Moves up ↔ down between barriers
+- Controls vertical space effectively
+- Great for ladder and climbing sections
+
+These simple behaviors combine to create surprisingly complex level challenges!
+
+
+## Setting Up Enemy Types: Modern Class Design
+
+Let's create a clean, flexible enemy system using contemporary JavaScript patterns:
+
+```javascript
+// Enemy type definitions - easy to extend!
+const ENEMY_TYPES = {
+    HORIZONTAL_PATROL: {
+        color: 0x8A2BE2,    // Purple
+        moveX: 1,           // Moves right initially
+        moveY: 0,           // No vertical movement
+        speed: 1,           // Pixels per frame
+        size: 10            // Square size
+    },
+    
+    VERTICAL_PATROL: {
+        color: 0x00CED1,    // Dark turquoise
+        moveX: 0,           // No horizontal movement
+        moveY: 1,           // Moves down initially
+        speed: 1,
+        size: 10
+    },
+    
+    FAST_HORIZONTAL: {
+        color: 0x32CD32,    // Lime green
+        moveX: 1,
+        moveY: 0,
+        speed: 2,           // Twice as fast!
+        size: 8             // Smaller but faster
+    }
+};
+
+// Enemy spawn configuration for each level
+const levelEnemies = {
+    1: [
+        { type: 'HORIZONTAL_PATROL', tileX: 2, tileY: 1 },
+        { type: 'VERTICAL_PATROL', tileX: 8, tileY: 1 },
+        { type: 'FAST_HORIZONTAL', tileX: 1, tileY: 5 }
+    ],
+    
+    2: [
+        { type: 'HORIZONTAL_PATROL', tileX: 3, tileY: 3 },
+        { type: 'HORIZONTAL_PATROL', tileX: 6, tileY: 4 }
+    ]
+};
 ```
 
-So, for the map1 we have declared 1 array representing 1 enemy. The numbers give us the type of enemy (woohooo! we have more than one type of dumb enemies) and its starting position. When map is built, the enemy is placed on the tile x=6, y=1. Same way we have 1 enemy in map2, but that's different type. You can add more enemies into one map, but you have to place them into walkable tiles, not inside the walls.
-
-Let's declare some templates for enemies:
-
-```
-game.Enemyp1 = function () {};
-game.Enemyp1.prototype.xMove = 0;
-game.Enemyp1.prototype.yMove = 1;
-game.Enemyp1.prototype.speed = 2;
-
-game.Enemyp2 = function () {};
-game.Enemyp2.prototype.xMove = 1;
-game.Enemyp2.prototype.yMove = 0;
-game.Enemyp2.prototype.speed = 2;
-```
-
-They look similar, but they behave different way. Enemyp1 will walk vertically because its property yMove is 1, but Enemyp2 will walk left and right. You can set enemies xMove/yMove properties into 1 or -1 or 0. Those are same values we pass to the moveChar function from detect keys function. Please avoid setting both xMove/yMove to non-zero unless you want your enemies to move diagonally.
-
-If you make both xMove and yMove equal to 0, you will have non-moving enemy. That's not much fun, but you never know what you might need.
-
-The speed property determines how fast enemy will move. Different enemies can have different speeds too.
+**Why this approach rocks:**
+- 📦 **Organized data**: All enemy properties in one place
+- 🚀 **Easy expansion**: Add new types without touching existing code
+- 🎯 **Level-specific**: Different enemy layouts per level
+- 🔧 **Tweakable**: Change speeds, colors, sizes instantly
 
 
-## PLACE THE ENEMY
+## Spawning Enemies: Bringing Danger to Life
 
-In the buildMap function add after doors and before char following piece of code:
+Let's create a robust enemy spawning system:
 
-```
-var enemies = myEnemies[game.currentMap];
-game.currentEnemies = enemies.length;
-for (var i = 0; i < game.currentEnemies; ++i)
-{
-	var name = "enemy" + i;
-	game[name]= new game["Enemyp" + enemies[i][0]];
-	game.clip.attachMovie("enemy" + enemies[i][0], name, 10001 + i);
-	game[name].clip = game.clip[name];
-	game[name].xtile = enemies[i][1];
-	game[name].ytile = enemies[i][2];
-	game[name].width = game.clip[name]._width / 2;
-	game[name].height = game.clip[name]._height / 2;
-	game[name].x = (game[name].xtile * game.tileW) + game.tileW / 2;
-	game[name].y = (game[name].ytile * game.tileH) + game.tileH / 2;
-	game[name].clip._x = game[name].x;
-	game[name].clip._y = game[name].y;
+```javascript
+// Active enemies array
+const enemies = [];
+let nextEnemyId = 0;
+
+// Spawn enemies for current level
+function spawnEnemiesForLevel(levelId) {
+    // Clear existing enemies
+    enemies.forEach(enemy => enemy.sprite.destroy());
+    enemies.length = 0;
+    
+    // Get enemy spawn data for this level
+    const spawns = levelEnemies[levelId] || [];
+    
+    spawns.forEach(spawnData => {
+        createEnemy(spawnData.type, spawnData.tileX, spawnData.tileY);
+    });
+}
+
+// Create individual enemy
+function createEnemy(typeName, tileX, tileY) {
+    const type = ENEMY_TYPES[typeName];
+    if (!type) {
+        console.warn(`Unknown enemy type: ${typeName}`);
+        return;
+    }
+    
+    // Create enemy sprite
+    const sprite = new Graphics()
+        .rect(0, 0, type.size, type.size)
+        .fill(type.color)
+        .stroke({width: 1, color: 0x000000}); // Black outline
+    
+    // Create enemy object
+    const enemy = {
+        id: nextEnemyId++,
+        sprite: sprite,
+        type: typeName,
+        
+        // Position (convert tile coords to pixels)
+        x: tileX * TILE_SIZE + (TILE_SIZE - type.size) / 2,
+        y: tileY * TILE_SIZE + (TILE_SIZE - type.size) / 2,
+        width: type.size,
+        height: type.size,
+        
+        // Movement properties
+        moveX: type.moveX,
+        moveY: type.moveY, 
+        speed: type.speed,
+        
+        // State
+        active: true
+    };
+    
+    // Position sprite
+    sprite.x = enemy.x;
+    sprite.y = enemy.y;
+    
+    // Add to stage and tracking
+    app.stage.addChild(sprite);
+    enemies.push(enemy);
+    
+    return enemy;
 }
 ```
 
-What's happening here? First we get enemies array for current map. Next we will set variable currentEnemies to the length of enemies array so we can always know how many enemies we have created. Then we loop through the enemies array (remember, we currently used only 1 enemy in each map, but there can be more).
-
-Variable name will have the name of our new enemy, so they are named "enemy0", "enemy1", "enemy2"... Then we make new enemy object from the templates we declared earlier:
-
-```
-game[name]= new game["Enemy" + enemies[i][0]];
-```
-
-from the enemies array we get the number in first position of first enemy. In our example there is number 1, so, new enemy is created using Enemy1 template. In map2 the enemy is made using Enemy2 template because in myEnemies array there is number 2.
-
-Next lines will add starting coordinates, width and height to the enemy object. Then its position is calculated and enemy is placed into correct position.
-
-But, you may cry out loud, but he doesn't move! No worry, we will make him move.
+**Smart spawning features:**
+- 🎯 **Tile-based positioning**: Place enemies precisely on grid
+- 🆔 **Unique IDs**: Track individual enemies for special behaviors
+- 🧹 **Clean lifecycle**: Proper creation and cleanup
+- 🎨 **Visual variety**: Different colors and sizes per type
 
 
-## MOVE THE ENEMY
+## Enemy AI: Simple Brains, Effective Results! 🤖
 
-Like most people, most enemies need brains. And so, let's write enemyBrain function:
+Time to give our enemies the intelligence to patrol and threaten the player:
 
-```
-function enemyBrain ()
-{
-	for (var i = 0; i < game.currentEnemies; ++i)
-	{
-		var name = "enemy" + i;
-		var ob = game[name];
-		getMyCorners (ob.x + ob.speed * ob.xMove, ob.y + ob.speed * ob.yMove, ob);
-		if (ob.downleft and ob.upleft and ob.downright and ob.upright)
-		{
-			moveChar(ob, ob.xMove, ob.yMove);
-		}
-		else
-		{
-			ob.xMove = -ob.xMove;
-			ob.yMove = -ob.yMove;
-		}
-		var xdist = ob.x - char.x;
-		var ydist = ob.y - char.y;
-		if (Math.sqrt(xdist * xdist + ydist * ydist) < ob.width + char.width)
-		{
-			removeMovieClip(_root.tiles);
-			_root.gotoAndPlay(1);
-		}
-	}
+```javascript
+// Main enemy AI update function
+function updateEnemies() {
+    enemies.forEach(enemy => {
+        if (!enemy.active) return;
+        
+        // Calculate next position
+        const nextX = enemy.x + enemy.moveX * enemy.speed;
+        const nextY = enemy.y + enemy.moveY * enemy.speed;
+        
+        // Check for wall collision
+        if (wouldHitWall(nextX, nextY, enemy.width, enemy.height)) {
+            // Hit wall - reverse direction!
+            enemy.moveX = -enemy.moveX;
+            enemy.moveY = -enemy.moveY;
+            
+            // Optional: Add turning animation or sound here
+            enemy.sprite.tint = 0xFFAAAA; // Brief flash
+            setTimeout(() => {
+                if (enemy.active) enemy.sprite.tint = 0xFFFFFF;
+            }, 100);
+        } else {
+            // Safe to move - update position
+            enemy.x = nextX;
+            enemy.y = nextY;
+        }
+        
+        // Update sprite to match position
+        enemy.sprite.x = enemy.x;
+        enemy.sprite.y = enemy.y;
+        
+        // Check collision with player
+        checkEnemyPlayerCollision(enemy);
+    });
+}
+
+// Collision detection between enemy and player
+function checkEnemyPlayerCollision(enemy) {
+    if (!player.alive) return;
+    
+    const distance = getDistance(enemy, player);
+    const minDistance = (enemy.width + player.width) / 2;
+    
+    if (distance < minDistance) {
+        handlePlayerHit(enemy);
+    }
+}
+
+// Handle what happens when player gets hit
+function handlePlayerHit(enemy) {
+    player.alive = false;
+    
+    // Visual feedback
+    player.sprite.tint = 0xFF0000; // Flash red
+    enemy.sprite.tint = 0xFFFF00;  // Enemy flashes yellow
+    
+    // Respawn after delay
+    setTimeout(() => {
+        respawnPlayer();
+    }, 1500);
+}
+
+function respawnPlayer() {
+    player.alive = true;
+    player.sprite.tint = 0xFFFFFF;
+    
+    // Reset to starting position
+    player.x = 60;
+    player.y = 180;
+    
+    // Reset enemy colors
+    enemies.forEach(enemy => {
+        enemy.sprite.tint = 0xFFFFFF;
+    });
+}
+
+// Utility: Distance between two objects
+function getDistance(obj1, obj2) {
+    const dx = (obj1.x + obj1.width/2) - (obj2.x + obj2.width/2);
+    const dy = (obj1.y + obj1.height/2) - (obj2.y + obj2.height/2);
+    return Math.sqrt(dx * dx + dy * dy);
 }
 ```
 
-As you can see, we again loop through all the enemies using variable game.currentEnemies. ob refers in every step to the current enemy object. When i=0, ob=enemy0 and so on.
+### The Magic of Simple AI
 
-We then call getMyCorners function to check if enemy will step into wall. If he won't go into wall, all the variables upleft, downleft, upright and downright will be true saying those tiles are walkable. It's safe to call moveChar function using xMove and yMove properties (which are -1, 0 or 1) same way we called moveChar from key detection to move char, but since we pass enemy object to moveChar, the enemy will be moved. Told you we can reuse same function to move many objects :)
+**What makes this "stupid" AI actually brilliant:**
 
-In case enemy would hit the wall tile, we reverse the xMove and yMove so enemy will start to move into opposite direction. If yMove was 1, it will become -1, but if it was 0, it will remain 0.
+🔄 **Predictable patterns**: Players can learn and plan around enemy movements
 
-Last part of brains checks if enemy is close enough to the hero and if they are too close, game ends. Of course, game doesn't usually end so easily, you would reduce hero's life or do other tricks, but that's up to you. We use simple equation called "Pythagoras theorem" to calculate the distance between enemy and hero. If you really-really want pixel perfect collision, you could create complex hitTest here, but I don't see reason for it. Don't get too close or you die!
+⚡ **Instant feedback**: Enemies react immediately to walls with direction changes
 
-To call this function in every step, add line in the end of detectKeys function:
+🎯 **Consistent threat**: Always moving, always dangerous, never idle
 
+🎨 **Visual personality**: Different colors and speeds create distinct "characters"
+
+**Performance benefits:**
+- 📊 **Efficient**: Simple math operations, no complex pathfinding
+- 🚀 **Scalable**: Can handle dozens of enemies without lag
+- 🧩 **Modular**: Easy to add new behaviors or modify existing ones
+
+**Design wisdom**: The best enemy AI doesn't try to outsmart the player - it creates interesting spatial and temporal puzzles for them to solve!
+
+### Integration with Game Loop
+
+```javascript
+// Add to your main game loop
+function gameLoop() {
+    handleInput();      // Player movement
+    updateEnemies();    // Enemy AI and movement
+    updatePhysics();    // Gravity, collisions, etc.
+    render();          // Draw everything
+}
+
+app.ticker.add(gameLoop);
 ```
-_root.enemyBrain();
-```
 
-That's it, you can add simple enemies to be avoided. Next chapter we make our enemies behave more like human being, that is, run around until hitting the wall, then change the direction and run more.
+**🎊 Boom!** Your peaceful world is now alive with danger and challenge! These simple patrolling enemies transform static levels into dynamic puzzles. Players must now time their movements, find safe paths, and feel the thrill of narrowly avoiding threats!
 
-You can download the source fla with all the code and movie set up here.
-
- 
-
-Big thanks to kuRTko for spotting annoying bug in the enemies code. I have updated the tutorials and flas, but if you happen to see code somewhere where enemies are declared as:
-game.Enemy1 = function ()
-instead of game.Enemyp1 = function (), please fix them. Note, the bug was that enemy prototypes used same name "enemy+number" as actual enemy objects. The prototypes should be named as "enemyp+number". Don't forget to check the line in the buildMap function too, it should be after update:
-game[name]= new game["Enemyp"+enemies[i][0]];
+**Coming next**: We'll make these enemies even smarter by adding platform awareness and more sophisticated patrol behaviors! [Next: Enemy on Platform](/tutorial/13-enemy-on-platform/)
