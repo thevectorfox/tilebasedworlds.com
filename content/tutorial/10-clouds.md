@@ -11,7 +11,7 @@ prev = "/tutorial/09-jumping/"
 Time to add one of the most satisfying platform mechanics in gaming - **cloud platforms**! These one-way surfaces let you jump up through them and move through them from the sides, but when you're falling down, you land on top. Think Mario's cloud platforms or Mega Man's jump-through floors - they make platforming feel incredibly smooth and natural!
 
 <div id="cloudDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="cloudCanvas" width="640" height="480" style="border: 2px solid #333; background: #87CEEB;"></canvas>
+    <canvas id="cloudCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
     <div style="margin-top: 10px;">
         <strong>Controls:</strong> Arrow Keys to move, Spacebar to jump<br>
         <strong>Try this:</strong> Jump up through the blue cloud platforms, then fall back down onto them!
@@ -26,13 +26,13 @@ const app = new Application();
 
 await app.init({
     canvas: canvas,
-    width: 640,
-    height: 480,
+    width: 300,
+    height: 240,
     backgroundColor: 0x87CEEB
 });
 
 // Game constants
-const TILE_SIZE = 40;
+const TILE_SIZE = 30;
 const GRAVITY = 0.8;
 const JUMP_POWER = -15;
 
@@ -43,16 +43,14 @@ const CLOUD = 2;
 
 // Create a map with cloud platforms
 const map = [
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,2,2,2,0,0,0,2,2,2,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,2,2,0,0,0,0,2,2,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,2,2,2,0,0,0,0,0,0,0,2,2,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    [1,1,1,1,1,1,1,1,1,1],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,2,2,0,0,2,2,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,2,0,0,0,0,0],
+    [0,2,2,0,0,0,0,2,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [1,1,1,1,1,1,1,1,1,1]
 ];
 
 // Create map display
@@ -82,22 +80,22 @@ for (let row = 0; row < map.length; row++) {
 
 // Create hero
 const hero = new Graphics()
-    .rect(0, 0, 30, 35)
-    .fill(0xFF6B6B);
-hero.x = 80;
-hero.y = map.length * TILE_SIZE - TILE_SIZE - 35;
+    .rect(0, 0, 12, 12)
+    .fill(0xff4444);
+hero.x = 60;
+hero.y = map.length * TILE_SIZE - TILE_SIZE - 12;
 app.stage.addChild(hero);
 
 // Hero properties
 const player = {
     sprite: hero,
-    x: 80,
-    y: map.length * TILE_SIZE - TILE_SIZE - 35,
-    width: 30,
-    height: 35,
+    x: 60,
+    y: map.length * TILE_SIZE - TILE_SIZE - 12,
+    width: 12,
+    height: 12,
     velocityX: 0,
     velocityY: 0,
-    speed: 4,
+    speed: 2,
     jumpPower: JUMP_POWER,
     onGround: false,
     wasFalling: false
@@ -206,7 +204,7 @@ function updatePlayer() {
     }
     
     // Keep player in bounds
-    player.x = Math.max(0, Math.min(player.x, 640 - player.width));
+    player.x = Math.max(0, Math.min(player.x, 300 - player.width));
     player.y = Math.max(0, player.y);
     
     // Update sprite position

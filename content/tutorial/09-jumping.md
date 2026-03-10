@@ -11,7 +11,7 @@ prev = "/tutorial/08-open-the-door/"
 Time to add one of the most satisfying mechanics in gaming - jumping! We're switching from top-down to side-scrolling view, where your hero can run left and right with arrow keys and launch into the air with the spacebar. Let's create that perfect jump feel that makes players want to bounce around your world!
 
 <div id="jumpingDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="jumpCanvas" width="640" height="480" style="border: 2px solid #333; background: #87CEEB;"></canvas>
+    <canvas id="jumpCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
     <div style="margin-top: 10px;">
         <strong>Controls:</strong> Arrow Keys to move, Spacebar to jump
     </div>
@@ -25,28 +25,26 @@ const app = new Application();
 
 await app.init({
     canvas: canvas,
-    width: 640,
-    height: 480,
+    width: 300,
+    height: 240,
     backgroundColor: 0x87CEEB
 });
 
 // Game constants
-const TILE_SIZE = 40;
+const TILE_SIZE = 30;
 const GRAVITY = 0.8;
 const JUMP_POWER = -15;
 
 // Create a simple map
 const map = [
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,1,1,1,0,0,0,1,1,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    [1,1,1,1,1,1,1,1,1,1],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,1,1,0,0,1,1,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,1,1,0,0,0],
+    [0,0,1,1,0,0,0,0,1,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [1,1,1,1,1,1,1,1,1,1]
 ];
 
 // Create map display
@@ -68,22 +66,22 @@ for (let row = 0; row < map.length; row++) {
 
 // Create hero
 const hero = new Graphics()
-    .rect(0, 0, 30, 35)
-    .fill(0xFF6B6B);
-hero.x = 80;
-hero.y = map.length * TILE_SIZE - TILE_SIZE - 35;
+    .rect(0, 0, 12, 12)
+    .fill(0xff4444);
+hero.x = 60;
+hero.y = map.length * TILE_SIZE - TILE_SIZE - 12;
 app.stage.addChild(hero);
 
 // Hero properties
 const player = {
     sprite: hero,
-    x: 80,
-    y: map.length * TILE_SIZE - TILE_SIZE - 35,
-    width: 30,
-    height: 35,
+    x: 60,
+    y: map.length * TILE_SIZE - TILE_SIZE - 12,
+    width: 12,
+    height: 12,
     velocityX: 0,
     velocityY: 0,
-    speed: 4,
+    speed: 2,
     jumpPower: JUMP_POWER,
     onGround: false,
     jumping: false
@@ -149,7 +147,7 @@ function updatePlayer() {
     }
     
     // Keep player in bounds
-    player.x = Math.max(0, Math.min(player.x, 640 - player.width));
+    player.x = Math.max(0, Math.min(player.x, 300 - player.width));
     player.y = Math.max(0, player.y);
     
     // Update sprite position
@@ -204,13 +202,13 @@ const player = {
     // Position and movement
     x: 100,
     y: 200,
-    width: 30,
-    height: 35,
+    width: 12,
+    height: 12,
     
     // Physics properties
     velocityX: 0,
     velocityY: 0,
-    speed: 4,              // Left/right movement speed
+    speed: 2,              // Left/right movement speed
     jumpPower: -15,        // Initial upward velocity
     gravity: 0.8,          // How fast gravity pulls down
     
