@@ -8,77 +8,118 @@ next = "/tutorial/03-more-maps/"
 prev = "/tutorial/01-why-tiles/"
 +++
 
-Maps are a type of 
+Let's build our first game world! Maps in tile-based games are stored as **2D arrays** - think of them as blueprints that tell your game exactly where to place walls, floors, enemies, and treasure. You're about to learn how to store entire game levels in just a few lines of code!
 
+## TWO DIMENSIONAL ARRAYS: YOUR GAME WORLD IN CODE
 
-## TWO DIMENSIONAL ARRAY
+Don't worry - 2D arrays aren't from another dimension! They're just arrays containing other arrays. Think of it like this: each row in your game world is an array, and your map is an array of those rows. Let's start simple!
 
-We need two-dimensional array for map. No, it's not something out of another dimension, it's only array with array as every element. Confused? Let's see.
-
-Normal, simple array that normal people can make:
-```
-myArray = ["a", "b", "c", "d"];
-```
-
-That was easy. You can get value of first element with myArray[0], which is "a", second element myArray[1] has value "b", and so on.
-
-Now the clever part! What if we don't put "a", "b" and "c" into array, but we put other arrays there? Yes, we can do that. Here, lets make some arrays:
-
-```
-a = ["a1", "a2", "a3"];
-b = ["b1", "b2", "b3"];
-c = ["c1", "c2", "c3"];
-myArray = [a, b, c];
+A basic array might store your player's inventory:
+```js
+const playerInventory = ["sword", "shield", "potion", "key"];
 ```
 
-Now we have declared array myArray and each element in there is also an array. So, the value of first element `myArray[0]` is a and a is array of ["a1", "a2", "a3"], the second element has value ["b1", "b2", "b3"]. If you write:
+Easy! You get the first item with `playerInventory[0]` ("sword"), second with `playerInventory[1]` ("shield"), and so on.
 
+Now here's where it gets EXCITING! What if instead of storing simple strings, we store arrays that represent rows of our game world? Check this out:
+
+```js
+// Each array represents one row of tiles in our game world
+const topRow = [1, 1, 1, 1, 1];    // All walls across the top
+const midRow = [1, 0, 0, 0, 1];    // Walls on sides, empty space inside  
+const botRow = [1, 1, 1, 1, 1];    // All walls across the bottom
+const gameMap = [topRow, midRow, botRow];
 ```
-myVar = myArray[2];
+
+Now `gameMap` contains three arrays, each representing a row! The first element `gameMap[0]` is our top row `[1, 1, 1, 1, 1]`, the second is our middle row with the empty space.
+
+**But here's the magic part!** You can access any specific tile in your world using two coordinates:
+
+```js
+const topLeftTile = gameMap[0][0];     // Gets 1 (wall)
+const centerTile = gameMap[1][2];      // Gets 0 (empty space)
+const bottomRightTile = gameMap[2][4]; // Gets 1 (wall)
 ```
 
-then myVar gets value ["c1", "c2", "c3"].
+Think of it like this: `gameMap[row][column]` - just like battleship coordinates! The first number picks which row (going down), the second picks which column (going across).
 
-Ok, so what, you might ask. We don't have to stop here. If you write: myVar=myArray[2][0]; then it gets value of first element of third element in myArray "c1".
-
-Let's practice more. myVar=myArray[0][1] takes first element of myArray (a) and second element from that ("a2"): myVar=myArray[1][0] gets value "b1".
-
-You get the picture?
-
-
-## MAKING THE MAP
-
-First we write the map array that will hold information about every tile:
-
+**Visual Connection:**
 ```
-myMap = [
-[1, 1, 1, 1, 1, 1, 1, 1],
-[1, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 1, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 1, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 1],
-[1, 1, 1, 1, 1, 1, 1, 1]
+gameMap[0] = [1, 1, 1, 1, 1]  →  [🧱][🧱][🧱][🧱][🧱]
+gameMap[1] = [1, 0, 0, 0, 1]  →  [🧱][  ][  ][  ][🧱]  
+gameMap[2] = [1, 1, 1, 1, 1]  →  [🧱][🧱][🧱][🧱][🧱]
+```
+
+Cool, right? Each number in your array becomes a tile in your game world!
+
+
+## BUILDING YOUR FIRST GAME LEVEL
+
+Now let's create a real game level! Here's how we'll store our map data:
+
+```js
+const myMap = [
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1], 
+  [1, 0, 1, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 1, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1]
 ];
 ```
 
-As you can see our map has 6 rows and 8 columns. If our hero would start from top left corner, he could move 8 steps right and 6 steps down before going out from the map and wondering into unknown space.
+**What you just created:** A complete game level that's 8 tiles wide and 6 tiles tall! Picture your hero starting at the top-left corner - they could explore 8 steps right and 6 steps down before reaching the edge of your world.
 
-But some smart people already have raised the important question: "What do those numbers in the map array mean?". Well, we will use some OOP (that's Objects, but don't run away, they are not so frightening as they sound) to create the tiles and manage our game. We declare several tiles first, they are like templates for other tiles we actually put into game. Then we loop through the map array and pick up the numbers in every position.
-
-If for example we get number 1, then we create new tile from Tile1 template. Then in the game, when we reach that tile, we will check the properties of that tile object. It can have many properties, most basic tiles have only 2 properties, walkable and frame.
-
-Walkable is property that shows if any character can walk into that tile (then we have set walkable=true) or it can not do that (false). We do not use hitTest as hitTest is slow and it is not cool to use it with tile based game.
-
-Frame is property that tells us what frame of tiles movie clip we have to show in that position. It is used when placing the tiles on the screen. As we use same tiles movie clip for every tile by attaching it over again, they all would show frame 1 by default. More about this on Creating Tiles section.
-
-So, if we declare following tile:
-
+**Visualize your level:**
 ```
-//wall tile
-Tile1 = function () {};
-Tile1.prototype.walkable = false;
-Tile1.prototype.frame = 2;
+🧱🧱🧱🧱🧱🧱🧱🧱
+🧱  🌟      🌟  🧱
+🧱  🧱        🧱
+🧱      🧱    🧱
+🧱            🧱
+🧱🧱🧱🧱🧱🧱🧱🧱
+```
+*(Where 🧱 = walls, 🌟 = walkable floors)*
+
+## WHAT DO THESE NUMBERS MEAN?
+
+Great question! Each number represents a different type of tile with its own properties and behavior. We'll use modern JavaScript objects to define what each number means:
+
+```js
+// Modern tile type definitions
+const TileTypes = {
+  0: {
+    name: 'floor',
+    walkable: true,
+    color: 0x228B22,  // Forest green
+    sprite: 'floor.png'
+  },
+  1: {
+    name: 'wall', 
+    walkable: false,
+    color: 0x8B4513,  // Brown
+    sprite: 'wall.png'
+  },
+  2: {
+    name: 'enemy',
+    walkable: false, 
+    color: 0xFF4500,  // Red
+    sprite: 'goomba.png',
+    harmful: true
+  }
+};
 ```
 
-then we make similar object every time there is 1 in the map array (Tile1), we also say this tile cant be stepped on (walkable=false) and in that spot tile movie clip should show frame 2.
+**Here's how it works:**
+- When your game sees a `0` in the map, it creates a floor tile that players can walk on
+- When it sees a `1`, it creates a wall that blocks movement  
+- A `2` might spawn an enemy that can hurt your player!
+
+**Key Properties:**
+- **walkable**: Can your player move through this tile? 
+- **sprite**: What image should be displayed?
+- **harmful**: Does touching this tile damage the player?
+- **color**: What color to use for simple graphics (like our demos)
+
+This system lets you design complex levels by just changing numbers in your array. Want to add a treasure chest? Just define tile type `3` and place some `3`s in your map!
 
