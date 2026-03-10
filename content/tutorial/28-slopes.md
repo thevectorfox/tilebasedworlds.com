@@ -18,14 +18,14 @@ Many people have asked me "How do I make my hero walk on the sloped tiles?". And
 
 Perhaps you do not know what sloped tiles are. In this picture, hero (the Duck named Charlie) is walking on sloped tile:
 
-![](p29_2.gif)
+![](/p29_2.gif)
 
 (Screenshot from the game "CHARLIE II"
 by Mike Wiering / Wiering Software)
 
 The slope allows our hero to get on higher (or lower) height simply by walking right (or left) without jumping (or falling). So, the slope we will talk about, is connecting 2 tiles with different heights:
 
-![](p29_3.gif)
+![](/p29_3.gif)
 
 When hero in left picture wants to continue moving right, he has to jump on the higher tile. But thanks to the slope, hero on the right picture is not forced into jumping. Sure, if our hero is jumper-type of hero, he could still jump in the right picture too, but normal heroes are very happy, if they can avoid jumping.
 
@@ -34,12 +34,12 @@ When hero in left picture wants to continue moving right, he has to jump on the 
 
 As soon as we want to add sloped tiles, we will face several problems (I bet you didn't expect any problems). First, the placement of hero on the sloped tile. If you remember, our hero is basically rectangle, all the movement and collisions are based on his corner points. We cant use same idea on the slope, since most heroes would end up standing on the slope without their feet touching the ground. Instead, we have to place center of hero on the sloped ground and move part of hero inside the ground.
 
-![](p29_4.gif)
+![](/p29_4.gif)
 
 Next, the slopes in our game must always be from one corner of the tile to the opposite corner and you should be careful how you place the slopes. You can't make slopes with some other angle or shape and you cant make strange maps with slopes.
 
 
-![](p29_5.gif)
+![](/p29_5.gif)
 
 ## CODE IT
 
@@ -111,7 +111,7 @@ If we were falling down (diry == 1), we will set the y property as if hero would
 
 xpos is the value of how far from the left edge of current tile center of our hero is:
 
-![](p29_6.gif)
+![](/p29_6.gif)
 
 If slope is going up, then we move hero up by the value of xpos, if its going down, then by the value of tileW-xpos. Note that if you don't use square tile, then you would need to find xpos as percentage from tileW.
 

@@ -20,21 +20,21 @@ In order this magic to work, we will do following: after arrow key has been pres
 
 This is perfect collision with wall:
 
-![](p08_2.gif)
+![](/p08_2.gif)
 
 Hero stands next to wall and in next step he would be inside the wall. We can't let it happen, so we won't. No moving, man! But world is not perfect, what if only part of hero would be colliding:
 
-![](p08_3.gif)
+![](/p08_3.gif)
 
 That requires us to check for collision between hero and wall with all 4 characters corner points. If any of hero's corners (lower left corner in this example), would be inside the wall, we will stop the hero.
 
 Or if hero is not next to wall yet, but would still go inside the wall if you allow him to step there:
 
-![](p08_4.gif)
+![](/p08_4.gif)
 
 We will have to place hero by the wall:
 
-![](p08_5.gif)
+![](/p08_5.gif)
 
 "Oh, no!" you might cry, "All this is impossible to do!" Not to worry, it's not actually very hard.
 
@@ -153,7 +153,7 @@ This block of code works for up movement. When up arrow key was pressed, value f
 
 But if one of corners happens to be inside the wall and so value of ob.upleft or ob.upright is "false", we place object near the wall. For char to be next to wall above it, its center point must be placed below the current tiles upper border by char.height.
 
-![](p08_6.gif)
+![](/p08_6.gif)
 
 ob.ytile*game.tileH would place character's center on the line between two tiles, we add height property of object to move it further down. Same way moveChar function goes through movements for down (diry == 1), left (dirx == -1) and right (dirx == 1).
 

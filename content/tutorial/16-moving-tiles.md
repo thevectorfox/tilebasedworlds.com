@@ -36,13 +36,13 @@ Before we actually start the coding, we have to make some rules. Rules, while an
 
 So, how can hero land on the moving tile. First and simplest way is to jump.
 
-![](p17_2.gif)
+![](/p17_2.gif)
 
 On the picture hero is moving down and in the next step he would be inside the moving tile. We will place him standing on the tile. Note that hero MUST be above the moving tile and hero MUST be moving down. In any other case hero won't land on moving tile.
 
 But that's not the only way for hero to get on the moving tile. In the next picture hero is standing still on the piece of wall and he is not moving anywhere.
 
-![](p17_3.gif)
+![](/p17_3.gif)
 
 But the moving tile is moving up and in the next step, hero would be inside the moving tile. Yes, we again have to make sure the hero will be catched by the moving tile and he starts to move up with the moving tile.
 
@@ -51,11 +51,11 @@ But the moving tile is moving up and in the next step, hero would be inside the 
 
 Once we have the hero standing on the moving tile, we also need to create some ways for the hero to get off. First, he can jump off. He can walk over the edge of moving tile. And also couple of possible situations exist in the next pictures:
 
-![](p17_4.gif)
+![](/p17_4.gif)
 
 When hero stands on the moving tile moving up and in the next step hero would hit the wall above, he should drop off the moving tile or he would be squashed. When hero is standing on the moving tile moving horizontally, hitting the wall left/right in next step, he should be placed near the wall and in case the moving tile keeps moving, hero should fall off.
 
-![](p17_5.gif)
+![](/p17_5.gif)
 
 In this picture hero is moving down while standing on the moving tile. When the hero hits the wall tile, he should stay on the wall. Moving tile continues going down, but without the hero.
 
@@ -211,7 +211,7 @@ function checkMovingTiles (y)
 
 Let's see what's happening here. If char is not moving up (diry is not -1), we calculate the boundaries for the char. Then we start to loop through all the moving tiles. ob will be moving tile object we are currently dealing with. We also calculate boundaries for current tile to figure out if they are colliding:
 
-![](p17_6.gif)
+![](/p17_6.gif)
 
 The if statement with "lasty" property secures that chars last position was above the moving tile and other if statements find collision between char and tile. If we have found moving tile, then the onMovingTile will be holding reference to the tile object.
 

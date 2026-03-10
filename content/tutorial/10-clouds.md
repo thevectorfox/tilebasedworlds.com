@@ -16,11 +16,11 @@ EXAMPLE HERE
 
 So, did you notice the difference? Let's look at the pictures just in case. Here we have normal brick wall type of tile. Hero cant enter that tile from any direction.
 
-![](p11_2.gif)
+![](/p11_2.gif)
 
 But this is cloud. Hero can enter the tile from any other direction, except from above. If hero is dumb enough to try entering from above, we place him just above to the cloud:
 
-![](p11_3.gif)
+![](/p11_3.gif)
 
 We will first set up some tiles with the property "cloud". If the tile has "cloud" set to true, it is obviously cloud type. Declare some prototypes:
 

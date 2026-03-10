@@ -20,17 +20,17 @@ There is no collision detection, so hero can walk outside from stage, but don't 
 
 First let's set up our hero character. Create 3 new movie clips. You will need one movie clip for character moving left (or right, I chose left), 1 movie clip for character moving up, and final movie clip for moving down. Inside those movie clips place the animations of your character moving.
 
-![](p07_2.gif)
+![](/p07_2.gif)
 
 There is no code needed for those movie clips.
 
 Now edit your "char" movie clip and create total of 5 keyframes inside it:
 
-![](p07_3.gif)
+![](/p07_3.gif)
 
 In keyframe 1 place the "char_up" movie clip, in keyframe 2 place "char_left", keyframe 4 gets "char_right" and keyframe 5 "char_down". You can use same movie clip for both left and right movement, you only flip one of the instances horizontally. Now make sure every instance with movement animation has instance name "char". Check the frames 1, 2, 4 and 5 again. Are they all named "char"? Don't worry, if you don't understand yet why certain movement is suppose to be in certain frame, we explain it when we look at the movement code.
 
-![](p07_4.gif)
+![](/p07_4.gif)
 
 Ok, time to script the actions.
 

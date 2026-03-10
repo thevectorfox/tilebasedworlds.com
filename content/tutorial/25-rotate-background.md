@@ -65,7 +65,7 @@ And thats it for today.
 
 Tip: when rotated, your tiles might create some ugly-looking lines between them:
 
-![](p26_2.gif)
+![](/p26_2.gif)
 
 You can fix it with increasing the size of your tiles by 1 px. In our example the tiles would still be placed using 30px space, but their actual size would be 31px.
 

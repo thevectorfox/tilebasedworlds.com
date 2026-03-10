@@ -20,7 +20,7 @@ You can download the source fla with all the code and movie set up here.
 
 Diamond view has 1 big flaw: its shaped like diamond. Yes, diamonds are girls best friend and I have nothing against them personally, just your monitor is not shaped like diamond (or if it is, could you please send me picture of it). Your game will be shaped like rectangle too. Surely you can just create more tiles to cover the whole stage area, plus lot of tiles outside the stage.
 
-![](p24_2.gif)
+![](/p24_2.gif)
 
 It doesn't look bad in the picture, but it will get worse when you make your game bigger. More extra tiles will be around to eat away those precious CPU cycles. If your game is small enough and you don't want to bother too much with the more complex system, use simple isometric scroll. Rest of us, let's move on.
 
@@ -37,11 +37,11 @@ The code behind this movie is getting long and complicated so I try to explain t
 
 The basic idea here is to fill the visible area with isometric tiles and not to have more tiles, that cant be viewed:
 
-![](p24_4.gif)
+![](/p24_4.gif)
 
 There is one extra row of tiles (marked with blue dots) and one column (red dots) to make sure tiles can be moved and they still fill the visible area. Now when our tiles have been moved right enough, we will take the whole column and move it straight across the stage (not in isometric angle!) to the left side. Same way with up/down movement.
 
-![](p24_5.gif)
+![](/p24_5.gif)
 
 To achieve this, we will set up bunch of new objects to hold information about the tiles. When building the map in the beginning the tile in the center (where hero stands) becomes "t_0_0" no matter on which tile the hero actually stands on.
 

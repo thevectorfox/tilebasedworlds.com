@@ -25,7 +25,7 @@ First draw your items movie clip. Place graphics of different items in the frame
 
 To show the collected points draw dynamic text box on the screen. Position this text box outside from tiles area so tiles wont cover it. The dynamic text box should show variable "points":
 
-![](p16_2.gif)
+![](/p16_2.gif)
 
 The variable "points" will need to remember the current points even when we change maps. We can safely attach it to the game object. In declaring game object add property points and set it to 0 (most games start with 0 points).
 

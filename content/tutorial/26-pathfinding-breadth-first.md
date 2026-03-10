@@ -35,7 +35,7 @@ The pseudo code for the breath-first search is very clearly explained in this li
 I will quote from the page above (skip it if you did read the explanation from the link):
 "This is a very expensive, but relatively clear algorithm. It begins with a starting point Source, and finds a path to a goal Target. The basic approach is to take each neighbour of the starting point, and then take each neighbour of those neighbors, and then the neighbours of those neighbours, and so on, expanding the tiles (nodes) being considered until finally one of them is the Goal. Each time a node is looked at, its neighbours are pushed onto a queue; thus the order in which the nodes are considered is one neighbour after another. Where numbers indicate the order in which the nodes are considered, the pattern is:
 
-![](p27_2.gif)
+![](/p27_2.gif)
 
 That is, we begin with 0. All of its neighbours 1-8 are put on the queue. Then the first element (1) is taken off the queue, and its neighbours 9-13 are put on the queue. The next element (2) is then taken off the queue, and its neighbours (i.e. 14) are put on the queue. Then (3) is taken off the queue, and its neighbours 15-17 are put on the queue; (4) is taken off, and its neighbours 18 are put on; and so on."
 

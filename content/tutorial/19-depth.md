@@ -21,13 +21,13 @@ I'm sure you have noticed how some things you draw in the Flash cover up other t
 
 Flash has also been kind enough to provide us layers. Layers are great to arrange objects, when you draw something on the layer above other layer, it will always remain in front of objects on the other layer.
 
-![](p20_2.gif)
+![](/p20_2.gif)
 
 In the picture blue square and red square are both drawn on layer1. Blue square was drawn last, so its in front of red square. Yellow square is on layer2 and since layer2 is above layer1, yellow square covers both blue and red square.
 
 In the next picture red and green squares are in the movie clip "mc1", blue and yellow squares are inside movie clip "mc2".
 
-![](p20_3.gif)
+![](/p20_3.gif)
 
 Blue and yellow square always cover red and green because the parent mc2 is above mc1. Inside movie clips you can arrange the order of squares, but you cant place blue square in front of red and same time yellow behind red.
 
@@ -44,7 +44,7 @@ You see, it has depth written in its syntax already. What is exactly that "depth
 
 In picture A hero is covering part of wall, so hero looks like being closer to viewer then wall, but in the picture B part of the wall covers hero making hero standing further.
 
-![](p20_4.gif)
+![](/p20_4.gif)
 
 Now, whats the difference between those two pictures beside hero/wall coverup? The hero and wall are same. The wall is in the same spot. Yes, the hero has moved up. Now we will come to the very important conclusion: **object moves closer when its y-coordinate increases**. Its also worth to remember that we will consider higher depth being closer to viewer.
 
@@ -60,7 +60,7 @@ Since we have rows of tiles, all in exactly same y coordinate, we also should ta
 mc.swapDepths(mc._y*movie_width+mc._x)
 ```
 
-![](p20_5.gif)
+![](/p20_5.gif)
 
 Tile in the left upper corner will be furthest, the depth of tiles increases (they will be closer) when moving right and down.
 
@@ -71,7 +71,7 @@ z-sorting is fancier name for what we have done so far with depths. It comes fro
 
 Please make sure that both tiles and hero have registration point in the left top corner. Draw the parts you want to overlap other tiles above registration point.
 
-![](p20_6.gif)
+![](/p20_6.gif)
 
 Now let's declare char object:
 

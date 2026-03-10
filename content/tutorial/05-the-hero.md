@@ -19,7 +19,7 @@ The hero is red square :) What, he doesn't look mighty? You can draw your own he
 
 Also note, how hero movie clip (red square) has registration point centered and tiles movie clip has registration point in the upper left corner:
 
-![](p06_2.gif)
+![](/p06_2.gif)
 
 Want some code? Add the line after tiles definitions:
 

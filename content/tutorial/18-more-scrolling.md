@@ -19,7 +19,7 @@ EXAMPLE HERE
 
 Hero will always move, only difference is, that when he reaches the edge of map, we won't scroll the background tiles anymore, making it not scroll. In the left picture hero is from the left edge "halfvisx" number of tiles away. If hero would move more left and the map would scroll, it would reveal an area not covered by the map and the tiles:
 
-![](p19_2.gif)
+![](/p19_2.gif)
 
 In the right picture hero is from the bottom edge "halfvisy" number of tiles away. No more scrolling should happen when hero moves down.
 

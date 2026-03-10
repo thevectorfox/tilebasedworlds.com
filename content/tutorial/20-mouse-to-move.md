@@ -21,7 +21,7 @@ Before we jump on the mouse, one thing should be made clear. So far our hero was
 
 Draw rectangle, which will represent the mouse, make it movie clip and set its linkage name to "mouse". Make sure you have aligned mouse graphics same way as tiles - left upper corner.
 
-![](p22_2.gif)
+![](/p22_2.gif)
 
 Now attach mouse to the stage, above all the tiles. In the buildMap function write.
 

@@ -16,7 +16,7 @@ EXAMPLE HERE
 
 While ladders seem to be easy enough, there are some things to consider. First, what kind of ladders are there?
 
-![](p12_2.gif)
+![](/p12_2.gif)
 
 In the picture, there are 4 different types of ladders. In tile A ladder is inside wall tile, which normally is not walkable. What can hero do in tile A? He can climb up and down, but he shouldn't be able to walk left or right or he will be stuck in the wall. Ask anyone, who has been stuck in the wall and they all say it doesn't feel good.
 
@@ -45,7 +45,7 @@ That should do it.
 
 We will use separate movie clip with ladder graphics that will be attached in the tile when tile has ladder. That way we don't have to draw different graphics for every ladder on different backgrounds. Make sure your ladder movie clip has "Export this movie" checked and it is linked as "ladder".
 
-![](p12_3.gif)
+![](/p12_3.gif)
 
 In the ladder movie clip draw ladder graphics same height as tile and place them in the center of tile horizontally.
 

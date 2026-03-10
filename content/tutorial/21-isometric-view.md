@@ -19,11 +19,11 @@ EXAMPLE HERE
 
 First you should know, that actual isometric view (from the mathematics) is little more complicated and never used in games. Now that you know it, forget it. From here on, we only talk about simple isometrics. Maybe best way to imagine isometric, is to look, what happens to the normal square, when its transformed into isometric view:
 
-![](p21_2.gif)
+![](/p21_2.gif)
 
 First we rotate the square by 45 degrees and then we make its height half the width. That was simple. Now let's create our tiles and hero:
 
-![](p21_3.gif)
+![](/p21_3.gif)
 
 It's important to place graphics to the registration point (little cross, where Flash starts to count coordinates from) like shown in the picture. The wall tile you can draw as high as you want. For the hero, I have left the tile in the picture so you hopefully understand its position better, don't place that rectangle in the final graphics of hero. It would only look strange, if hero walks around, rectangle around him.
 
@@ -32,7 +32,7 @@ It's important to place graphics to the registration point (little cross, where 
 
 First thing to change, is size of tiles and size of hero. But wait, what size? So far it was clear, width and height of movie clip, but in isometric view the height of movie clip can be almost anything.
 
-![](p21_4.gif)
+![](/p21_4.gif)
 
 So, value of tileW variable is half the width of actual tile graphics. For the hero, its width and height properties are equal and half of its graphics actual width. Write it down:
 

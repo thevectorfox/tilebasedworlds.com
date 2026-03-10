@@ -25,7 +25,7 @@ EXAMPLE HERE
 
 In the left picture is non-scrolling game. Hero moves right, everything else stays where it was. Now, in the right picture we have scrolling game. Hero is also suppose to move right, but to make it look like scrolling, we actually keep hero in its current position and move everything else to the left.
 
-![](p18_2.gif)
+![](/p18_2.gif)
 
 So, theory is easy: when hero is suppose to move, move all the tiles in the opposite direction. But since we have used to place hero inside the tiles movie clip with all the background tiles, hero would move in opposite way with them. To fix it, we still move everything in opposite direction AND we will move hero same amount in correct direction.
 
@@ -35,7 +35,7 @@ Easiest way to scroll tiles, is to place all the tiles on screen, but to show on
 
 Our last hope is to place only visible tiles on stage and when they go off, we move the same tiles to the opposite side, rename them and reuse same movie clips. That's called "gotoAndStop" scrolling engine:
 
-![](p18_3.gif)
+![](/p18_3.gif)
 
 Like seen on the picture, when tile goes off from right, we move the tile to the left. We also have to rename the movie clip, since all our movie clips have names like "t_3_4" which means it is placed in the y=3, x=4. And tile in the new position probably has to show different frame (graphic), that's why we need to send it to correct frame with correct graphics and that's why this method is called "gotoAndStop".
 
@@ -44,7 +44,7 @@ Like seen on the picture, when tile goes off from right, we move the tile to the
 
 In most scrolling games, hero is always in the center of the screen.
 
-![](p17_4.gif)
+![](/p17_4.gif)
 
 You can see how number of tiles left from hero is equal to the number of tiles right from him. That means your number of columns is 3, 5, 7, 9, 11 etc, but never 2, 4, 6, 8. Same goes for rows too.
 

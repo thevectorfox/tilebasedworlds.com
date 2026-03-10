@@ -18,7 +18,7 @@ For this kind of game we only need 1 view on the hero as he is always looked dir
 
 For movement in any direction, we will need 2 variables, the angle of the movement and the value of the movement. We will use rotation of the hero movie clip for the angle and variable "speed" in the char object for the value of movement. When we know angle and value, we can find out x and y components from those:
 
-![](p25_2.gif)
+![](/p25_2.gif)
 
 To project speed vector with the known length and angle to the x and y axis, we can use these lines:
 
@@ -125,7 +125,7 @@ I have added check for each movement value to be at least 0.5 pixels. When calcu
 
 As you can see, when the hero is rotated, it can move its corners by small amount into the wall tiles. This is happening because we are not taking into account its rotation when calculating the corner points. As long your hero is shaped like a square the corners won't go too much into walls, but when you use very tall rectangle for the hero the bug becomes obvious.
 
-![](p25_3.gif)
+![](/p25_3.gif)
 
 You can fix this easily by updating the width and height of the char object every time it is rotated. Place 2 lines in the left and right key detection code after changing the rotation:
 
