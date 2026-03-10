@@ -358,3 +358,100 @@ function updateMovement(hero, keys, gameState, app) {
     }
 }
 ```
+
+## ADVANCED FEATURES 🎆
+
+**Enhanced Room System:**
+
+```js
+// Advanced room building with atmosphere
+function buildRoom(roomId, app) {
+    const room = rooms[roomId];
+    
+    // Clear previous room
+    app.stage.removeChildren();
+    
+    // Change background color based on room
+    app.renderer.background.color = room.background || 0x2c3e50;
+    
+    // Render the map
+    renderMap(room.map, app);
+    
+    // Add atmospheric effects
+    if (room.particles) {
+        addParticleEffects(room.particles, app);
+    }
+    
+    // Play room music
+    if (room.music) {
+        playBackgroundMusic(room.music);
+    }
+    
+    // Add room title
+    displayRoomTitle(room.name, app);
+    
+    console.log(`🏠 Entered: ${room.name}`);
+}
+
+// Different door types with special effects
+const specialDoors = {
+    LOCKED: {
+        canUse: (hero) => hero.hasKey,
+        message: "This door is locked. You need a key!",
+        sound: "door_locked.ogg"
+    },
+    
+    MAGIC: {
+        canUse: (hero) => hero.mana >= 10,
+        cost: { mana: 10 },
+        message: "The magical portal shimmers as you pass through...",
+        effect: "sparkle"
+    },
+    
+    TELEPORTER: {
+        canUse: () => true,
+        message: "*WHOOSH* Instant teleportation!", 
+        effect: "flash"
+    }
+};
+
+// Smart door system
+function tryUseDoor(tileType, hero) {
+    const doorData = doors[tileType];
+    if (!doorData) return false;
+    
+    // Check if door can be used
+    if (doorData.special) {
+        const specialType = specialDoors[doorData.special];
+        if (!specialType.canUse(hero)) {
+            showMessage(specialType.message);
+            return false;
+        }
+        
+        // Apply costs
+        if (specialType.cost) {
+            Object.assign(hero, specialType.cost);
+        }
+        
+        // Show special effects
+        if (specialType.effect) {
+            playEffect(specialType.effect);
+        }
+    }
+    
+    return true; // Door can be used!
+}
+```
+
+🏆 **WORLD BUILDER ACHIEVED!**
+
+You've just mastered the art of creating interconnected game worlds! This is the same system used in classic RPGs, adventure games, and modern indies. Your players can now explore rich, connected environments that feel alive and purposeful.
+
+**What you've built:**
+- ✅ Multi-room game world system
+- ✅ Smooth room transition mechanics
+- ✅ Flexible door/portal architecture
+- ✅ Professional state management
+- ✅ The foundation for epic adventures!
+
+Ready to add some vertical action to your world? Next up: jumping mechanics that'll make your hero soar! [Next: Jumping](/tutorial/09-jumping/)
