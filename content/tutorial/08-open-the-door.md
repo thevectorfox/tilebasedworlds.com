@@ -8,96 +8,353 @@ next = "/tutorial/09-jumping/"
 prev = "/tutorial/07-hit-the-wall/"
 +++
 
-How long can you stay in one room? How long will you look at same picture? Yep, we need more rooms to explore. That means a way to change the map, create new room from tiles and place the hero in correct position.
+Ready to build your first WORLD? 🗺️ One room was just the beginning - now you're about to create interconnected spaces like the dungeons in Zelda, the sprawling stations in Metroid, or the mysterious houses in classic RPGs. You're about to become a world builder! ✨
 
-```
-EXAMPLE HERE
-```
+<div id="door-demo" style="border: 2px solid #00ff41; border-radius: 8px; margin: 20px 0; background: #000;"></div>
 
-To make two rooms, we declare two maps:
+<script>
+window.addEventListener('load', async function() {
+    // Create PixiJS application for room transition demo
+    const app = new PIXI.Application();
+    await app.init({
+        width: 300,
+        height: 240,
+        backgroundColor: 0x2c3e50,
+        antialias: true
+    });
+    
+    document.getElementById('door-demo').appendChild(app.canvas);
+    
+    // Multiple rooms to explore!
+    const rooms = {
+        1: {
+            name: "Starting Room",
+            map: [
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 2, 1],  // Door on the right
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+            ]
+        },
+        2: {
+            name: "Secret Chamber",
+            map: [
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 1, 1, 0, 0, 1, 1, 0, 1],
+                [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+                [3, 0, 1, 1, 0, 0, 1, 1, 0, 1],  // Door on the left
+                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+            ]
+        }
+    };
+    
+    // Door definitions - where each door leads
+    const doors = {
+        2: { toRoom: 2, playerX: 1, playerY: 6 },  // Right door goes to room 2
+        3: { toRoom: 1, playerX: 8, playerY: 6 }   // Left door goes back to room 1
+    };
+    
+    // Game state
+    const game = {
+        currentRoom: 1,
+        tileSize: 30
+    };
+    
+    // Hero object
+    const hero = {
+        tileX: 2,
+        tileY: 3,
+        x: 0,
+        y: 0,
+        width: 12,
+        height: 12,
+        sprite: null
+    };
+    
+    // Create hero sprite
+    const heroSprite = new PIXI.Graphics();
+    heroSprite.beginFill(0xff4444);
+    heroSprite.drawRect(-6, -6, 12, 12);
+    heroSprite.endFill();
+    heroSprite.lineStyle(2, 0xffffff);
+    heroSprite.drawRect(-6, -6, 12, 12);
+    hero.sprite = heroSprite;
+    
+    // Room title text
+    const roomTitle = new PIXI.Text('Starting Room', {
+        fontSize: 16,
+        fill: 0x00ff41,
+        fontFamily: 'monospace'
+    });
+    roomTitle.x = 10;
+    roomTitle.y = 5;
+    
+    // Build and display current room
+    function buildRoom(roomId) {
+        // Clear previous room
+        app.stage.removeChildren();
+        
+        const room = rooms[roomId];
+        const map = room.map;
+        
+        // Render tiles
+        for (let row = 0; row < map.length; row++) {
+            for (let col = 0; col < map[row].length; col++) {
+                const tileType = map[row][col];
+                const tile = new PIXI.Graphics();
+                
+                // Different colors for different tile types
+                if (tileType === 1) {
+                    tile.beginFill(0x00ff41);  // Wall
+                } else if (tileType === 2 || tileType === 3) {
+                    tile.beginFill(0xffff00);  // Door (yellow)
+                } else {
+                    tile.beginFill(0x003311);  // Floor
+                }
+                
+                tile.drawRect(0, 0, game.tileSize, game.tileSize);
+                tile.lineStyle(1, 0x00ff41, 0.3);
+                tile.drawRect(0, 0, game.tileSize, game.tileSize);
+                tile.endFill();
+                tile.x = col * game.tileSize;
+                tile.y = row * game.tileSize;
+                app.stage.addChild(tile);
+            }
+        }
+        
+        // Add hero and title
+        app.stage.addChild(hero.sprite);
+        updateHeroPosition();
+        
+        roomTitle.text = room.name;
+        app.stage.addChild(roomTitle);
+    }
+    
+    function updateHeroPosition() {
+        hero.x = (hero.tileX * game.tileSize) + (game.tileSize / 2);
+        hero.y = (hero.tileY * game.tileSize) + (game.tileSize / 2);
+        hero.sprite.x = hero.x;
+        hero.sprite.y = hero.y;
+    }
+    
+    // Check for door transitions
+    function checkDoors() {
+        const currentMap = rooms[game.currentRoom].map;
+        const tileType = currentMap[hero.tileY][hero.tileX];
+        
+        if (doors[tileType]) {
+            // Found a door! Transition to new room
+            const door = doors[tileType];
+            game.currentRoom = door.toRoom;
+            hero.tileX = door.playerX;
+            hero.tileY = door.playerY;
+            
+            // Flash effect for transition
+            hero.sprite.tint = 0xffff00;
+            setTimeout(() => {
+                hero.sprite.tint = 0xffffff;
+            }, 200);
+            
+            buildRoom(game.currentRoom);
+        }
+    }
+    
+    // Movement with door detection
+    const keys = {
+        ArrowUp: false,
+        ArrowDown: false,
+        ArrowLeft: false,
+        ArrowRight: false
+    };
+    
+    window.addEventListener('keydown', (e) => {
+        if (keys.hasOwnProperty(e.code)) {
+            keys[e.code] = true;
+            e.preventDefault();
+        }
+    });
+    
+    window.addEventListener('keyup', (e) => {
+        if (keys.hasOwnProperty(e.code)) {
+            keys[e.code] = false;
+            e.preventDefault();
+        }
+    });
+    
+    function updateMovement() {
+        const currentMap = rooms[game.currentRoom].map;
+        let newTileX = hero.tileX;
+        let newTileY = hero.tileY;
+        
+        if (keys.ArrowUp && newTileY > 0) newTileY--;
+        else if (keys.ArrowDown && newTileY < currentMap.length - 1) newTileY++;
+        else if (keys.ArrowLeft && newTileX > 0) newTileX--;
+        else if (keys.ArrowRight && newTileX < currentMap[0].length - 1) newTileX++;
+        
+        // Check if new position is walkable (not a wall)
+        const newTileType = currentMap[newTileY][newTileX];
+        if (newTileType !== 1) {  // 1 = wall
+            hero.tileX = newTileX;
+            hero.tileY = newTileY;
+            updateHeroPosition();
+            checkDoors();  // Check for room transitions!
+        }
+    }
+    
+    app.ticker.add(updateMovement);
+    
+    // Start in room 1
+    buildRoom(1);
+});
+</script>
 
-```
-myMap1 = [
-[1, 1, 1, 1, 1, 1, 1, 1],
-[1, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 1, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 1, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 2],
-[1, 1, 1, 1, 1, 1, 1, 1]
-];
+**Try it!** Move around with arrow keys and walk into the yellow doors to explore different rooms! 🚪✨
 
+## CREATING MULTIPLE ROOMS 🏰
 
-myMap2 = [
-[1, 1, 1, 1, 1, 1, 1, 1],
-[1, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 1, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 1, 0, 1],
-[3, 0, 0, 0, 0, 0, 0, 1],
-[1, 1, 1, 1, 1, 1, 1, 1]
-];
-```
-In the game object we also set the number of currently used map:
+**Modern Room System:**
 
-```
-game={tileW:30, tileH:30, currentMap:1}
-```
-So, we start exploring in the myMap1. To call buildMap function, we calculate the map needed with _root["myMap"+game.currentMap] when currentMap is 1, we will get myMap1:
+Let's build a clean, flexible system for managing multiple rooms:
 
-```
-buildMap(_root["myMap" + game.currentMap])
-```
-Next we need new object to represent the doors:
-
-```
-game.Doors = function (newmap, newcharx, newchary)
-{
-	this.newmap = newmap;
-	this.newcharx = newcharx;
-	this.newchary = newchary;
+```js
+// Our room database - easy to expand!
+const rooms = {
+    1: {
+        name: "Village Square",
+        map: [
+            [1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 2, 1],  // Door (tile type 2)
+            [1, 1, 1, 1, 1, 1, 1, 1]
+        ],
+        music: "village_theme.ogg",
+        background: "#2c3e50"
+    },
+    
+    2: {
+        name: "Mysterious Cave", 
+        map: [
+            [1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 1, 0, 0, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [3, 0, 0, 0, 0, 0, 0, 1],  // Different door (tile type 3)
+            [1, 1, 1, 1, 1, 1, 1, 1]
+        ],
+        music: "cave_ambient.ogg",
+        background: "#1a1a2e"
+    }
 };
 
-game.Doors.prototype.walkable = true;
-game.Doors.prototype.frame = 3;
-game.Doors.prototype.door = true;
-game.Tile2 = function () { };
-game.Tile2.prototype = new game.Doors(2, 1, 4);
-game.Tile3 = function () { };
-game.Tile3.prototype = new game.Doors(1, 6, 4);
+// Door destinations - where each door type leads
+const doors = {
+    2: { 
+        toRoom: 2, 
+        playerX: 1, 
+        playerY: 4,
+        message: "Entering the mysterious cave..."
+    },
+    3: { 
+        toRoom: 1, 
+        playerX: 6, 
+        playerY: 4,
+        message: "Returning to the village..."
+    }
+};
+
+// Game state manager
+const gameState = {
+    currentRoom: 1,
+    previousRoom: null,
+    transitionInProgress: false
+};
 ```
-As you probably already guessed, door tile can be stepped on, it shows frame 3 and it has new property "door" set to "true". We will use this property to determine if hero is standing on the door.
 
-The doors use something called "inheritance", which may sound terrible, but is actually a good thing. The "doors" objects are all created using "Doors" template and all the tiles containing doors inherit all the properties of "door" object, for example they all are walkable and show frame 3.
+**Why this approach rocks:**
+- 📦 **Organized**: All room data in one place
+- 🚀 **Scalable**: Easy to add new rooms and properties  
+- 🔧 **Flexible**: Each room can have unique settings
+- 🧠 **Clear**: Simple object structure anyone can understand
 
-Every door we create must have the following information: what number of map to show next, what is the new x and y position of our character. If you don't move the character to new position, then tiles will be changed, but hero stays at the same spot and this doesn't look correct. Word of caution about new coordinates for the hero. You should avoid placing hero in the next map also on the door tile as if he just stepped in from the wall. If new x/y position is also door, then as soon player moves, this next door in new map is detected and hero is sent back. Remember, place your hero next to door tile in new map!
+## ROOM TRANSITIONS: SMOOTH & PROFESSIONAL 🚀
 
-When new door object is made, we pass 3 variables to it: newmap, newcharx, newchary. And new door object will have those values attached to its properties. So, when number 2 is set in the map array, we know its going to be made from Tile2 template and since Tile2 objects are created from Doors templates, it will have all the properties of Doors object. Tile2 object passes newmap=2 to the Doors template, so all the Tile2 objects will send hero to the map2. You can have more than 1 similar door in the game. You may want to put Tile2 type doors in several maps, and they all send hero to the map2.
+**Step 1: Door Detection**
 
-## MORE ACTIONS
-
-In the moveChar function add this code to the end, just before returning true:
-
-```
-if (game["t_" + ob.ytile + "_" + ob.xtile].door and ob == _root.char)
-{
-	changeMap(ob);
+```js
+// Check if player is standing on a door
+function checkForDoors(hero, currentRoom) {
+    const map = rooms[currentRoom].map;
+    const tileType = map[hero.tileY][hero.tileX];
+    
+    // Is this tile a door?
+    if (doors[tileType]) {
+        return doors[tileType];
+    }
+    
+    return null; // No door here
 }
 ```
-Here after we have moved the char (or some other moving object) we will check if the tile char is standing now, is door. As we don't want map to change when bullet or enemy steps on the door tile, we will also check if current object is the hero. We will use changeMap function for the map change:
 
-```
-function changeMap(ob)
-{
-	var name = "t_" + ob.ytile + "_" + ob.xtile;
-	game.currentMap = game[name].newMap;
-	ob.ytile = game[name].newchary;
-	ob.xtile = game[name].newcharx;
-	ob.frame = ob.clip._currentframe;
-	buildMap(_root["myMap" + game.currentMap]);
+**Step 2: Room Transition System**
+
+```js
+function transitionToRoom(doorData, hero, gameState, app) {
+    // Prevent multiple rapid transitions
+    if (gameState.transitionInProgress) return;
+    
+    gameState.transitionInProgress = true;
+    
+    // Optional: Show transition effect
+    showTransitionEffect(doorData.message);
+    
+    // Update game state
+    gameState.previousRoom = gameState.currentRoom;
+    gameState.currentRoom = doorData.toRoom;
+    
+    // Move hero to new position
+    hero.tileX = doorData.playerX;
+    hero.tileY = doorData.playerY;
+    
+    // Rebuild the room
+    buildRoom(gameState.currentRoom, app);
+    
+    // Re-enable transitions after a brief delay
+    setTimeout(() => {
+        gameState.transitionInProgress = false;
+    }, 500);
+}
+
+function showTransitionEffect(message) {
+    // Simple fade effect or message display
+    console.log(`🚀 ${message}`);
+    
+    // You could add visual effects here:
+    // - Screen fade
+    // - Flash effect  
+    // - Loading animation
+    // - Sound effects
 }
 ```
-This code should be pretty obvious, get the values from the door tile and update variables of currentMap, ytile and xtile. The new property ob.frame will save current direction of the hero. Without this trick, our hero would start in frame1 every time he enters new map. You would also need to add line in the buildMap function after you have placed the char clip:
 
+**Step 3: Integration with Movement**
+
+```js
+function updateMovement(hero, keys, gameState, app) {
+    // ... normal movement code ...
+    
+    // After successful movement, check for doors
+    const doorData = checkForDoors(hero, gameState.currentRoom);
+    if (doorData) {
+        transitionToRoom(doorData, hero, gameState, app);
+    }
+}
 ```
-char.clip.gotoAndStop(char.frame);
-```
-That's it, make some maps and play with doors.
