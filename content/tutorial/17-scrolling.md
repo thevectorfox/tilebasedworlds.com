@@ -8,215 +8,266 @@ next = "/tutorial/18-more-scrolling/"
 prev = "/tutorial/16-moving-tiles/"
 +++
 
-Before we start to scroll, we must make one thing very clear. Flash is slow. Flash is extremely slow. Scrolling means moving hundreds of tiles on screen and it should happen 20-30 times in second. Too many scrolling tiles means Flash cant draw them in time and slows down. Your game will crawl like a sleeping snail.
+Your world is bigger than one screen. Scrolling is how you show it - it's the technique behind every side-scroller ever made, from the original Super Mario Bros to Hollow Knight. The camera follows the hero, and the whole world slides past. Let's build it!
 
-"What?" you might wonder, "no scrolling? And how did snail fall to sleep?".
+<div id="scrollDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="scrollCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Arrow Keys + Space to jump<br>
+        <strong>Explore:</strong> The world is twice as wide as the screen! →
+    </div>
+</div>
 
-You can make scrolling tiles, but you should be careful not to make scrolling area too big and not to scroll too many tiles. How big is too big and how many is too many, those answers you have to find out yourself. Remember, that Flash games are played mostly on the browser, probably many windows are opened same time, many programs are running on background and players don't always have the latest powerful computers. Test your game in old crappy computers and if it feels slowing down, make it smaller.
+<script type="module">
+import { Application, Graphics, Container } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
 
-Let's look at what we will be making:
+const canvas = document.getElementById('scrollCanvas');
+const app = new Application();
+await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x87CEEB });
 
+const TILE_SIZE = 30;
+const SCREEN_W = 300;
+const SCREEN_H = 240;
+const GRAVITY = 0.6;
 
-```
-EXAMPLE HERE
-```
+// Map is 20 tiles wide × 8 tall (600×240px) - twice the viewport width
+const map = [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1],
+    [1,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
 
-## THEORY
+// All game objects live inside the world container
+const world = new Container();
+app.stage.addChild(world);
 
-In the left picture is non-scrolling game. Hero moves right, everything else stays where it was. Now, in the right picture we have scrolling game. Hero is also suppose to move right, but to make it look like scrolling, we actually keep hero in its current position and move everything else to the left.
-
-![](/p18_2.gif)
-
-So, theory is easy: when hero is suppose to move, move all the tiles in the opposite direction. But since we have used to place hero inside the tiles movie clip with all the background tiles, hero would move in opposite way with them. To fix it, we still move everything in opposite direction AND we will move hero same amount in correct direction.
-
-Time for example. Scrolling game. Hero is suppose to move 10 pixels right. First, we move all the tiles (including hero) left by 10 px, and we move hero right by 10 px. In the end, it looks like hero has stayed on place, but other tiles have scrolled left.
-
-Easiest way to scroll tiles, is to place all the tiles on screen, but to show only small portion of them, then we simply move them all around. This might make your game very slow, since thousands of tiles outside visible area still need resources. Next idea is to remove tiles when they go off from visible area and attach tiles when they come visible again. Thats better, but Flash spends too much time removing/attaching movie clips.
-
-Our last hope is to place only visible tiles on stage and when they go off, we move the same tiles to the opposite side, rename them and reuse same movie clips. That's called "gotoAndStop" scrolling engine:
-
-![](/p18_3.gif)
-
-Like seen on the picture, when tile goes off from right, we move the tile to the left. We also have to rename the movie clip, since all our movie clips have names like "t_3_4" which means it is placed in the y=3, x=4. And tile in the new position probably has to show different frame (graphic), that's why we need to send it to correct frame with correct graphics and that's why this method is called "gotoAndStop".
-
-
-## PREPARING TO SCROLL
-
-In most scrolling games, hero is always in the center of the screen.
-
-![](/p17_4.gif)
-
-You can see how number of tiles left from hero is equal to the number of tiles right from him. That means your number of columns is 3, 5, 7, 9, 11 etc, but never 2, 4, 6, 8. Same goes for rows too.
-
-Let's declare game object:
-
-```
-game = {tileW:30, tileH:30, currentMap:1, visx:7, visy:5, centerx:120, centery:90};
-```
-
-visx property is number of visible columns and visy is number of rows. We also need properties centerx/centery to mark center point of our movie.
-
-When we scroll the tiles, we might have to show tiles that are not declared in the map array. Like when hero happily walks left until he stands on the leftmost tile declared with map array, we still have some tiles left from him to show. For those kind of tiles we create new tile type with no graphics to show (to make it easier for Flash). In the tiles movie clip make new empty keyframe in frame 20. Add the code to declare this type of tile:
-
-```
-game.Tile4 = function () {};
-game.Tile4.prototype.walkable = false;
-game.Tile4.prototype.frame = 20;
-```
-
-You might also want to cover some tiles partly ouside of visible area. For that purpose make new movie clip with linkage name "frame", that has hole in the middle, showing only the tiles through that hole.
-
-
-## BUILD THE WORLD OF SCROLL
-
-Let's start with buildMap function.
-
-```
-function buildMap (map)
-{
-	_root.attachMovie("empty", "tiles", 1);
-	game.halfvisx = int(game.visx / 2);
-	game.halfvisy = int(game.visy / 2);
-```
-We will calculate 2 new properties for the game object. halfvisx and halfvisx will hold information about number of columns and rows from the chars position to the edge of visible area. When total number of columns visx=5, then halfvisx=2, meaning 2 columns are right from hero, 2 columns are left and 1 is straight in the center with the hero.
-
-```
-game.clip = _root.tiles;
-game.clip._x = game.centerx - (char.xtile * game.tileW) - game.tileW / 2;
-game.clip._y = game.centery - (char.ytile * game.tileH) - game.tileH / 2;
-```
-
-We have to place movie clip holding all the tiles and the hero based on 2 variables: center point of the game declared in the game object by centerx/centery and position of the hero declared in the char object by xtile/ytile. When hero is placed on the x coordinate (char.xtile*game.tileW)+game.tileW/2, then tiles mc have to be in the opposite direction, thats why we subtract that number from the centerx.
-
-```
-for (var y = char.ytile - game.halfvisy; y <= char.ytile + game.halfvisy + 1; ++y)
-{
-	for (var x = char.xtile - game.halfvisx; x <= char.xtile + game.halfvisx + 1; ++x)
-	{
-		var name = "t_" + y + "_" + x;
-		if (y >= 0 and x >= 0 and y <= map.length - 1 and x <= map[0].length - 1)
-		{
-			game[name] = new game["Tile" + map[y][x]]();
-		}
-		else
-		{
-			game[name] = new game.Tile4();
-		}
-		game.clip.attachMovie("tile", name, 1 + y * 100 + x * 2);
-		game.clip[name]._x = (x * game.tileW);
-		game.clip[name]._y = (y * game.tileH);
-		game.clip[name].gotoAndStop(game[name].frame);
-	}
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        if (map[row][col] === 1) {
+            const tile = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            tile.x = col * TILE_SIZE;
+            tile.y = row * TILE_SIZE;
+            world.addChild(tile);
+        }
+    }
 }
-```
-This loop creates all the visible tile objects and also attaches movie clips for the tiles. As you can see, the loop doesn't start from 0 anymore, it starts from the ytile-halfvisy. Same way it doesn't run until the end of map array, it runs until ytile+halfvisy+1. The if condition then checks if the tile to be created is in the map array. If it falls outside the map, we use empty tile from the tile4 template.
 
-In order to create seamless scroll, we have to use one extra row and one extra column of tiles in the right and bottom edge. Those tiles ensure, that even when we move half of tile to the other side, there wont be any empty space.
+const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+world.addChild(heroSprite);
 
-```
-_root.attachMovie("frame", "frame", 100);
-```
+const player = {
+    sprite: heroSprite,
+    x: 60, y: 150,
+    width: 12, height: 12,
+    velocityX: 0, velocityY: 0,
+    speed: 2, jumpPower: -10,
+    onGround: false
+};
 
-Last line attaches frame to cover areas of movie you dont want to be seen.
+// Smooth camera (lerp toward target)
+let camX = 0;
+const SMOOTH = 0.12;
 
-```
-char.clip = game.clip.char;
-char.x = (char.xtile * game.tileW) + game.tileW / 2;
-char.y = (char.ytile * game.tileW) + game.tileW / 2;
-char.width = char.clip._width / 2;
-char.height = char.clip._height / 2;
-char.clip._x = char.x;
-char.clip._y = char.y;
-char.clip.gotoAndStop(char.frame);
-char.xstep = char.x;
-char.ystep = char.y;
-```
-
-The char is created exactly same way as before. Only difference are 2 new properties xstep and ystep, which we will use later to check for right time to move rows or columns of tiles to the other side.
-
-
-## SCROLL! SCROLL!
-
-Now that we have set up the world, we need to actually scroll it. In the end of moveChar function after we have calculated the ob.xtile/ob.ytile for hero, add code to scroll:
-
-```
-game.clip._x = game.centerx - ob.x;
-game.clip._y = game.centery - ob.y;
-if (ob.xstep < ob.x - game.tileW)
-{
-	var xnew = ob.xtile + game.halfvisx + 1;
-	var xold = ob.xtile - game.halfvisx - 1;
-	for (var i = ob.ytile - game.halfvisy - 1; i <= ob.ytile + game.halfvisy + 1; ++i)
-	{
-		changeTile (xold, i, xnew, i, _root["myMap" + game.currentMap]);
-	}
-	ob.xstep = ob.xstep + game.tileW;
+function updateCamera() {
+    const targetX = player.x + player.width / 2 - SCREEN_W / 2;
+    camX += (targetX - camX) * SMOOTH;
+    world.x = -Math.round(camX);
 }
-else if(ob.xstep > ob.x)
-{
-	var xold = ob.xtile + game.halfvisx + 1;
-	var xnew = ob.xtile - game.halfvisx - 1;
-	for (var i = ob.ytile - game.halfvisy - 1; i <= ob.ytile + game.halfvisy + 1; ++i)
-	{
-		changeTile (xold, i, xnew, i, _root["myMap" + game.currentMap]);
-	}
-	ob.xstep = ob.xstep - game.tileW;
+
+function isSolid(x, y) {
+    const col = Math.floor(x / TILE_SIZE);
+    const row = Math.floor(y / TILE_SIZE);
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return true;
+    return map[row][col] === 1;
 }
-if(ob.ystep < ob.y - game.tileH)
-{
-	var ynew = ob.ytile + game.halfvisy + 1;
-	var yold = ob.ytile - game.halfvisy - 1;
-	for (var i = ob.xtile - game.halfvisx - 1; i <= ob.xtile + game.halfvisx + 1; ++i)
-	{
-		changeTile (i, yold, i, ynew, _root["myMap" + game.currentMap]);
-	}
-	ob.ystep = ob.ystep + game.tileH;
+
+const keys = {};
+window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+function gameLoop() {
+    if (keys['ArrowLeft'])  player.velocityX = -player.speed;
+    else if (keys['ArrowRight']) player.velocityX = player.speed;
+    else player.velocityX = 0;
+
+    if ((keys['Space'] || keys['ArrowUp']) && player.onGround) {
+        player.velocityY = player.jumpPower;
+        player.onGround = false;
+    }
+
+    player.velocityY += GRAVITY;
+
+    const newX = player.x + player.velocityX;
+    if (!isSolid(newX, player.y + 2) && !isSolid(newX, player.y + player.height - 2) &&
+        !isSolid(newX + player.width, player.y + 2) && !isSolid(newX + player.width, player.y + player.height - 2)) {
+        player.x = newX;
+    }
+
+    if (player.velocityY > 0) {
+        if (isSolid(player.x + 2, player.y + player.height + player.velocityY) ||
+            isSolid(player.x + player.width - 2, player.y + player.height + player.velocityY)) {
+            player.y = Math.floor((player.y + player.height) / TILE_SIZE) * TILE_SIZE - player.height;
+            player.velocityY = 0;
+            player.onGround = true;
+        } else {
+            player.y += player.velocityY;
+            player.onGround = false;
+        }
+    } else if (player.velocityY < 0) {
+        if (isSolid(player.x + 2, player.y + player.velocityY) ||
+            isSolid(player.x + player.width - 2, player.y + player.velocityY)) {
+            player.y = Math.ceil(player.y / TILE_SIZE) * TILE_SIZE;
+            player.velocityY = 0;
+        } else {
+            player.y += player.velocityY;
+        }
+    }
+
+    player.sprite.x = player.x;
+    player.sprite.y = player.y;
+    updateCamera();
 }
-else if(ob.ystep > ob.y)
-{
-	var yold = ob.ytile + game.halfvisy + 1;
-	var ynew = ob.ytile - game.halfvisy - 1;
-	for (var i = ob.xtile - game.halfvisx - 1; i <= ob.xtile + game.halfvisx + 1; ++i)
-	{
-		changeTile (i, yold, i, ynew, _root["myMap" + game.currentMap]);
-	}
-	ob.ystep = ob.ystep - game.tileH;
-}
-return (true);
+
+app.ticker.add(gameLoop);
+</script>
+
+Notice that the hero stays near the center of the screen while the world slides around them. That's the illusion of scrolling - the hero isn't really moving on screen, the world is.
+
+## THE THEORY 🎥
+
+Without scrolling, the hero moves across the screen and eventually hits the edge. With scrolling, you keep the hero roughly centered and shift *everything else* in the opposite direction.
+
+In PixiJS, the cleanest way to do this is a **world Container**. Put every tile, enemy, and sprite inside it. Then move the container itself. From the player's point of view, nothing changes - their coordinates are still world-space pixels. The container offset is purely a visual trick.
+
+```
+screen position = world position - camera position
 ```
 
-First we move game.clip holding all the tiles and the hero to new position based on center point and coordinates of the hero. Then we have 4 similar blocks of code, each for 1 direction. When hero has moved more then the size of tiles, those loops call changeTile function with correct variables. When loop has ended and tiles have been moved/renamed/changed, we update ystep/xstep properties.
+When the hero is at world x=450, and the camera is at x=300, the hero appears at screen x=150 (center of a 300px wide screen). The container shifts left by 300px and everything inside appears shifted left by that amount.
 
-Now lets make that changeTile function:
+## SETTING UP THE WORLD CONTAINER 🌍
 
+The only structural change from earlier tutorials: instead of adding tiles directly to `app.stage`, add them to a `Container` called `world`. The stage itself stays empty except for UI elements like a score display.
+
+```js
+import { Application, Graphics, Container } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
+
+const world = new Container();
+app.stage.addChild(world);
+
+// All game objects go into world, NOT app.stage
+function buildMap() {
+    for (let row = 0; row < map.length; row++) {
+        for (let col = 0; col < map[row].length; col++) {
+            if (map[row][col] === 1) {
+                const tile = new Graphics()
+                    .rect(0, 0, game.tileSize, game.tileSize)
+                    .fill(0x8B4513);
+                tile.x = col * game.tileSize;
+                tile.y = row * game.tileSize;
+                world.addChild(tile); // ← world, not app.stage
+            }
+        }
+    }
+}
+
+// UI elements (score, health bar) go on the stage directly
+// so they don't scroll with the world
+const scoreText = new Text({ text: 'Score: 0', style: scoreStyle });
+app.stage.addChild(scoreText); // ← stage, so it stays fixed
 ```
-function changeTile (xold, yold, xnew, ynew, map)
-{
-	var nameold = "t_" + yold + "_" + xold;
-	var namenew = "t_" + ynew + "_" + xnew;
-	if(ynew >= 0 and xnew >= 0 and ynew <= map.length - 1 and xnew <= map[0].length-1)
-	{
-		game[namenew] = new game["Tile" + map[ynew][xnew]]();
-		game.clip[nameold]._name = namenew;
-		game.clip[namenew].gotoAndStop(game[namenew].frame);
-		game.clip[namenew]._x = (xnew * game.tileW);
-		game.clip[namenew]._y = (ynew * game.tileH);
-	}
-	else
-	{
-		game[namenew] = new game.Tile3();
-		game.clip[nameold]._name = namenew;
-		game.clip[namenew].gotoAndStop(game[namenew].frame);
-	}
+
+Your collision detection (`isSolid`) doesn't change at all - it still uses the player's world coordinates to check the map array. The camera offset is invisible to the game logic.
+
+## THE CAMERA 📷
+
+The camera is just two numbers: `camX` and `camY`. You set `world.x = -camX` and `world.y = -camY` each frame to shift everything into view.
+
+**Simple version** - snaps instantly to the player:
+
+```js
+function updateCamera() {
+    // Center the viewport on the player
+    const camX = player.x + player.width / 2 - SCREEN_W / 2;
+    const camY = player.y + player.height / 2 - SCREEN_H / 2;
+
+    world.x = -camX;
+    world.y = -camY;
 }
 ```
 
-So, we will receive 2 old coordinates and 2 new for our tile. To check if tile is still inside map array, we also have passed the map. "nameold" will be our tiles old name and "namenew" will be new name. After we have created new tile object with new and fresh name, the line:
+**Smooth version** - eases toward the player position for that polished feel:
 
+```js
+let camX = 0;
+let camY = 0;
+const CAMERA_SMOOTH = 0.12; // 0 = never moves, 1 = instant snap
+
+function updateCamera() {
+    const targetX = player.x + player.width / 2 - SCREEN_W / 2;
+    const targetY = player.y + player.height / 2 - SCREEN_H / 2;
+
+    // Move a fraction of the remaining distance each frame
+    camX += (targetX - camX) * CAMERA_SMOOTH;
+    camY += (targetY - camY) * CAMERA_SMOOTH;
+
+    // Round to whole pixels to prevent blurry sub-pixel rendering
+    world.x = -Math.round(camX);
+    world.y = -Math.round(camY);
+}
 ```
-game.clip[nameold]._name = namenew;
+
+This easing makes the camera feel like it has weight - it chases the player but slightly lags behind, which looks professional. Try values between `0.08` (floaty) and `0.2` (snappy).
+
+Call `updateCamera()` at the end of your game loop, after all positions are updated:
+
+```js
+function gameLoop() {
+    handleInput();
+    applyPhysics();
+    resolveCollisions();
+    updateCamera(); // ← always last
+}
 ```
 
-renames tiles movie clip. When new movie clip is empty, then we don't need to place it to the new _x/_y, it can remain in its old position.
+## LARGE MAPS: TILE RECYCLING ♻️
 
-You can download the source fla with all the code and movie set up here.
+For most games - maps up to around 100×100 tiles - just render all tiles into the world container. PixiJS automatically skips drawing anything outside the viewport, so performance is not a problem.
+
+For truly massive maps (thousands of tiles), you can recycle tile sprites as they scroll off-screen: take the column of tiles that just left the left edge and move those same sprites to the right edge, updating their appearance to match the new map data. This keeps the sprite count constant no matter how large the map is.
+
+The pattern works like this:
+
+```js
+// Only create sprites for the visible window + 1 tile buffer on each edge
+const VISIBLE_COLS = Math.ceil(SCREEN_W / TILE_SIZE) + 2; // e.g. 12
+const VISIBLE_ROWS = Math.ceil(SCREEN_H / TILE_SIZE) + 2;
+
+// When the camera moves right by one full tile:
+function recycleColumn(oldCol, newCol) {
+    for (let row = firstVisibleRow; row <= lastVisibleRow; row++) {
+        const sprite = tileSprites.get(`${oldCol}_${row}`);
+
+        // Move sprite to new map position
+        sprite.x = newCol * TILE_SIZE;
+        sprite.y = row * TILE_SIZE;
+
+        // Update sprite appearance for new tile type
+        const tileType = map[row][newCol];
+        updateTileSprite(sprite, tileType);
+
+        // Re-key in the tracking map
+        tileSprites.delete(`${oldCol}_${row}`);
+        tileSprites.set(`${newCol}_${row}`, sprite);
+    }
+}
+```
+
+**When do you need this?** If you can't feel your game stuttering, you don't need it. Premature optimization is the root of all evil - start with the simple container approach, and only add recycling if you hit a real performance problem.
+
+**Next up**: The camera works, but walk to the edge of the map and you'll see the problem. [Next: More Scrolling](/tutorial/18-more-scrolling/)

@@ -8,150 +8,261 @@ next = "/tutorial/19-depth/"
 prev = "/tutorial/17-scrolling/"
 +++
 
-Keeping the hero in the center is all fine until we move at the border of map, then we start to see some ugly background outside of the map. You can make this problem disappear, if you build wall tiles inside your map, preventing hero's approaches to the edge. But that will need additional planning in the maps, and it adds unnecessary empty area around them. Much better idea is to scroll the background only when hero is not near the edge. Like this:
+The camera from the previous tutorial has one flaw: walk to the edge of the map and the camera keeps going, revealing the empty void beyond. Every great platformer stops scrolling at the map boundary so the world feels solid and complete. Let's fix it!
 
-```
-EXAMPLE HERE
-```
+<div id="clampDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="clampCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Arrow Keys + Space to jump<br>
+        <strong>Notice:</strong> Camera stops at the world's edges! 🗺️
+    </div>
+</div>
 
+<script type="module">
+import { Application, Graphics, Container } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
 
-## HOW FAR IS TOO FAR?
+const canvas = document.getElementById('clampCanvas');
+const app = new Application();
+await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x87CEEB });
 
-Hero will always move, only difference is, that when he reaches the edge of map, we won't scroll the background tiles anymore, making it not scroll. In the left picture hero is from the left edge "halfvisx" number of tiles away. If hero would move more left and the map would scroll, it would reveal an area not covered by the map and the tiles:
+const TILE_SIZE = 30;
+const SCREEN_W = 300;
+const SCREEN_H = 240;
+const GRAVITY = 0.6;
 
-![](/p19_2.gif)
+// Map is 20×14 tiles (600×420px) - larger than the 300×240 viewport in both axes
+const map = [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1],
+    [1,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,1,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1],
+    [1,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
 
-In the right picture hero is from the bottom edge "halfvisy" number of tiles away. No more scrolling should happen when hero moves down.
+const MAP_COLS = map[0].length;
+const MAP_ROWS = map.length;
+const MAP_W = MAP_COLS * TILE_SIZE; // 600px
+const MAP_H = MAP_ROWS * TILE_SIZE; // 420px
 
-We have to consider the new positions of hero also when we first build the map. If hero starts near the map edge, he cant be placed in the center. What actually happens, is that we will shift all the tiles, included hero by certain amount when placing them with buildMap function.
+const world = new Container();
+app.stage.addChild(world);
 
-After placing tiles clip and calculating values for halfvisx/halfvisy in the buildMap function add code:
-
-```
-game.mapwidth = map[0].length;
-game.mapheight = map.length;
-```
-
-game.mapwidth will be the number of horizontal tiles on current map and game.mapheight is number of vertical tiles. We will use those to determine, if hero is near the right or bottom edge of map. Now let's calculate how much we have to move tiles when hero starts near the edge:
-
-```
-if(char.xtile < game.halfvisx)
-{
-	var fixx = char.xtile - game.halfvisx;
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        if (map[row][col] === 1) {
+            const tile = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            tile.x = col * TILE_SIZE;
+            tile.y = row * TILE_SIZE;
+            world.addChild(tile);
+        }
+    }
 }
-else if(char.xtile > game.mapwidth - game.halfvisx)
-{
-	var fixx = game.mapwidth - char.xtile;
+
+const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+world.addChild(heroSprite);
+
+const player = {
+    sprite: heroSprite,
+    x: 60, y: 330,
+    width: 12, height: 12,
+    velocityX: 0, velocityY: 0,
+    speed: 2, jumpPower: -10,
+    onGround: false
+};
+
+let camX = 0;
+let camY = player.y + player.height / 2 - SCREEN_H / 2;
+const SMOOTH = 0.12;
+
+function updateCamera() {
+    const targetX = player.x + player.width / 2 - SCREEN_W / 2;
+    const targetY = player.y + player.height / 2 - SCREEN_H / 2;
+
+    camX += (targetX - camX) * SMOOTH;
+    camY += (targetY - camY) * SMOOTH;
+
+    // Clamp: don't scroll past the map edges
+    camX = Math.max(0, Math.min(camX, MAP_W - SCREEN_W));
+    camY = Math.max(0, Math.min(camY, MAP_H - SCREEN_H));
+
+    world.x = -Math.round(camX);
+    world.y = -Math.round(camY);
 }
-if(char.ytile < game.halfvisy)
-{
-	var fixy = char.ytile - game.halfvisy;
+
+function isSolid(x, y) {
+    const col = Math.floor(x / TILE_SIZE);
+    const row = Math.floor(y / TILE_SIZE);
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return true;
+    return map[row][col] === 1;
 }
-else if(char.ytile > game.mapheight - game.halfvisy - 1)
-{
-	var fixy = game.mapheight - char.ytile - 1;
+
+const keys = {};
+window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+function gameLoop() {
+    if (keys['ArrowLeft'])  player.velocityX = -player.speed;
+    else if (keys['ArrowRight']) player.velocityX = player.speed;
+    else player.velocityX = 0;
+
+    if ((keys['Space'] || keys['ArrowUp']) && player.onGround) {
+        player.velocityY = player.jumpPower;
+        player.onGround = false;
+    }
+
+    player.velocityY += GRAVITY;
+
+    const newX = player.x + player.velocityX;
+    if (!isSolid(newX, player.y + 2) && !isSolid(newX, player.y + player.height - 2) &&
+        !isSolid(newX + player.width, player.y + 2) && !isSolid(newX + player.width, player.y + player.height - 2)) {
+        player.x = newX;
+    }
+
+    if (player.velocityY > 0) {
+        if (isSolid(player.x + 2, player.y + player.height + player.velocityY) ||
+            isSolid(player.x + player.width - 2, player.y + player.height + player.velocityY)) {
+            player.y = Math.floor((player.y + player.height) / TILE_SIZE) * TILE_SIZE - player.height;
+            player.velocityY = 0;
+            player.onGround = true;
+        } else {
+            player.y += player.velocityY;
+            player.onGround = false;
+        }
+    } else if (player.velocityY < 0) {
+        if (isSolid(player.x + 2, player.y + player.velocityY) ||
+            isSolid(player.x + player.width - 2, player.y + player.velocityY)) {
+            player.y = Math.ceil(player.y / TILE_SIZE) * TILE_SIZE;
+            player.velocityY = 0;
+        } else {
+            player.y += player.velocityY;
+        }
+    }
+
+    player.sprite.x = player.x;
+    player.sprite.y = player.y;
+    updateCamera();
 }
+
+// Start camera near the player's initial position
+camX = 0;
+camY = Math.max(0, Math.min(player.y + player.height / 2 - SCREEN_H / 2, MAP_H - SCREEN_H));
+
+app.ticker.add(gameLoop);
+</script>
+
+Walk to a corner of the map - the camera stops cleanly at the edge and the hero keeps moving. That's the `clamp`. Two lines added to `updateCamera()` and the void disappears.
+
+## HOW FAR IS TOO FAR? 📐
+
+The camera position tells us where the top-left corner of the viewport sits in world space. The camera should never go negative (that would show left of the map) and it should never go so far right that the right edge of the viewport extends beyond the map.
+
+Picture it: if the map is 600px wide and the viewport is 300px wide, the camera's maximum x position is `600 - 300 = 300`. Any further right and you'd be showing 300px of map followed by 300px of nothing.
+
+```text
+camera min = 0
+camera max = (map width in pixels) - (screen width in pixels)
 ```
 
-fixx and fixy will have value of number of tiles needed to shift everything to make hero appear in the correct position. First line checks if hero is near the left edge, it happens only when xtile is less than halfvisx and then we move tiles by the amount of xtile-halfvisx. In the right edge hero stands only if xtile is more then mapwidth-halfvisx.
+The same logic applies vertically.
 
-Now we add fixx/fixy to the position of tile:
+## CLAMPING THE CAMERA 🗜️
 
-```
-game.clip._x = game.centerx - ((char.xtile - fixx) * game.tileW) - game.tileW / 2;
-game.clip._y = game.centery - ((char.ytile - fixy) * game.tileH) - game.tileH / 2;
-```
+Add two lines to `updateCamera()` after the smoothing, before you apply the position:
 
-and we also have to change the loops for creating visible tiles:
+```js
+let camX = 0;
+let camY = 0;
+const SMOOTH = 0.12;
 
-```
-for (var y = char.ytile - game.halfvisy - fixy; y <= char.ytile
-                                                  + game.halfvisy + 1 - fixy; ++y)
-{
-	for (var x = char.xtile - game.halfvisx - fixx; x <= char.xtile
-                                                  + game.halfvisx + 1 - fixx; ++x)
-	{
-		...
-```
-That's about building the map. Now let's move on to move the hero.
+// Store map dimensions in pixels for easy reuse
+const MAP_W = map[0].length * game.tileSize; // e.g. 20 tiles × 30px = 600px
+const MAP_H = map.length    * game.tileSize; // e.g. 14 tiles × 30px = 420px
 
+function updateCamera() {
+    const targetX = player.x + player.width  / 2 - SCREEN_W / 2;
+    const targetY = player.y + player.height / 2 - SCREEN_H / 2;
 
-## MOVING ON THE EDGE
+    camX += (targetX - camX) * SMOOTH;
+    camY += (targetY - camY) * SMOOTH;
 
-In the moveChar function put the scrolling part into if statements:
+    // Clamp: never show outside the map
+    camX = Math.max(0, Math.min(camX, MAP_W - SCREEN_W));
+    camY = Math.max(0, Math.min(camY, MAP_H - SCREEN_H));
 
-```
-if(ob.x > game.halfvisx * game.tileW + game.tileW / 2)
-{
-   if(ob.x < (game.mapwidth - game.halfvisx) * game.tileW - game.tileW / 2)
-   {
-      game.clip._x = game.centerx - ob.x;
-      if(ob.xstep < ob.x - game.tileW)
-      {
-         var xnew = ob.xtile + game.halfvisx + 1;
-         var xold = ob.xtile - game.halfvisx - 1;
-         var fixy = Math.round(((game.centery - ob.y) - game.clip._y) / game.tileH);
-         for (var i = ob.ytile - game.halfvisy - 1 + fixy; i <= ob.ytile + game.halfvisy
-		                                                         + 1 + fixy; ++i)
-         {
-            changeTile (xold, i, xnew, i, _root["myMap" + game.currentMap]);
-         }
-         ob.xstep = ob.xstep + game.tileW;
-      }
-      else if(ob.xstep > ob.x)
-      {
-         var xold = ob.xtile + game.halfvisx + 1;
-         var xnew = ob.xtile - game.halfvisx - 1;
-         var fixy = Math.round(((game.centery - ob.y) - game.clip._y) / game.tileH);
-         for (var i = ob.ytile - game.halfvisy - 1 + fixy; i <= ob.ytile + game.halfvisy
-		                                                         + 1 + fixy; ++i)
-         {
-            changeTile (xold, i, xnew, i, _root["myMap" + game.currentMap]);
-         }
-         ob.xstep = ob.xstep - game.tileW;
-      }
-   }
-}
-```
-
-It's the same thing as before, only we first check if hero has moved near the edge. Also for the loop moving tiles from one side to the other work correctly, we have to use our friends fixy/fixx again. Notice that unlike in the buildMap function, we use actual pixel coordinates here because our hero can move not only by whole tile, but also by fraction of tile.
-
-Same way we modify vertical movement too:
-
-```
-if(ob.y > game.halfvisy * game.tileH + game.tileH / 2)
-{
-   if(ob.y < (game.mapheight - game.halfvisy) * game.tileH - game.tileH / 2)
-   {
-      game.clip._y = game.centery - ob.y;
-      if(ob.ystep < ob.y - game.tileH)
-      {
-         var ynew = ob.ytile + game.halfvisy + 1; var yold = ob.ytile - game.halfvisy - 1;
-         var fixx = Math.round(((game.centerx - ob.x) - game.clip._x) / game.tileW);
-         for (var i = ob.xtile - game.halfvisx - 1 + fixx; i <= ob.xtile + game.halfvisx
-		                                                         + 1 + fixx; ++i)
-         {
-            changeTile (i, yold, i, ynew, _root["myMap" + game.currentMap]);
-         }
-         ob.ystep = ob.ystep + game.tileH;
-      }
-      else if(ob.ystep > ob.y)
-      {
-         var yold = ob.ytile + game.halfvisy + 1;
-         var ynew = ob.ytile - game.halfvisy - 1;
-         var fixx = Math.round(((game.centerx - ob.x) - game.clip._x) / game.tileW);
-         for (var i = ob.xtile - game.halfvisx - 1 + fixx; i <= ob.xtile + game.halfvisx
-		                                                         + 1 + fixx; ++i)
-         {
-            changeTile (i, yold, i, ynew, _root["myMap" + game.currentMap]);
-         }
-         ob.ystep = ob.ystep - game.tileH;
-      }
-   }
+    world.x = -Math.round(camX);
+    world.y = -Math.round(camY);
 }
 ```
 
-That's all from the scrolling department, next we will look at the depth of movie clips and something very scary called "z-sorting".
+`Math.max(0, ...)` prevents the camera going too far left or up. `Math.min(..., MAP_W - SCREEN_W)` prevents it going too far right or down. Together they lock the viewport inside the map at all times.
 
-You can download the source fla with all the code and movie set up here.
+## STARTING NEAR THE EDGE 🏁
 
+There's one more edge case (pun intended): what if the hero starts near a corner of the map? If the map is only 8 tiles wide and the hero starts at tile 1, the camera would want to center on the hero - but that would put the left side of the viewport outside the map.
+
+The clamp already handles this automatically! Just initialize `camX` and `camY` using the same formula you use every frame, and `Math.max/min` will catch it:
+
+```js
+// Initialize camera before the first frame
+// The clamp will handle edge cases automatically
+camX = Math.max(0, Math.min(
+    player.x + player.width  / 2 - SCREEN_W / 2,
+    MAP_W - SCREEN_W
+));
+camY = Math.max(0, Math.min(
+    player.y + player.height / 2 - SCREEN_H / 2,
+    MAP_H - SCREEN_H
+));
+```
+
+This ensures the very first frame renders correctly, with no jump or pop as the camera corrects itself.
+
+## ONE-AXIS SCROLLING 🔁
+
+Some games only scroll horizontally (classic side-scrollers like the original Mario), others only vertically. You can easily restrict the camera to one axis:
+
+```js
+function updateCamera() {
+    // Horizontal scroll only - vertical is fixed
+    const targetX = player.x + player.width / 2 - SCREEN_W / 2;
+    camX += (targetX - camX) * SMOOTH;
+    camX = Math.max(0, Math.min(camX, MAP_W - SCREEN_W));
+
+    world.x = -Math.round(camX);
+    world.y = 0; // Vertical position never changes
+}
+```
+
+Or lock the horizontal axis for a vertical-only scroller:
+
+```js
+function updateCamera() {
+    const targetY = player.y + player.height / 2 - SCREEN_H / 2;
+    camY += (targetY - camY) * SMOOTH;
+    camY = Math.max(0, Math.min(camY, MAP_H - SCREEN_H));
+
+    world.x = 0; // Horizontal position never changes
+    world.y = -Math.round(camY);
+}
+```
+
+That's the complete scrolling system! The full `updateCamera` function is only about 8 lines, but it handles worlds of any size, smooth following, and clean edge behavior.
+
+**What you've built:**
+
+- ✅ World Container that decouples game logic from camera position
+- ✅ Smooth camera easing that follows the player
+- ✅ Clamped edges - no more void beyond the map
+- ✅ Correct initial camera position even when the hero starts near an edge
+- ✅ Single-axis scrolling for classic-style games
+
+**Next up**: Your world has depth - now let's render it that way. [Next: Depth](/tutorial/19-depth/)
