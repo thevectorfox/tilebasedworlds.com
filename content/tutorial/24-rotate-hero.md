@@ -8,134 +8,438 @@ next = "/tutorial/25-rotate-background/"
 prev = "/tutorial/23-isometric-scroll/"
 +++
 
-Hopefully you have noticed how our hero has been so far walking straight. He could walk straight to the left or straight to the right, but not in any angle. Now we will allow player to rotate the hero and walk in any direction. Play with this example, left and right arrow keys to rotate, up and down arrow keys to move:
+Ready to make your hero feel more alive? So far our character has been limited to walking in just four directions - up, down, left, and right. That's fine for a retro RPG, but what if you want to create a top-down shooter, a racing game, or a spaceship adventure? Time to unlock the magic of **360-degree movement**!
 
-```
-EXAMPLE HERE
-```
+In this tutorial, you'll learn how to rotate your hero and move in any direction using the power of trigonometry (don't worry, it's easier than it sounds!). By the end, your character will move like they do in games like *Asteroids*, *Hotline Miami*, or any twin-stick shooter.
 
-For this kind of game we only need 1 view on the hero as he is always looked directly down. So, you can get rid of all other frames in the char movie clip except the one, where hero faces right. Moving right is default position for movement, when angle of rotation is 0. Don't forget, the hero is still looked straight down, but he should be placed so he looks at the right.
+**What You'll Build:**
+- Smooth character rotation with arrow keys
+- Movement in any direction based on rotation angle
+- Collision detection that works with rotated characters
 
-For movement in any direction, we will need 2 variables, the angle of the movement and the value of the movement. We will use rotation of the hero movie clip for the angle and variable "speed" in the char object for the value of movement. When we know angle and value, we can find out x and y components from those:
+**Prerequisites:**
+- Completed the previous movement and collision tutorials
+- Basic understanding of our standard character object pattern
 
-![](/p25_2.gif)
+Let's start by setting up our rotatable hero. For top-down rotation games, you only need one sprite frame - typically facing right (0 degrees rotation). This becomes your "default" direction, and we'll rotate from there.
 
-To project speed vector with the known length and angle to the x and y axis, we can use these lines:
+<div id="rotateDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="rotateCanvas" width="300" height="240" style="border: 2px solid #333; background: #2c3e50; display: block; margin: 0 auto;"></canvas>
+    <div style="margin-top: 10px; font-family: monospace;">
+        <strong>Controls:</strong> ← → Rotate, ↑ ↓ Move Forward/Back
+    </div>
+    <div id="rotateStatus" style="margin-top: 5px; font-size: 12px; color: #666; min-height: 16px;"></div>
+</div>
 
-```
-speedx = speed * Math.cos(angle);
-speedy = speed * Math.sin(angle);
-```
+<script type="module">
+import { Application, Container, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
 
-Don't forget the weird thing in Flash, that _rotation property is given in degrees and Math methods expect the angle to be in radians. If we use _rotation as angle, we must first convert it into radians using:
+const canvas = document.getElementById('rotateCanvas');
+const app = new Application();
 
-```
-anglerad = _rotation * Math.PI / 180;
-```
+await app.init({
+    canvas: canvas,
+    width: 300,
+    height: 240,
+    backgroundColor: 0x2c3e50
+});
 
-Ready to rewrite key detection function? What we want, is the char movie clip to rotate when left or right arrow keys are pressed and move when up or down arrow keys are pressed:
+// Game constants
+const TILE_SIZE = 30;
 
-```
-if (Key.isDown(Key.RIGHT))
-{
-  ob.clip._rotation += 5;
+// Create a simple map with walls around the edges
+const map = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,0,0,1,1,0,1],
+    [1,0,1,0,0,0,0,1,0,1],
+    [1,0,0,0,1,1,0,0,0,1],
+    [1,0,1,0,1,1,0,1,0,1],
+    [1,0,1,1,0,0,1,1,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1]
+];
+
+// Create map display
+const mapContainer = new Container();
+app.stage.addChild(mapContainer);
+
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        if (map[row][col] === 1) {
+            const tile = new Graphics()
+                .rect(0, 0, TILE_SIZE, TILE_SIZE)
+                .fill(0x34495e);
+            tile.x = col * TILE_SIZE;
+            tile.y = row * TILE_SIZE;
+            mapContainer.addChild(tile);
+        }
+    }
 }
-else if (Key.isDown(Key.LEFT))
-{
-  ob.clip._rotation -= 5;
+
+// Create hero - arrow shape pointing right
+const hero = new Graphics();
+hero.beginFill(0xff4444);
+// Draw a simple arrow pointing right (starting direction)
+hero.moveTo(0, 4);
+hero.lineTo(8, 4);
+hero.lineTo(8, 0);
+hero.lineTo(12, 6);
+hero.lineTo(8, 12);
+hero.lineTo(8, 8);
+hero.lineTo(0, 8);
+hero.closePath();
+hero.endFill();
+
+// Set pivot point to center for smooth rotation
+hero.pivot.set(6, 6);
+app.stage.addChild(hero);
+
+// Player properties
+const player = {
+    sprite: hero,
+    x: 150,  // Center of screen
+    y: 120,
+    width: 12,
+    height: 12,
+    rotation: 0,        // Current angle in radians
+    rotationSpeed: 0.1, // How fast we rotate
+    speed: 2,           // Movement speed
+    velocityX: 0,
+    velocityY: 0
+};
+
+// Position the sprite
+player.sprite.x = player.x;
+player.sprite.y = player.y;
+
+// Input handling
+const keys = {};
+window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+// Collision detection
+function checkTileCollision(x, y) {
+    const col = Math.floor(x / TILE_SIZE);
+    const row = Math.floor(y / TILE_SIZE);
+    
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) {
+        return true; // Treat out of bounds as solid
+    }
+    
+    return map[row][col] === 1;
 }
-if (Key.isDown(Key.UP))
-{
-  ob.speedx = ob.speed * Math.cos((ob.clip._rotation) * Math.PI / 180);
-  ob.speedy = ob.speed * Math.sin((ob.clip._rotation) * Math.PI / 180);
-  keyPressed = _root.moveChar(ob, ob.speedx, ob.speedy);
+
+// Check if player would collide with walls
+function checkPlayerCollision(newX, newY) {
+    // Check all four corners of the player
+    const halfW = player.width / 2;
+    const halfH = player.height / 2;
+    
+    return checkTileCollision(newX - halfW, newY - halfH) ||
+           checkTileCollision(newX + halfW, newY - halfH) ||
+           checkTileCollision(newX - halfW, newY + halfH) ||
+           checkTileCollision(newX + halfW, newY + halfH);
 }
-else if (Key.isDown(Key.DOWN))
-{
-  ob.speedx = -ob.speed * Math.cos((ob.clip._rotation) * Math.PI / 180);
-  ob.speedy = -ob.speed * Math.sin((ob.clip._rotation) * Math.PI / 180);
-  keyPressed = _root.moveChar(ob, ob.speedx, ob.speedy);
+
+// Status display for educational purposes
+const statusElement = document.getElementById('rotateStatus');
+function updateStatus() {
+    const degrees = (player.rotation * 180 / Math.PI).toFixed(0);
+    const normalizedDegrees = ((degrees % 360) + 360) % 360;
+    const vX = player.velocityX.toFixed(1);
+    const vY = player.velocityY.toFixed(1);
+    const speed = Math.sqrt(vX * vX + vY * vY).toFixed(1);
+    
+    statusElement.textContent = `Angle: ${normalizedDegrees}° | Velocity: (${vX}, ${vY}) | Speed: ${speed}`;
+}
+
+function updatePlayer() {
+    // Rotation controls
+    if (keys['ArrowLeft']) {
+        player.rotation -= player.rotationSpeed;
+    }
+    if (keys['ArrowRight']) {
+        player.rotation += player.rotationSpeed;
+    }
+    
+    // Calculate movement based on rotation
+    player.velocityX = 0;
+    player.velocityY = 0;
+    
+    if (keys['ArrowUp']) {
+        // Move forward in facing direction
+        player.velocityX = player.speed * Math.cos(player.rotation);
+        player.velocityY = player.speed * Math.sin(player.rotation);
+    } else if (keys['ArrowDown']) {
+        // Move backward
+        player.velocityX = -player.speed * Math.cos(player.rotation);
+        player.velocityY = -player.speed * Math.sin(player.rotation);
+    }
+    
+    // Try to move, check for collisions
+    const newX = player.x + player.velocityX;
+    const newY = player.y + player.velocityY;
+    
+    if (!checkPlayerCollision(newX, newY)) {
+        player.x = newX;
+        player.y = newY;
+        
+        // Visual feedback when moving
+        player.sprite.tint = player.velocityX !== 0 || player.velocityY !== 0 ? 0xffaaaa : 0xffffff;
+    } else {
+        // Hit a wall - brief red flash
+        player.sprite.tint = 0xff6666;
+        setTimeout(() => player.sprite.tint = 0xffffff, 150);
+    }
+    
+    // Keep player in reasonable bounds
+    player.x = Math.max(20, Math.min(player.x, 280));
+    player.y = Math.max(20, Math.min(player.y, 220));
+    
+    // Update sprite
+    player.sprite.x = player.x;
+    player.sprite.y = player.y;
+    player.sprite.rotation = player.rotation;
+    
+    // Educational status display
+    updateStatus();
+}
+
+// Game loop
+app.ticker.add(updatePlayer);
+</script>
+
+## The Magic of Vectors and Angles
+
+For movement in any direction, we need two key components:
+1. **The angle** - which direction the character is facing
+2. **The speed** - how fast they're moving
+
+When you know both angle and speed, you can calculate the exact X and Y movement using trigonometry. Here's the beautiful math behind it:
+
+![Vector diagram showing angle and speed conversion to X/Y components]
+
+```javascript
+// Convert polar coordinates (angle + speed) to cartesian (x, y)
+const speedX = speed * Math.cos(angle);
+const speedY = speed * Math.sin(angle);
+```
+
+In JavaScript, trigonometric functions expect angles in **radians**, not degrees. Since we often think in degrees (360° circle), here's the conversion:
+
+```javascript
+const angleInRadians = angleInDegrees * Math.PI / 180;
+```
+
+But don't worry - PixiJS rotation works in radians by default, so this conversion happens naturally!
+
+## Setting Up Your Rotatable Character
+
+Let's upgrade our standard player object to handle rotation and directional movement:
+
+```javascript
+const player = {
+    // Position and size (standard 12x12 hero)
+    x: 150,
+    y: 120,
+    width: 12,
+    height: 12,
+    
+    // Movement properties
+    speed: 3,           // Pixels per frame
+    rotation: 0,        // Current angle in radians
+    rotationSpeed: 0.1, // How fast we rotate (radians per frame)
+    
+    // Velocity components
+    velocityX: 0,
+    velocityY: 0,
+    
+    // PixiJS sprite
+    sprite: null
+};
+
+// Create the PixiJS sprite (facing right by default)
+player.sprite = new PIXI.Graphics();
+player.sprite.beginFill(0xff4444);  // Our standard red hero color
+player.sprite.drawRect(0, 0, player.width, player.height);
+player.sprite.endFill();
+player.sprite.x = player.x;
+player.sprite.y = player.y;
+app.stage.addChild(player.sprite);
+```
+
+## Handling Rotation Input
+
+Time to make your hero respond to controls! We'll use the arrow keys for rotation (left/right) and movement (up/down):
+
+```javascript
+// Key state tracking
+const keys = {};
+
+// Add event listeners for smooth input handling
+window.addEventListener('keydown', (e) => {
+    keys[e.key] = true;
+});
+
+window.addEventListener('keyup', (e) => {
+    keys[e.key] = false;
+});
+
+// Update function called every frame
+function updatePlayer() {
+    // Rotation controls (left/right arrows)
+    if (keys['ArrowLeft']) {
+        player.rotation -= player.rotationSpeed;
+    }
+    if (keys['ArrowRight']) {
+        player.rotation += player.rotationSpeed;
+    }
+    
+    // Calculate movement based on current rotation
+    let isMoving = false;
+    
+    if (keys['ArrowUp']) {
+        // Move forward in the direction we're facing
+        player.velocityX = player.speed * Math.cos(player.rotation);
+        player.velocityY = player.speed * Math.sin(player.rotation);
+        isMoving = true;
+    } else if (keys['ArrowDown']) {
+        // Move backward (reverse direction)
+        player.velocityX = -player.speed * Math.cos(player.rotation);
+        player.velocityY = -player.speed * Math.sin(player.rotation);
+        isMoving = true;
+    } else {
+        // No movement keys pressed - stop the player
+        player.velocityX = 0;
+        player.velocityY = 0;
+    }
+    
+    // Apply movement if we're moving
+    if (isMoving) {
+        moveCharacter(player, player.velocityX, player.velocityY);
+    }
+    
+    // Update the sprite rotation and position
+    player.sprite.rotation = player.rotation;
+    player.sprite.x = player.x;
+    player.sprite.y = player.y;
 }
 ```
 
-When up or down arrow keys are pressed, we first calculate the x and y movement values and then we call the moveChar function using those. Since we are now passing both values to the moveChar function, we also have to change some code in that function. So far our moveChar function has always got only 0, 1 or -1 in the x or y directions (refresh your memory from tutorial 6).
+**Pro Tip**: The rotation speed of 0.1 radians gives you smooth, controlled rotation. That's about 5.7 degrees per frame - experiment with different values to find what feels best for your game!
 
-The number 5 here is only as an example, you can use other numbers to change the rotation. Try to use numbers that create full circle in the end (360 degrees). So 2, 4, 6, 12 and 90 are good, but 13.5 and 7 would be bad choice.
+## Updating Movement for Any Direction
 
-Remove all the ob.speed parts from that function:
+Now that we can move in any direction (not just the cardinal directions), we need to update our collision detection function. The key change is handling fractional movement values instead of just -1, 0, or 1:
 
-```
-function moveChar (ob, dirx, diry)
-{
-  getMyCorners(ob.x, ob.y + diry, ob);
-  if (diry < -0.5)
-  {
-    if (ob.upleft and ob.upright)
-    {
-      ob.y += diry;
+```javascript
+function moveCharacter(player, deltaX, deltaY) {
+    // Test vertical movement first
+    getCornerPositions(player.x, player.y + deltaY, player);
+    
+    if (deltaY < -0.1) { // Moving up (with small threshold)
+        if (player.canMoveUp) {
+            player.y += deltaY;
+        } else {
+            // Snap to tile boundary
+            player.y = player.tileY * game.tileSize + player.height;
+        }
+    } else if (deltaY > 0.1) { // Moving down
+        if (player.canMoveDown) {
+            player.y += deltaY;
+        } else {
+            // Snap to tile boundary  
+            player.y = (player.tileY + 1) * game.tileSize - player.height;
+        }
     }
-    else
-    {
-      ob.y = ob.ytile * game.tileH + ob.height;
+    
+    // Test horizontal movement
+    getCornerPositions(player.x + deltaX, player.y, player);
+    
+    if (deltaX < -0.1) { // Moving left
+        if (player.canMoveLeft) {
+            player.x += deltaX;
+        } else {
+            // Snap to tile boundary
+            player.x = player.tileX * game.tileSize + player.width;
+        }
+    } else if (deltaX > 0.1) { // Moving right
+        if (player.canMoveRight) {
+            player.x += deltaX;
+        } else {
+            // Snap to tile boundary
+            player.x = (player.tileX + 1) * game.tileSize - player.width;
+        }
     }
-  }
-  if (diry > 0.5)
-  {
-    if (ob.downleft and ob.downright)
-    {
-      ob.y += diry;
-    }
-    else
-    {
-      ob.y = (ob.ytile + 1) * game.tileH - ob.height;
-    }
-  }
-  getMyCorners(ob.x + dirx, ob.y, ob);
-  if (dirx < -0.5)
-  {
-    if (ob.downleft and ob.upleft)
-    {
-      ob.x += dirx;
-    }
-    else
-    {
-      ob.x = ob.xtile * game.tileW + ob.width;
-    }
-  }
-  if (dirx > 0.5)
-  {
-    if (ob.upright and ob.downright)
-    {
-      ob.x += dirx;
-    }
-    else
-    {
-      ob.x = (ob.xtile + 1) * game.tileW - ob.width;
-    }
-  }
-  ob.clip._x = ob.x;
-  ob.clip._y = ob.y;
-  ob.xtile = Math.floor(ob.x / game.tileW);
-  ob.ytile = Math.floor(ob.y / game.tileH);
-  return (true);
+    
+    // Update tile position
+    player.tileX = Math.floor(player.x / game.tileSize);
+    player.tileY = Math.floor(player.y / game.tileSize);
 }
 ```
 
-I have added check for each movement value to be at least 0.5 pixels. When calculating speedx and speedy using sin and cos functions, Flash will return very small values instead of 0. Something like 0.00000000000000001255. You can't detect so small movement on the screen so we will ignore it.
+**Why the 0.1 threshold?** When using `Math.cos()` and `Math.sin()`, you sometimes get tiny values like 0.000000001 instead of exactly 0. The threshold prevents microscopic "movements" that would be invisible on screen.
 
-As you can see, when the hero is rotated, it can move its corners by small amount into the wall tiles. This is happening because we are not taking into account its rotation when calculating the corner points. As long your hero is shaped like a square the corners won't go too much into walls, but when you use very tall rectangle for the hero the bug becomes obvious.
+## Handling Rotation Collision Challenges
 
-![](/p25_3.gif)
+Here's a neat challenge: when your character rotates, their visual bounds change, but our collision detection still uses the original rectangular bounds. This can cause corners to clip through walls slightly.
 
-You can fix this easily by updating the width and height of the char object every time it is rotated. Place 2 lines in the left and right key detection code after changing the rotation:
+![](Diagram showing rotated character collision bounds)
 
+**Two Solutions:**
+
+### Option 1: Simple Circular Collision
+For most games, treating your character as a circle works amazingly well:
+
+```javascript
+function getCornerPositions(x, y, player) {
+    // Use circular collision - radius is half the character's size
+    const radius = Math.max(player.width, player.height) / 2;
+    const centerX = x + player.width / 2;
+    const centerY = y + player.height / 2;
+    
+    // Check if circle overlaps with any tiles
+    const leftTile = Math.floor((centerX - radius) / game.tileSize);
+    const rightTile = Math.floor((centerX + radius) / game.tileSize);
+    const topTile = Math.floor((centerY - radius) / game.tileSize);
+    const bottomTile = Math.floor((centerY + radius) / game.tileSize);
+    
+    // Simple collision flags
+    player.canMoveLeft = !checkTileCollision(leftTile, Math.floor(centerY / game.tileSize));
+    player.canMoveRight = !checkTileCollision(rightTile, Math.floor(centerY / game.tileSize));
+    player.canMoveUp = !checkTileCollision(Math.floor(centerX / game.tileSize), topTile);
+    player.canMoveDown = !checkTileCollision(Math.floor(centerX / game.tileSize), bottomTile);
+}
 ```
-char.width = char.clip._width / 2;
-char.height = char.clip._height / 2;
+
+### Option 2: Live with the Clipping
+For square-ish characters, the visual clipping is minimal and barely noticeable during gameplay. Many successful games use this approach because it's simple and performs well.
+
+## Putting It All Together
+
+Add this to your main game loop:
+
+```javascript
+// Game loop
+function gameLoop() {
+    updatePlayer();
+    
+    // Your other game updates here...
+    
+    requestAnimationFrame(gameLoop);
+}
+
+// Start the game!
+gameLoop();
 ```
 
-This will take care of those pesky corners (yay!) but it will create another bug (bummer). You see, we only check for the corners when hero moves, but we don't check for corners when he rotates. This will allow the hero to rotate near the wall while standing so its corner goes into wall and when he starts to move finally, its position is updated and movement might look jumpy. I'm not sure which is better way so in the fla I have let the corners go into walls.
+**🎉 Congratulations!** You've just implemented 360-degree character movement! Your hero can now:
+- Rotate smoothly with the arrow keys  
+- Move forward and backward in any direction
+- Handle collisions with directional movement
+- Move like characters in modern action games
 
-You can download the source fla with all the code and movie set up here.
+**Try This**: Experiment with different rotation speeds and movement speeds to find what feels right for your game. Top-down shooters often use faster rotation, while exploration games prefer slower, more deliberate movement.
 
-In the next chapter we will have even more fun by rotating entire background.
+In the next tutorial, we'll take this rotation concept even further by rotating the entire background around a fixed player - creating camera effects that'll make your game feel truly dynamic!

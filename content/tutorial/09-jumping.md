@@ -11,10 +11,11 @@ prev = "/tutorial/08-open-the-door/"
 Time to add one of the most satisfying mechanics in gaming - jumping! We're switching from top-down to side-scrolling view, where your hero can run left and right with arrow keys and launch into the air with the spacebar. Let's create that perfect jump feel that makes players want to bounce around your world!
 
 <div id="jumpingDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="jumpCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys to move, Spacebar to jump
+    <canvas id="jumpCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB; display: block; margin: 0 auto;"></canvas>
+    <div style="margin-top: 10px; font-family: monospace;">
+        <strong>Controls:</strong> ← → Arrow Keys to move, Spacebar to jump
     </div>
+    <div id="jumpStatus" style="margin-top: 5px; font-size: 12px; color: #666; min-height: 16px;"></div>
 </div>
 
 <script type="module">
@@ -87,6 +88,16 @@ const player = {
     jumping: false
 };
 
+// Status display for educational purposes
+const statusElement = document.getElementById('jumpStatus');
+function updateStatus() {
+    const vY = player.velocityY.toFixed(1);
+    const status = `Velocity Y: ${vY} | Ground: ${player.onGround ? 'Yes' : 'No'} | State: ${
+        player.onGround ? 'Standing' : player.velocityY < 0 ? 'Rising' : 'Falling'
+    }`;
+    statusElement.textContent = status;
+}
+
 // Input handling
 const keys = {};
 window.addEventListener('keydown', (e) => { keys[e.code] = true; });
@@ -114,14 +125,14 @@ function updatePlayer() {
         player.velocityX = 0;
     }
     
-    // Jumping
+    // Jumping - only when on ground!
     if (keys['Space'] && player.onGround) {
         player.velocityY = player.jumpPower;
         player.jumping = true;
         player.onGround = false;
     }
     
-    // Apply gravity
+    // Apply gravity constantly = more realistic physics!
     player.velocityY += GRAVITY;
     
     // Update position
@@ -129,30 +140,38 @@ function updatePlayer() {
     player.y += player.velocityY;
     
     // Collision detection
-    // Check ground
+    // Check ground collision while falling
     const groundCheck = checkTileCollision(player.x + player.width/2, player.y + player.height + 1);
     if (groundCheck && player.velocityY > 0) {
+        // Land on ground - snap to tile boundary
         player.y = Math.floor((player.y + player.height) / TILE_SIZE) * TILE_SIZE - player.height;
         player.velocityY = 0;
         player.onGround = true;
         player.jumping = false;
+        
+        // Visual feedback: brief color change when landing
+        player.sprite.tint = 0xffff44; // Yellow flash
+        setTimeout(() => player.sprite.tint = 0xffffff, 100);
     } else if (!groundCheck) {
         player.onGround = false;
     }
     
-    // Check ceiling
+    // Check ceiling collision while jumping up
     if (checkTileCollision(player.x + player.width/2, player.y) && player.velocityY < 0) {
         player.y = Math.ceil(player.y / TILE_SIZE) * TILE_SIZE;
-        player.velocityY = 0;
+        player.velocityY = 0; // Stop upward movement
     }
     
     // Keep player in bounds
     player.x = Math.max(0, Math.min(player.x, 300 - player.width));
     player.y = Math.max(0, player.y);
     
-    // Update sprite position
+    // Update sprite visuals
     player.sprite.x = player.x;
     player.sprite.y = player.y;
+    
+    // Educational status display
+    updateStatus();
 }
 
 // Game loop
