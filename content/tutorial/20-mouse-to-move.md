@@ -8,163 +8,343 @@ next = "/tutorial/21-isometric-view/"
 prev = "/tutorial/19-depth/"
 +++
 
-It's time to let go of the keyboard and grab that little furry thing on your desk. Not that, the computer mouse. While moving hero around with the keys is fine and has been happening for a long time, we should also understand why mouse is so popular. Mouse is so convenient, click here, click there:
+Put down the keyboard and click anywhere on the map. The hero walks there. Click-to-move is the movement style behind countless RPGs, strategy games, and point-and-click adventures. Let's build it!
 
+<div id="mouseDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="mouseCanvas" width="300" height="240" style="border: 2px solid #333; background: #5a8a3a; cursor: crosshair;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Click anywhere on the green area<br>
+        <strong>Notice:</strong> The hero walks to the tile you clicked, one step at a time
+    </div>
+</div>
+
+<script type="module">
+import { Application, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
+
+const canvas = document.getElementById('mouseCanvas');
+const app = new Application();
+await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x5a8a3a });
+
+const TILE_SIZE = 30;
+const CENTER = (TILE_SIZE - 12) / 2; // 9px offset to center a 12px hero in a 30px tile
+
+const map = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1],
+];
+
+// Draw walls
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        if (map[row][col] === 1) {
+            const wall = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            wall.x = col * TILE_SIZE;
+            wall.y = row * TILE_SIZE;
+            app.stage.addChild(wall);
+        }
+    }
+}
+
+const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+app.stage.addChild(heroSprite);
+
+const player = {
+    sprite: heroSprite,
+    x: 39, y: 39,       // Pixel position (tile 1,1 center: 1*30+9)
+    width: 12, height: 12,
+    tileX: 1, tileY: 1,
+    dirX: 0, dirY: 0,
+    speed: 2,
+    moving: false,
+    targetTileX: 1, targetTileY: 1
+};
+
+heroSprite.x = player.x;
+heroSprite.y = player.y;
+
+// Tile hover cursor - yellow highlight
+const cursor = new Graphics()
+    .rect(1, 1, TILE_SIZE - 2, TILE_SIZE - 2)
+    .fill({ color: 0xffff00, alpha: 0.35 });
+cursor.visible = false;
+app.stage.addChild(cursor);
+
+// Target marker - small crosshair at destination
+const targetMarker = new Graphics();
+targetMarker.visible = false;
+app.stage.addChild(targetMarker);
+
+function isWalkable(col, row) {
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return false;
+    return map[row][col] === 0;
+}
+
+let mouseCol = -1;
+let mouseRow = -1;
+
+canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    mouseCol = Math.floor(mx / TILE_SIZE);
+    mouseRow = Math.floor(my / TILE_SIZE);
+
+    if (isWalkable(mouseCol, mouseRow)) {
+        cursor.x = mouseCol * TILE_SIZE;
+        cursor.y = mouseRow * TILE_SIZE;
+        cursor.visible = true;
+    } else {
+        cursor.visible = false;
+    }
+});
+
+canvas.addEventListener('mouseleave', () => {
+    cursor.visible = false;
+    mouseCol = -1;
+    mouseRow = -1;
+});
+
+canvas.addEventListener('click', () => {
+    if (!isWalkable(mouseCol, mouseRow)) return;
+
+    player.targetTileX = mouseCol;
+    player.targetTileY = mouseRow;
+    player.moving = true;
+
+    // Draw crosshair at target
+    const cx = mouseCol * TILE_SIZE + TILE_SIZE / 2;
+    const cy = mouseRow * TILE_SIZE + TILE_SIZE / 2;
+    targetMarker.clear()
+        .moveTo(cx - 5, cy).lineTo(cx + 5, cy)
+        .moveTo(cx, cy - 5).lineTo(cx, cy + 5)
+        .stroke({ color: 0xffff00, width: 2 });
+    targetMarker.visible = true;
+});
+
+function movePlayer() {
+    if (!player.moving) return;
+
+    // Are we exactly at a tile center?
+    const atCenter = player.x % TILE_SIZE === CENTER &&
+                     player.y % TILE_SIZE === CENTER;
+
+    if (atCenter) {
+        player.tileX = Math.floor(player.x / TILE_SIZE);
+        player.tileY = Math.floor(player.y / TILE_SIZE);
+
+        // Reached the destination?
+        if (player.tileX === player.targetTileX && player.tileY === player.targetTileY) {
+            player.moving = false;
+            targetMarker.visible = false;
+            return;
+        }
+
+        // Pick next direction: try horizontal first, then vertical
+        player.dirX = 0;
+        player.dirY = 0;
+        if (player.tileX < player.targetTileX && isWalkable(player.tileX + 1, player.tileY)) {
+            player.dirX = 1;
+        } else if (player.tileX > player.targetTileX && isWalkable(player.tileX - 1, player.tileY)) {
+            player.dirX = -1;
+        } else if (player.tileY < player.targetTileY && isWalkable(player.tileX, player.tileY + 1)) {
+            player.dirY = 1;
+        } else if (player.tileY > player.targetTileY && isWalkable(player.tileX, player.tileY - 1)) {
+            player.dirY = -1;
+        } else {
+            player.moving = false; // blocked - can't reach target
+            targetMarker.visible = false;
+            return;
+        }
+    }
+
+    player.x += player.dirX * player.speed;
+    player.y += player.dirY * player.speed;
+    player.sprite.x = player.x;
+    player.sprite.y = player.y;
+}
+
+function gameLoop() {
+    movePlayer();
+}
+
+app.ticker.add(gameLoop);
+</script>
+
+Notice the hero steps from tile center to tile center - no stopping halfway. That's the key characteristic of tile-based movement: the hero is always perfectly aligned to the grid.
+
+## TILE-TO-TILE MOVEMENT 🗂️
+
+Keyboard movement is pixel-perfect - hold the key and the hero drifts wherever you point. Click-to-move is different: each click sets a destination **tile**, and the hero walks there by stepping from center to center.
+
+This simplification is actually a strength:
+
+- **No mid-step collision detection** - we only check if the next tile is walkable when the hero is centered and choosing a direction
+- **Predictable movement** - the hero never ends up between tiles or wedged in a corner
+- **Easy animation** - facing direction updates cleanly at each tile boundary
+
+## TRACKING THE MOUSE 🖱️
+
+Two canvas events give us everything we need:
+
+```js
+let mouseCol = -1;
+let mouseRow = -1;
+
+canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;  // pixel position within the canvas
+    const my = e.clientY - rect.top;
+
+    // Convert pixel → tile
+    mouseCol = Math.floor(mx / TILE_SIZE);
+    mouseRow = Math.floor(my / TILE_SIZE);
+});
 ```
-EXAMPLE HERE
+
+`getBoundingClientRect()` accounts for the canvas's position on the page, so `mx` and `my` are always relative to the canvas top-left corner, not the browser window.
+
+Add a highlight rectangle to show which tile is hovered. Put it on `app.stage` last so it renders on top of everything:
+
+```js
+const cursor = new Graphics()
+    .rect(1, 1, TILE_SIZE - 2, TILE_SIZE - 2)
+    .fill({ color: 0xffff00, alpha: 0.35 });
+app.stage.addChild(cursor); // added last = renders on top
+
+canvas.addEventListener('mousemove', (e) => {
+    // ... update mouseCol and mouseRow ...
+
+    if (isWalkable(mouseCol, mouseRow)) {
+        cursor.x = mouseCol * TILE_SIZE;
+        cursor.y = mouseRow * TILE_SIZE;
+        cursor.visible = true;
+    } else {
+        cursor.visible = false; // hide over walls
+    }
+});
+
+canvas.addEventListener('mouseleave', () => {
+    cursor.visible = false;
+});
 ```
 
-Before we jump on the mouse, one thing should be made clear. So far our hero was able to move pixel perfect, but that is not the case with the mouse. Mouse control also means hero will be stepping from center of one tile to the center of next and he can't stop somewhere between two tiles, look around, whistle nice tune. Moving from one tile to another is much simpler than pixel perfect positioning. We don't need collision detection for example, when we want to walk on next tile, we only check if its walkable and then its all happy walking until we reach the center.
+## CLICK TO SET TARGET 🎯
 
+When the player clicks a walkable tile, store the destination and tell the hero to start moving:
 
-## MAKING THE MOUSE
+```js
+canvas.addEventListener('click', () => {
+    if (!isWalkable(mouseCol, mouseRow)) return; // ignore wall clicks
 
-Draw rectangle, which will represent the mouse, make it movie clip and set its linkage name to "mouse". Make sure you have aligned mouse graphics same way as tiles - left upper corner.
-
-![](/p22_2.gif)
-
-Now attach mouse to the stage, above all the tiles. In the buildMap function write.
-
+    player.targetTileX = mouseCol;
+    player.targetTileY = mouseRow;
+    player.moving = true;
+});
 ```
-_root.attachMovie("mouse", "mouse", 2);
+
+Wall clicks are silently ignored - nothing visible happens. Only valid walkable tiles trigger movement.
+
+The `player` object needs a few extra properties for this system:
+
+```js
+const player = {
+    x: 39, y: 39,           // Pixel position (starts at tile 1,1 center)
+    width: 12, height: 12,
+    tileX: 1, tileY: 1,     // Current tile (updated each time hero centers)
+    dirX: 0, dirY: 0,       // Current movement direction
+    speed: 2,               // Must divide evenly into TILE_SIZE (30 ÷ 2 = 15 frames/tile)
+    moving: false,
+    targetTileX: 1, targetTileY: 1,
+    sprite: heroSprite
+};
 ```
 
-Everything else in the buildMap function remains the same, so I'm not going to go over it again. For mouse cursor to update its position correctly, let's create new function, called work:
+The `speed` constraint matters: since the hero moves `speed` pixels per frame, and must stop exactly at tile centers, `TILE_SIZE ÷ speed` must be a whole number. Speed 2 works perfectly (30 ÷ 2 = 15 frames per tile). Speed 7 would not (30 ÷ 7 = 4.28...).
 
-```
-function work()
-{
-	game.xmouse = Math.round((_root._xmouse - game.tileW / 2) / game.tileW);
-	game.ymouse = Math.round((_root._ymouse - game.tileH / 2) / game.tileH);
-	_root.mouse._x = game.xmouse * game.tileW;
-	_root.mouse._y = game.ymouse * game.tileH;
+## MOVING TILE BY TILE 🚶
+
+The movement function runs every frame. It does three things:
+
+1. **Check if at tile center** - if yes, pick a new direction
+2. **Check if at destination** - if yes, stop
+3. **Move** in the current direction
+
+```js
+function movePlayer() {
+    if (!player.moving) return;
+
+    // A 12px hero centered in a 30px tile has x offset of (30-12)/2 = 9
+    const CENTER = (TILE_SIZE - player.width) / 2;
+    const atCenter = player.x % TILE_SIZE === CENTER &&
+                     player.y % TILE_SIZE === CENTER;
+
+    if (atCenter) {
+        // Snap tile coordinates from pixel position
+        player.tileX = Math.floor(player.x / TILE_SIZE);
+        player.tileY = Math.floor(player.y / TILE_SIZE);
+
+        if (player.tileX === player.targetTileX && player.tileY === player.targetTileY) {
+            player.moving = false; // arrived!
+            return;
+        }
+
+        // Greedy direction choice: close horizontal gap first, then vertical
+        player.dirX = 0;
+        player.dirY = 0;
+
+        if (player.tileX < player.targetTileX && isWalkable(player.tileX + 1, player.tileY)) {
+            player.dirX = 1;
+        } else if (player.tileX > player.targetTileX && isWalkable(player.tileX - 1, player.tileY)) {
+            player.dirX = -1;
+        } else if (player.tileY < player.targetTileY && isWalkable(player.tileX, player.tileY + 1)) {
+            player.dirY = 1;
+        } else if (player.tileY > player.targetTileY && isWalkable(player.tileX, player.tileY - 1)) {
+            player.dirY = -1;
+        } else {
+            player.moving = false; // can't reach target from here
+            return;
+        }
+    }
+
+    // Move in chosen direction
+    player.x += player.dirX * player.speed;
+    player.y += player.dirY * player.speed;
+    player.sprite.x = player.x;
+    player.sprite.y = player.y;
 }
 ```
 
-We calculate properties xmouse and ymouse in the game object, which will know where mouse is. To be exact, the tile number its over. In the char object we had similar properties called xtile and ytile. Last two lines place the mouse over that tile.
+The modulo check `player.x % TILE_SIZE === CENTER` is the trick. Since the hero starts at a tile center (x=39 for tile 1, where 39 % 30 = 9 = CENTER), and moves in 2px steps, it hits the next center (x=69, 69 % 30 = 9) after exactly 15 frames - and every tile center beyond that.
 
-This function will be called on every frame from the controller movie clip on stage:
+## THE PATHFINDING TRADE-OFF 🗺️
 
-```
-onClipEvent (enterFrame)
-{
-	_root.work();
-}
-```
+This approach is called **greedy pathfinding**: always try to close the gap directly. It works well on open maps, but gets stuck when walls are in the way:
 
-As we don't use keys, you can delete detectKeys function in case you have it left over from earlier chapter.
+```text
+H = hero, T = target, # = wall
 
-Now that we have mouse moving like it should, we add a way to click on stage. Write this to the controller mc:
-
-```
-onClipEvent (mouseUp)
-{
-	_root.getTarget();
-}
+. H . . . . .
+. . . # . . .    ← hero tries to go right, hits wall, stops
+. . . . T . .
 ```
 
-When left mouse button is released, we call function getTarget. By using clip event "mouseUp", we call the function only, when mouse button is released, not when its pressed down. If you prefer it other way, replace it with mouseDown event. Write the getTarget function:
+The hero reaches the wall column and can't progress: going right hits the wall, going down/up doesn't reduce the horizontal gap, so it gives up.
 
-```
-function getTarget()
-{
-	if(game["t_" + game.ymouse + "_" + game.xmouse].walkable)
-	{
-		game.targetx = game.xmouse;
-		game.targety = game.ymouse;
-		char.moving = true;
-	}
-}
-```
+The proper solution is **A\* pathfinding** (pronounced "A star") - an algorithm that finds the shortest route around any obstacle. The good news: the tile grid you already have is exactly the structure A\* needs. There are excellent JavaScript A\* libraries, and swapping out the direction-picking `if/else` block for an A\* path is straightforward when your map grows complex enough to need it.
 
-Here we make sure player actually clicks on walkable tile. You know how players are, they click everywhere and when you ask them politely "Why in the name of God did you have to click there?", they only say "I dunno, looked like nice spot". Anyway, we ensure they can still click anywhere they want to, but our function ignores all the clicks on non-walkable tiles. If, however, by some miracle, the player manages to click on walkable tile, we set properties "targetx" and "targety" to the tiles below the mouse. And we set variable "char.moving" to true.
+For open maps, puzzle games, or games where the player can see obstacles before clicking, the greedy approach works fine - and it's much simpler to understand and debug.
 
+**What you've built:**
 
-## MOVING THE HERO TO RIGHT TILE
+- ✅ Mouse hover highlighting with a tile cursor
+- ✅ Click-to-set-target that ignores wall clicks
+- ✅ Tile-by-tile movement using modulo center detection
+- ✅ Greedy pathfinding: close horizontal gap first, then vertical
 
-In the getTarget function we did set variable "moving" to true and as long that variable is true, our hero tries to move. Since we don't want the hero to move when game starts, set the moving variable to false in char object:
-
-```
-char = {xtile:2, ytile:1, speed:2, moving:false};
-```
-
-Add some code in the end of work function:
-
-```
-var ob = char;
-if (!ob.moving)
-{
-	ob.clip.char.gotoAndStop(1);
-}
-else
-{
-	moveChar(ob);
-	ob.clip.char.play();
-}
-```
-
-Until moving variable is false, hero stands still and doesn't play any animations. But when moving is true, we play the walking animation and call function to move the char. Don't worry, for the movement from tile-to-tile our moveChar function is much simpler:
-
-```
-function moveChar(ob)
-{
-   if((ob.x - game.tileW / 2) % game.tileW == 0 and (ob.y - game.tileH / 2)
-                                                         % game.tileH == 0)
-   {
-      ob.xtile = Math.floor(ob.x / game.tileW);
-      ob.ytile = Math.floor(ob.y / game.tileH);
-      if(game["t_" + ob.ytile + "_" + (ob.xtile+1)].walkable and game.targetx > ob.xtile)
-      {
-         ob.dirx = 1;
-         ob.diry = 0;
-      }
-      else if(game["t_" + ob.ytile + "_" + (ob.xtile-1)].walkable
-	                               and game.targetx < ob.xtile)
-      {
-         ob.dirx = -1;
-         ob.diry = 0;
-      }
-      else if(game["t_" + (ob.ytile + 1) + "_" + ob.xtile].walkable
-	                                 and game.targety > ob.ytile)
-      {
-         ob.dirx = 0;
-         ob.diry = 1;
-      }
-      else if(game["t_" + (ob.ytile - 1) + "_" + ob.xtile].walkable
-	                                 and game.targety < ob.ytile)
-      {
-         ob.dirx = 0;
-         ob.diry = -1;
-      }
-      else
-      {
-         ob.moving = false;
-         return;
-      }
-   }
-   ob.y += ob.speed * ob.diry;
-   ob.x += ob.speed * ob.dirx;
-   ob.clip._x = ob.x;
-   ob.clip._y = ob.y;
-   ob.clip.gotoAndStop(ob.dirx + ob.diry * 2 + 3);
-}
-```
-
-First line in the function checks if hero is currently standing in the center of tile and that would mean he is ready to move, if he only knew where to go and why to go there. The x position and y position are checked using modulo "%". This basically checks the remainder of dividing chars position by tile size. When x and y are in the center of tile, then dividing them with tileW gives remainder 0 and we start to pick new direction.
-
-Advanced pathfinding algorithms are available for Flash too, mainly A*. Most of them are going to take a lot of time to calculate path from point A to point B. Our method here is very basic and doesn't find any paths, hero moves in one direction until it reaches the target coordinate or wall. Then he moves vertically same way.
-
-To know which way to turn, let's look at the going right decision:
-
-```
-if(game["t_" + ob.ytile + "_" + (ob.xtile+1)].walkable and game.targetx > ob.xtile)
-{
-	...
-```
-
-We check if the tile 1 step right from the hero's current tile, has walkable property set to true. And we also check if the mouse was clicked right from the hero.
-
-That's all for today about controlling the hero with mouse.
-
-You can download the source fla with all the code and movie set up here.
-
+**Next up**: Rotate the whole world 45 degrees. [Next: Isometric View](/tutorial/21-isometric-view/)
