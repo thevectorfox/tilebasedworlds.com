@@ -8,347 +8,541 @@ next = "/tutorial/17-scrolling/"
 prev = "/tutorial/15-getting-items/"
 +++
 
-Gather up, boys and girls, for today I am going to tell you a little story about moving tiles. Some of you may know it already by the name "moving platform", don't be fooled by the name, it's still same cute thing.
+Moving platforms! 🏃‍♂️ They're in every great platformer - the swinging platforms in Donkey Kong Country, the cloud lifts in Mario, the crumbling bridges in Crash Bandicoot. They transform a flat level into a dynamic puzzle that rewards timing and skill. Let's build them!
 
-Once, long time ago, in the land of tile based games, lived a young tile. He was a happy tile. One fine day a hero came to him and asked: "Young tile, why don't you move?"
+<div id="movingTilesDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="movingCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Arrow Keys to move, Space to jump<br>
+        <strong>Challenge:</strong> Ride the platforms to reach every level! 🟩
+    </div>
+</div>
 
-"I don't know how to move," said little tile.
+<script type="module">
+import { Application, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
 
-"That's sad," sighed the hero, "since I would love to stand on you and move with you to the places I can't reach by my own."
+const canvas = document.getElementById('movingCanvas');
+const app = new Application();
+await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x87CEEB });
 
-That day young tile realised his life was not so happy anymore.
+const TILE_SIZE = 30;
+const GRAVITY = 0.6;
 
-But we can help him to move:
+const map = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [1,1,1,0,0,0,0,1,1,1],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [1,1,0,0,0,0,0,0,1,1],
+    [1,1,1,1,1,1,1,1,1,1]
+];
 
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        if (map[row][col] === 1) {
+            const tile = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            tile.x = col * TILE_SIZE;
+            tile.y = row * TILE_SIZE;
+            app.stage.addChild(tile);
+        }
+    }
+}
+
+// Moving tile definitions: speed, direction, range (relative tiles from start)
+const MOVING_TILE_TYPES = {
+    1: { speed: 1, dirX: 0, dirY: 1,  rangeMinY: 0, rangeMaxY: 4, color: 0x44BB44 }, // vertical
+    2: { speed: 1, dirX: 1, dirY: 0,  rangeMinX: 0, rangeMaxX: 5, color: 0x44AACC }  // horizontal
+};
+
+// Moving tile data: [type, startTileX, startTileY]
+const myMovingTiles = [
+    [],
+    [[1, 5, 1], [2, 2, 5]]
+];
+
+const game = { currentRoom: 1, tileSize: TILE_SIZE };
+const movingTiles = [];
+
+function buildMovingTiles() {
+    for (const [type, startTileX, startTileY] of myMovingTiles[game.currentRoom]) {
+        const def = MOVING_TILE_TYPES[type];
+        const sprite = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE / 2).fill(def.color);
+
+        const tile = {
+            sprite,
+            x: startTileX * TILE_SIZE,
+            y: startTileY * TILE_SIZE,
+            width: TILE_SIZE,
+            height: TILE_SIZE / 2,
+            speed: def.speed,
+            dirX: def.dirX,
+            dirY: def.dirY,
+            minX: (startTileX + (def.rangeMinX || 0)) * TILE_SIZE,
+            maxX: (startTileX + (def.rangeMaxX || 0)) * TILE_SIZE,
+            minY: (startTileY + (def.rangeMinY || 0)) * TILE_SIZE,
+            maxY: (startTileY + (def.rangeMaxY || 0)) * TILE_SIZE,
+        };
+
+        sprite.x = tile.x;
+        sprite.y = tile.y;
+        app.stage.addChild(sprite);
+        movingTiles.push(tile);
+    }
+}
+
+const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+app.stage.addChild(heroSprite);
+
+const player = {
+    sprite: heroSprite,
+    x: 60, y: 150,
+    width: 12, height: 12,
+    velocityX: 0, velocityY: 0,
+    speed: 2, jumpPower: -10,
+    onGround: false,
+    onMovingTile: null,
+    lastY: 150
+};
+
+function isSolid(x, y) {
+    const col = Math.floor(x / TILE_SIZE);
+    const row = Math.floor(y / TILE_SIZE);
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return true;
+    return map[row][col] === 1;
+}
+
+function checkLandOnMovingTile(dy) {
+    for (const tile of movingTiles) {
+        // Only land from above: player's bottom was above tile top last frame
+        if (player.lastY + player.height > tile.y) continue;
+
+        const nextBottom = player.y + player.height + dy;
+        if (nextBottom >= tile.y && nextBottom <= tile.y + tile.height) {
+            // Check horizontal overlap
+            if (player.x + player.width > tile.x && player.x < tile.x + tile.width) {
+                return tile;
+            }
+        }
+    }
+    return null;
+}
+
+function updateMovingTiles() {
+    for (const tile of movingTiles) {
+        // Bounce at boundaries
+        const nextX = tile.x + tile.speed * tile.dirX;
+        const nextY = tile.y + tile.speed * tile.dirY;
+
+        if (tile.dirX !== 0 && (nextX <= tile.minX || nextX >= tile.maxX)) tile.dirX = -tile.dirX;
+        if (tile.dirY !== 0 && (nextY <= tile.minY || nextY >= tile.maxY)) tile.dirY = -tile.dirY;
+
+        tile.x += tile.speed * tile.dirX;
+        tile.y += tile.speed * tile.dirY;
+        tile.sprite.x = tile.x;
+        tile.sprite.y = tile.y;
+
+        // If tile is moving up, check if it scoops up a stationary player
+        if (tile.dirY < 0 && player.onMovingTile === null) {
+            const tileTop = tile.y;
+            if (player.y + player.height >= tileTop && player.y + player.height <= tileTop + tile.height) {
+                if (player.x + player.width > tile.x && player.x < tile.x + tile.width) {
+                    player.onMovingTile = tile;
+                    player.onGround = true;
+                }
+            }
+        }
+    }
+
+    // Carry player with their platform
+    if (player.onMovingTile) {
+        const tile = player.onMovingTile;
+
+        // Move vertically with tile
+        if (tile.dirY !== 0) {
+            const newPlayerY = tile.y - player.height;
+            // Check if the tile is pushing player into a ceiling
+            if (isSolid(player.x + 2, newPlayerY) || isSolid(player.x + player.width - 2, newPlayerY)) {
+                // Squashed - detach and push down
+                player.onMovingTile = null;
+                player.onGround = false;
+                player.velocityY = 1;
+            } else {
+                player.y = newPlayerY;
+            }
+        }
+
+        // Move horizontally with tile
+        if (tile.dirX !== 0) {
+            const newPlayerX = player.x + tile.speed * tile.dirX;
+            const hitLeft  = isSolid(newPlayerX, player.y + 2) || isSolid(newPlayerX, player.y + player.height - 2);
+            const hitRight = isSolid(newPlayerX + player.width, player.y + 2) || isSolid(newPlayerX + player.width, player.y + player.height - 2);
+
+            if (!hitLeft && !hitRight) {
+                player.x = newPlayerX;
+            } else {
+                // Wall stopped horizontal movement - fall off
+                player.onMovingTile = null;
+                player.onGround = false;
+            }
+        }
+
+        // Check if player has walked off the edge of the tile
+        if (player.x + player.width <= tile.x || player.x >= tile.x + tile.width) {
+            player.onMovingTile = null;
+            player.onGround = false;
+        }
+
+        player.sprite.x = player.x;
+        player.sprite.y = player.y;
+    }
+}
+
+const keys = {};
+window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+function gameLoop() {
+    player.lastY = player.y;
+
+    // Update tiles first (they carry the player)
+    updateMovingTiles();
+
+    // Horizontal input
+    if (keys['ArrowLeft'])  player.velocityX = -player.speed;
+    else if (keys['ArrowRight']) player.velocityX = player.speed;
+    else player.velocityX = 0;
+
+    // Jump
+    if ((keys['Space'] || keys['ArrowUp']) && (player.onGround || player.onMovingTile)) {
+        player.velocityY = player.jumpPower;
+        player.onGround = false;
+        player.onMovingTile = null; // Leave the platform
+    }
+
+    // Gravity (not while standing on a tile)
+    if (!player.onMovingTile) {
+        player.velocityY += GRAVITY;
+    }
+
+    // Horizontal movement + wall collision
+    if (!player.onMovingTile) {
+        const newX = player.x + player.velocityX;
+        if (!isSolid(newX, player.y + 2) && !isSolid(newX, player.y + player.height - 2) &&
+            !isSolid(newX + player.width, player.y + 2) && !isSolid(newX + player.width, player.y + player.height - 2)) {
+            player.x = newX;
+        }
+    }
+
+    // Vertical movement + collision (only when not carried by a tile)
+    if (!player.onMovingTile) {
+        if (player.velocityY > 0) {
+            // Falling down - check static tiles first
+            const newY = player.y + player.velocityY;
+            if (isSolid(player.x + 2, newY + player.height) || isSolid(player.x + player.width - 2, newY + player.height)) {
+                player.y = Math.floor((player.y + player.height) / TILE_SIZE) * TILE_SIZE - player.height;
+                player.velocityY = 0;
+                player.onGround = true;
+            } else {
+                // Check moving tile landing
+                const landedTile = checkLandOnMovingTile(player.velocityY);
+                if (landedTile) {
+                    player.y = landedTile.y - player.height;
+                    player.velocityY = 0;
+                    player.onGround = false;
+                    player.onMovingTile = landedTile;
+                } else {
+                    player.y = newY;
+                    player.onGround = false;
+                }
+            }
+        } else if (player.velocityY < 0) {
+            // Moving up - check ceiling
+            const newY = player.y + player.velocityY;
+            if (isSolid(player.x + 2, newY) || isSolid(player.x + player.width - 2, newY)) {
+                player.y = Math.ceil(player.y / TILE_SIZE) * TILE_SIZE;
+                player.velocityY = 0;
+            } else {
+                player.y = newY;
+            }
+        }
+    }
+
+    player.x = Math.max(0, Math.min(player.x, 288));
+    player.sprite.x = player.x;
+    player.sprite.y = player.y;
+}
+
+buildMovingTiles();
+app.ticker.add(gameLoop);
+</script>
+
+Before we start coding, let's agree on the rules. Moving platforms in this tutorial work like cloud tiles - the hero can only land on them from above. Here's what we need to handle:
+
+- Moving tiles travel horizontally or vertically between two boundaries
+- The hero can land on a moving tile only by falling onto it from above
+- A tile moving upward can scoop up a stationary hero
+- When riding a tile, the hero moves with it
+- Walls still block the hero even while riding a moving tile
+- When a tile pushes the hero into a wall, the hero detaches and falls
+
+## DEFINING MOVING TILE TYPES 📐
+
+Instead of static map tiles, moving tiles need a set of behavior properties. Define them as plain objects - one entry per tile type:
+
+```js
+const MOVING_TILE_TYPES = {
+    1: {
+        speed: 2,
+        dirX: 0,  dirY: 1,      // Vertical mover (0 = no movement on that axis)
+        rangeMinY: -1,           // Relative to starting tile: goes 1 tile up...
+        rangeMaxY: 4,            // ...and 4 tiles down
+        color: 0x44BB44
+    },
+    2: {
+        speed: 2,
+        dirX: 1,  dirY: 0,      // Horizontal mover
+        rangeMinX: -2,           // 2 tiles left of start...
+        rangeMaxX: 3,            // ...3 tiles right
+        color: 0x44AACC
+    }
+};
 ```
-EXAMPLE HERE
-```
 
-Before we actually start the coding, we have to make some rules. Rules, while annoying, are very helpful. What are we doing? Where to go? Whats the meaning of life? Rules to answer:
+`dirX`/`dirY` tell the tile which way to start moving. The range values are **relative to the starting tile position**, so you can place the same tile type anywhere in a map and its travel range will follow it. The tile bounces when it hits either boundary.
 
-- moving tiles are cloud type (for explanation please look here)
-- moving tiles can move horisontally and vertically
-- hero can land on the moving tile only from above
-- when hero is standing on moving tile, he moves with the tile
-- hero on moving tile still can't go into wall
+## PLACING MOVING TILES 🗺️
 
-## STEPPING ON MOVING TILE
+Like enemies and items, moving tiles are stored in a data array per room:
 
-So, how can hero land on the moving tile. First and simplest way is to jump.
-
-![](/p17_2.gif)
-
-On the picture hero is moving down and in the next step he would be inside the moving tile. We will place him standing on the tile. Note that hero MUST be above the moving tile and hero MUST be moving down. In any other case hero won't land on moving tile.
-
-But that's not the only way for hero to get on the moving tile. In the next picture hero is standing still on the piece of wall and he is not moving anywhere.
-
-![](/p17_3.gif)
-
-But the moving tile is moving up and in the next step, hero would be inside the moving tile. Yes, we again have to make sure the hero will be catched by the moving tile and he starts to move up with the moving tile.
-
-
-## STEPPING OFF
-
-Once we have the hero standing on the moving tile, we also need to create some ways for the hero to get off. First, he can jump off. He can walk over the edge of moving tile. And also couple of possible situations exist in the next pictures:
-
-![](/p17_4.gif)
-
-When hero stands on the moving tile moving up and in the next step hero would hit the wall above, he should drop off the moving tile or he would be squashed. When hero is standing on the moving tile moving horizontally, hitting the wall left/right in next step, he should be placed near the wall and in case the moving tile keeps moving, hero should fall off.
-
-![](/p17_5.gif)
-
-In this picture hero is moving down while standing on the moving tile. When the hero hits the wall tile, he should stay on the wall. Moving tile continues going down, but without the hero.
-
-
-## PREPARING
-
-Draw moving tile movie clip. You can have many different moving tiles, put them in different frames inside "movingtiles" mc. Make sure mc in the library is linked as "movingtiles".
-
-Declare movingtiles objects:
-
-```
-game.MovingTilep1 = function () {};
-game.MovingTilep1.prototype.speed = 2;
-game.MovingTilep1.prototype.dirx = 0;
-game.MovingTilep1.prototype.diry = 1;
-game.MovingTilep1.prototype.miny = 0;
-game.MovingTilep1.prototype.maxy = 2;
-game.MovingTilep1.prototype.width = game.tileW / 2;
-game.MovingTilep1.prototype.height = game.tileH / 2;
- 
-game.MovingTilep2= function () {};
-game.MovingTilep2.prototype.speed = 2;
-game.MovingTilep2.prototype.dirx = 1;
-game.MovingTilep2.prototype.diry = 0;
-game.MovingTilep2.prototype.minx = -2;
-game.MovingTilep2.prototype.maxx = 2;
-game.MovingTilep2.prototype.width = game.tileW / 2;
-game.MovingTilep2.prototype.height = game.tileH / 2;
-```
-
-We have 2 kinds of moving tiles: MovingTilep1 will be moving vertically (its diry property is set to non-zero value) and MovingTilep2 is horizontal mover (since its dirx is set so). The speed property, as you might have already guessed, sets how many pixels tile moves in each step.
-
-The miny/maxy/minx/maxx properties will set the boundaries for the movement. We could write some absolute values too, but then doing changes will be confusing. Instead, we have the boundaries set as relative to the starting position of the moving tile. We can place the moving tile in any position and it will still move correctly between its boundaries. Remember, moving tiles dont check for any wall tiles and its your job to place them so they dont move through walls. Or place them so they move through walls if you want so. You are making the game, so you are the god.
-
-Let's look at the example. Movingtile starts in the position x=2, y=5. It has vertical movement and miny=-1, maxy=4. How far will it move then? Starting y-miny=5+(-1)=4, so minimum position it goes, is x=2, y=4. Maximum position is 5+4=9 or the position x=2, y=9.
-
-To give moving tiles starting position, we use array similar to the enemies array:
-
-```
-//moving tiles array is in the order [tile type, xtile, ytile]
-myMovingTiles = [
-[0],
-[[1, 4, 2]],
-[[2, 4, 4]]
+```js
+// myMovingTiles[roomIndex] = [[type, startTileX, startTileY], ...]
+const myMovingTiles = [
+    [],                       // Room 0 - unused
+    [[1, 4, 2]],              // Room 1: one vertical platform starting at tile (4, 2)
+    [[2, 4, 4]]               // Room 2: one horizontal platform starting at tile (4, 4)
 ];
 ```
 
-In the map1 we have declared 1 moving tile. Its type 1 (made from the template MovingTile1) and its placed at the starting position x=4, y=2. Map2 also has only 1 moving tile. You can put more than 1 moving tile in each map.
+Call `buildMovingTiles()` when you build the room. It converts the relative range values into absolute pixel boundaries so you never have to recalculate them during gameplay:
 
-Next we need to add moving tiles in the buildMap function. Write after the enemies code:
+```js
+const movingTiles = []; // all active moving tile objects
 
-```
-game.movingtiles = myMovingTiles[game.currentMap];
-for (var i = 0; i < game.movingtiles.length; ++i)
-{
-	var name = "movingtile" + i;
-	game[name] = new game["MovingTilep" + game.movingtiles[i][0]];
-	game.clip.attachMovie("movingtiles", name, 12001 + i);
-	game[name].clip = game.clip[name];
-	game[name].clip.gotoAndStop(game.movingtiles[i][0]);
-	game[name].xtile = game.movingtiles[i][1];
-	game[name].ytile = game.movingtiles[i][2];
-	game[name].x = game[name].xtile * game.tileW + game.tileW / 2;
-	game[name].y = game[name].ytile * game.tileH + game.tileH / 2;
-	game[name].clip._x = game[name].x;
-	game[name].clip._y = game[name].y;
-	game[name].minx = game[name].minx + game[name].xtile;
-	game[name].maxx = game[name].maxx + game[name].xtile;
-	game[name].miny = game[name].miny + game[name].ytile;
-	game[name].maxy = game[name].maxy + game[name].ytile;
+function buildMovingTiles() {
+    movingTiles.length = 0; // Clear previous room's tiles
+
+    for (const [type, startTileX, startTileY] of myMovingTiles[game.currentRoom]) {
+        const def = MOVING_TILE_TYPES[type];
+
+        const sprite = new Graphics()
+            .rect(0, 0, game.tileSize, game.tileSize / 2)
+            .fill(def.color);
+
+        const tile = {
+            sprite,
+            x: startTileX * game.tileSize,
+            y: startTileY * game.tileSize,
+            width:  game.tileSize,
+            height: game.tileSize / 2,
+            speed: def.speed,
+            dirX:  def.dirX,
+            dirY:  def.dirY,
+            // Convert relative range → absolute pixel bounds
+            minX: (startTileX + (def.rangeMinX ?? 0)) * game.tileSize,
+            maxX: (startTileX + (def.rangeMaxX ?? 0)) * game.tileSize,
+            minY: (startTileY + (def.rangeMinY ?? 0)) * game.tileSize,
+            maxY: (startTileY + (def.rangeMaxY ?? 0)) * game.tileSize,
+        };
+
+        sprite.x = tile.x;
+        sprite.y = tile.y;
+        app.stage.addChild(sprite);
+        movingTiles.push(tile);
+    }
 }
 ```
 
-We take the array for current map from the moving tiles array. Variable game.movingtiles will be holding info about how many moving tiles we have on stage and where they start at. Then we create new object, place mc on stage in correct position and send it in correct frame. Note that type1 moving tile will be sent to the frame1, type2 to the frame2. Last part of the code calculates values for the boundaries for each moving tile. While the names are again miny/max/minx/maxx, the properties are not relative anymore. Each moving tile object will have absolute values for its boundaries so we don't have to constantly calculate them over and over to check if its time to turn back.
+Storing absolute boundaries avoids recalculating `start + range` on every frame. That may not sound like much, but at 60fps with many tiles it adds up!
 
-In the moveChar function we have to add 1 line in the beginning to save current y position:
+## LANDING ON A MOVING TILE 🎯
 
-```
-ob.lasty = ob.y;
-```
+The landing check has one critical rule: **the hero must have been above the tile on the previous frame**. Without this, the hero would teleport to the top of any tile they happen to overlap with from the side.
 
-We will also have to rewrite the code in the moveChar function for movement down
+Save `player.lastY` at the very start of your game loop before anything moves:
 
-```
-if (diry == 1)
-{
-	if (ob.downleft and ob.downright and !checkMovingTiles(speed * diry))
-	{
-		ob.y += speed * diry;
-	}
-	else
-	{
-		ob.jump = false;
-		if(ob.onMovingTile)
-		{
-			ob.y = ob.onMovingTile.y - ob.onMovingTile.height - ob.height;
-		}
-		else
-		{
-			ob.y = (ob.ytile + 1) * game.tileH - ob.height;
-		}
-	}
+```js
+function gameLoop() {
+    player.lastY = player.y;  // ← must be first!
+
+    updateMovingTiles();
+    handleInput();
+    // ...
 }
 ```
 
-We have added the call for checkMovingTiles function, which will return true in case hero will land on moving tile. And if we have landed on it, we set the y coordinate of the hero so it stands just above the tile.
+Then when checking downward movement, test against moving tiles after static tiles:
 
+```js
+function checkLandOnMovingTile(dy) {
+    for (const tile of movingTiles) {
+        // Was the player's bottom above the tile top last frame?
+        if (player.lastY + player.height > tile.y) continue;
 
-## IS HERO ON MOVING TILE?
-
-You already guessed from the addition in the moveChar function, yes, its time to make new function for the checking if char is standing on the moving tile. checkMovingTiles function not only finds the answer, but it also saves the name of the tile hero currently moves on, into the char object.
-
-```
-function checkMovingTiles (y)
-{
-	if(char.diry <> -1)
-	{
-		var heroymax = char.y + char.height + y;
-		var heroxmax = char.x + char.width;
-		var heroxmin = char.x - char.width;
-		foundit = false;
-		for (var i = 0; i < game.movingtiles.length; i++)
-		{
-			var ob = game["movingtile" + i];
-			var tileymax = ob.y + ob.height;
-			var tileymin = ob.y - ob.height;
-			var tilexmax = ob.x + ob.width;
-			var tilexmin = ob.x - ob.width;
-			if(char.lasty + char.height <= tileymin)
-			{
-				if (heroymax <= tileymax and heroymax >= tileymin)
-				{
-					if (heroxmax > tilexmin and heroxmax < tilexmax)
-					{
-						char.onMovingTile = ob;
-						foundit = true;
-						break;
-					}
-					else if (heroxmin > tilexmin and heroxmin
-					                                     < tilexmax)
-					{
-						char.onMovingTile = ob;
-						foundit = true;
-						break;
-					}
-				}
-			}
-		}
-		return(foundit);
-	}
+        // Will the player overlap the tile top after this movement?
+        const nextBottom = player.y + player.height + dy;
+        if (nextBottom >= tile.y && nextBottom <= tile.y + tile.height) {
+            // Check horizontal overlap
+            if (player.x + player.width > tile.x && player.x < tile.x + tile.width) {
+                return tile; // Found it!
+            }
+        }
+    }
+    return null;
 }
 ```
 
-Let's see what's happening here. If char is not moving up (diry is not -1), we calculate the boundaries for the char. Then we start to loop through all the moving tiles. ob will be moving tile object we are currently dealing with. We also calculate boundaries for current tile to figure out if they are colliding:
+Use it inside your downward movement code, after the static floor check:
 
-![](/p17_6.gif)
-
-The if statement with "lasty" property secures that chars last position was above the moving tile and other if statements find collision between char and tile. If we have found moving tile, then the onMovingTile will be holding reference to the tile object.
-
-
-## IT SHALL MOVE
-
-Be prepared for the ugliest, biggest, meanest function in the history of mankind! It is big, because it does many things, first, it moves around all the moving tiles, it then checks if the tiles need to have their movement direction reversed, and if that's not hard work enough, this function also handles the movement of hero standing on the moving tile and checks if hero should fall off from it.
-
-```
-function moveTiles ()
-{
-	for (var i = 0; i < game.movingtiles.length; i++)
-	{
-		var ob = game["movingtile" + i];
-		getMyCorners (ob.x + ob.speed * ob.dirx, ob.y + ob.speed * ob.diry, ob);
-		if (ob.miny > ob.upY or ob.maxy < ob.downY)
-		{
-			ob.diry = -ob.diry;
-		}
-		if (ob.minx > ob.leftX or ob.maxx < ob.rightX)
-		{
-			ob.dirx = -ob.dirx;
-		}
-		ob.x = ob.x + ob.speed * ob.dirx;
-		ob.y = ob.y + ob.speed * ob.diry;
-		ob.xtile = Math.floor(ob.x / game.tileW);
-		ob.ytile = Math.floor(ob.y / game.tileH);
-		ob.clip._x = ob.x;
-		ob.clip._y = ob.y;
-		if(ob.diry == -1)
-		{
-			checkMovingTiles(0);
-		}
-	}
-	
-	//check if hero is on moving tile
-	if(char.onMovingTile)
-	{
-		getMyCorners (char.x, char.y + char.onMovingTile.speed
-		                                     * char.onMovingTile.diry, char);
-		if (char.onMovingTile.diry == -1)
-		{
-			if (char.upleft and char.upright)
-			{
-				char.y = char.onMovingTile.y - char.onMovingTile.height
-				                                          - char.height;
-			}
-			else
-			{
-				char.y = char.ytile * game.tileH + char.height;
-				char.jumpspeed = 0;
-				char.jump = true;
-				char.onMovingTile = false;
-			}
-		}
-		if (char.onMovingTile.diry == 1)
-		{
-			if (char.downleft and char.downright)
-			{
-				char.y = char.onMovingTile.y - char.onMovingTile.height
-				                                          - char.height;
-			}
-			else
-			{
-				char.onMovingTile = false;
-				char.y = (char.ytile + 1) * game.tileH - char.height;
-			}
-		}
-		getMyCorners (char.x + char.onMovingTile.speed 
-		                                 * char.onMovingTile.dirx, char.y, char);
-		if (char.onMovingTile.dirx == -1)
-		{
-			if (char.downleft and char.upleft)
-			{
-				char.x += char.onMovingTile.speed
-				                  * char.onMovingTile.dirx;
-			}
-			else
-			{
-				char.x = char.xtile * game.tileW + char.width;
-				fall (char);
-			}
-		}
-		if (char.onMovingTile.dirx == 1)
-		{
-			if (char.upright and char.downright)
-			{
-				char.x += char.onMovingTile.speed
-				                  * char.onMovingTile.dirx;
-			}
-			else
-			{
-				fall (char);
-				char.x = (char.xtile + 1) * game.tileW - char.width;
-			}
-		}
-		updateChar (char);
-	}
+```js
+if (player.velocityY > 0) {
+    if (/* static floor check */) {
+        // Hit a static floor tile - normal landing
+    } else {
+        const landedTile = checkLandOnMovingTile(player.velocityY);
+        if (landedTile) {
+            player.y = landedTile.y - player.height; // Snap to top of platform
+            player.velocityY = 0;
+            player.onMovingTile = landedTile;        // Remember which tile we're on
+        } else {
+            player.y += player.velocityY;            // Still falling
+        }
+    }
 }
 ```
 
-Well, like told before, the first part moves moving tiles. It loops through all the moving tiles and compares their next position with miny/maxy(minx/maxx properties. If moving tile has moved too far, its movement is reversed.
+## MOVING ALL THE TILES 🔄
 
-With the following code:
+The `updateMovingTiles()` function runs once per frame **before** player input. It handles three jobs:
 
-```
-if(ob.diry==-1)
-{
-	checkMovingTiles(0);
+1. Move each tile and bounce it at its boundaries
+2. Scoop up a stationary hero if a tile rises up to meet them
+3. Carry the hero along if they're already standing on a tile
+
+```js
+function updateMovingTiles() {
+    // --- Part 1: Move every tile ---
+    for (const tile of movingTiles) {
+        const nextX = tile.x + tile.speed * tile.dirX;
+        const nextY = tile.y + tile.speed * tile.dirY;
+
+        // Reverse direction at boundaries
+        if (tile.dirX !== 0 && (nextX <= tile.minX || nextX >= tile.maxX)) tile.dirX = -tile.dirX;
+        if (tile.dirY !== 0 && (nextY <= tile.minY || nextY >= tile.maxY)) tile.dirY = -tile.dirY;
+
+        tile.x += tile.speed * tile.dirX;
+        tile.y += tile.speed * tile.dirY;
+        tile.sprite.x = tile.x;
+        tile.sprite.y = tile.y;
+
+        // Part 2: Can a rising tile scoop up the hero?
+        if (tile.dirY < 0 && player.onMovingTile === null) {
+            const tileTop = tile.y;
+            if (player.y + player.height >= tileTop &&
+                player.y + player.height <= tileTop + tile.height &&
+                player.x + player.width > tile.x &&
+                player.x < tile.x + tile.width) {
+                player.onMovingTile = tile;
+            }
+        }
+    }
+
+    // --- Part 3: Carry the hero ---
+    if (!player.onMovingTile) return;
+
+    const tile = player.onMovingTile;
+
+    // Move vertically with tile
+    if (tile.dirY !== 0) {
+        const newPlayerY = tile.y - player.height;
+        const hitCeiling = isSolid(player.x + 2, newPlayerY) ||
+                           isSolid(player.x + player.width - 2, newPlayerY);
+        if (hitCeiling) {
+            // Squashed against ceiling - detach
+            player.onMovingTile = null;
+            player.velocityY = 1;
+        } else {
+            player.y = newPlayerY;
+        }
+    }
+
+    // Move horizontally with tile
+    if (tile.dirX !== 0) {
+        const newPlayerX = player.x + tile.speed * tile.dirX;
+        const hitWall = isSolid(newPlayerX, player.y + 2) ||
+                        isSolid(newPlayerX, player.y + player.height - 2) ||
+                        isSolid(newPlayerX + player.width, player.y + 2) ||
+                        isSolid(newPlayerX + player.width, player.y + player.height - 2);
+        if (!hitWall) {
+            player.x = newPlayerX;
+        } else {
+            // Wall blocked horizontal movement - detach and fall
+            player.onMovingTile = null;
+        }
+    }
+
+    // Walked off the edge? Let gravity take over
+    if (player.x + player.width <= tile.x || player.x >= tile.x + tile.width) {
+        player.onMovingTile = null;
+    }
 }
 ```
 
-we check if we have picked up the hero. Notice, that this is only possible if hero is standing still on the edge of wall and tile is moving up (diry is -1).
+## WRAPPING IT INTO THE GAME LOOP 🔁
 
-The part of function from the line:
+Two small changes to your existing game loop:
 
-```
-if(char.onMovingTile)
-{
-	...
-```
-deals with hero. When onMovingTile property is not false, that means char is standing on one of them and its onMovingTile refers to the right moving tile object. The code here is very similar to the code in moveChar function. We calculate corners for next position of hero using getMyCorners function, if we havent hit any walls, we move the hero with tile, but if some hard wall has been found, then hero cant move there.
+**Before input processing**, save lastY and run tile updates:
 
+```js
+function gameLoop() {
+    player.lastY = player.y; // Always first!
+    updateMovingTiles();      // Tiles move (and carry player) before input
 
-## WRAPPING IT UP
+    handleInput();
 
-In the detectKeys function add line to the beginning to move all the tiles before hero gets chance to move too:
+    // Skip gravity when riding a platform
+    if (!player.onMovingTile) {
+        player.velocityY += GRAVITY;
+    }
 
-```
-moveTiles();
-```
-
-and in case hero will jump, we have to set its onMovingTile property to false:
-
-```
-ob.onMovingTile=false;
+    // ... rest of movement and collision ...
+}
 ```
 
-You can download the source fla with all the code and movie set up here.
+**In your jump code**, clear `onMovingTile` when the hero leaves the platform:
 
+```js
+function handleJump() {
+    if (keys['Space'] && (player.onGround || player.onMovingTile)) {
+        player.velocityY = player.jumpPower;
+        player.onGround = false;
+        player.onMovingTile = null; // ← leave the platform on jump
+    }
+}
+```
+
+That's it! Notice that `movingTiles` doesn't need saving when changing rooms - unlike items, platforms always reset to their starting position when you re-enter a room.
+
+## DESIGN TIPS 💡
+
+Now that you can build moving platforms, here's how pros use them:
+
+**Pacing and rhythm**: Platforms that move at the same speed as the player's walk speed create satisfying sync. Try `speed: 2` for tiles in a world where the hero also moves at 2 pixels/frame.
+
+**No wall clipping**: Moving tiles don't check the static map - it's your job to place their boundaries so they don't clip through walls. That's a feature, not a bug! Want a platform that slides through a wall into a secret room? Go for it.
+
+**Multiple tiles**: Add more entries to `myMovingTiles` to fill a room. A gauntlet of precisely timed platforms at different speeds creates the kind of challenge players remember.
+
+**Next up**: Your world is getting dynamic - now let's make it *big*. [Next: Scrolling](/tutorial/17-scrolling/)
