@@ -8,226 +8,975 @@ next = "/tutorial/15-getting-items/"
 prev = "/tutorial/13-enemy-on-platform/"
 +++
 
-You can kill the enemies in many ways. You can use sword, gun or words (extremely powerful weapon that takes long time to master). Let's see how we can shoot the enemy (use SHIFT key to shoot):
+Time to fight back! 🔫 There's nothing quite like the satisfaction of blasting enemies that have been chasing you around! Whether you're firing arrows like Link, blasting with a mega buster like Mega Man, or launching fireballs like Mario - giving players offensive weapons transforms passive avoidance into active, strategic combat!
 
-```
-EXAMPLE HERE
-```
+<div id="shootingDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="shootingCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Arrow Keys to move, Shift to shoot<br>
+        <strong>Mission:</strong> Destroy all the enemies! Watch them explode! 💥
+    </div>
+</div>
 
-When I say "bullet", I mean any object that is flying from the hero looking to kill baddies. It can be cannon ball, arrow, ice cream, penguin etc.
+<script type="module">
+import { Application, Sprite, Container, Graphics, Ticker } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
 
-First, we again should think of, what is shooting suppose to do and how will our bullets behave. When key is pressed (SHIFT key), bullet object and movie clip are created on the correct side of the hero. The bullet should start moving straight in the direction hero is facing. If bullet hits the wall or enemy, it is destroyed. If it hits enemy, then enemy is also destroyed.
+const canvas = document.getElementById('shootingCanvas');
+const app = new Application();
 
-The speed of bullet should be higher than speed of hero unless you wish to give hero some way to stop the moving bullets. Usually the dumb enemies don't see bullets coming, but you could create enemies that try to avoid bullets. You could also make enemies shooting at the hero.
+await app.init({
+    canvas: canvas,
+    width: 300,
+    height: 240,
+    backgroundColor: 0x87CEEB
+});
+
+// Game constants
+const TILE_SIZE = 30;
+
+// Create a combat arena
+const map = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,0,0,0,1,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,1,1,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,0,0,0,1,0,1],
+    [1,1,1,1,1,1,1,1,1,1]
+];
+
+// Create map display
+const mapContainer = new Container();
+app.stage.addChild(mapContainer);
+
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        if (map[row][col] === 1) {
+            const tile = new Graphics()
+                .rect(0, 0, TILE_SIZE, TILE_SIZE)
+                .fill(0x8B4513);
+            tile.x = col * TILE_SIZE;
+            tile.y = row * TILE_SIZE;
+            mapContainer.addChild(tile);
+        }
+    }
+}
+
+// Create hero
+const hero = new Graphics()
+    .rect(0, 0, 12, 12)
+    .fill(0xff4444);
+hero.x = 60;
+hero.y = 180;
+app.stage.addChild(hero);
+
+// Hero object
+const player = {
+    sprite: hero,
+    x: 60,
+    y: 180,
+    width: 12,
+    height: 12,
+    speed: 2,
+    lastDirection: { x: 0, y: -1 }, // Default shoot up
+    lastShot: 0,
+    shootCooldown: 300 // 300ms between shots
+};
+
+// Bullet system
+const bullets = [];
+const bulletPool = []; // Reuse bullet objects for performance
+
+function createBullet(x, y, dirX, dirY) {
+    let bullet;
+    
+    // Reuse from pool or create new
+    if (bulletPool.length > 0) {
+        bullet = bulletPool.pop();
+        bullet.active = true;
+    } else {
+        bullet = {
+            sprite: new Graphics().rect(0, 0, 4, 4).fill(0xFFFF00),
+            active: true,
+            width: 4,
+            height: 4
+        };
+        app.stage.addChild(bullet.sprite);
+    }
+    
+    // Set bullet properties
+    bullet.x = x;
+    bullet.y = y;
+    bullet.velocityX = dirX * 4; // Bullet speed
+    bullet.velocityY = dirY * 4;
+    bullet.sprite.x = x;
+    bullet.sprite.y = y;
+    bullet.sprite.visible = true;
+    
+    bullets.push(bullet);
+    return bullet;
+}
+
+function destroyBullet(index) {
+    const bullet = bullets[index];
+    bullet.active = false;
+    bullet.sprite.visible = false;
+    bulletPool.push(bullet); // Return to pool
+    bullets.splice(index, 1);
+}
+
+// Enemy system
+const enemies = [];
+
+function spawnEnemies() {
+    const spawns = [
+        { x: 180, y: 60 },
+        { x: 240, y: 120 },
+        { x: 120, y: 150 },
+        { x: 210, y: 180 },
+        { x: 90, y: 90 }
+    ];
+    
+    spawns.forEach((spawn, index) => {
+        const enemySprite = new Graphics()
+            .rect(0, 0, 10, 10)
+            .fill(0x8A2BE2)
+            .stroke({width: 1, color: 0x000000});
+        
+        const enemy = {
+            sprite: enemySprite,
+            x: spawn.x,
+            y: spawn.y,
+            width: 10,
+            height: 10,
+            health: 1,
+            active: true
+        };
+        
+        enemy.sprite.x = enemy.x;
+        enemy.sprite.y = enemy.y;
+        app.stage.addChild(enemy.sprite);
+        enemies.push(enemy);
+    });
+}
+
+// Input handling
+const keys = {};
+window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+// Collision detection
+function isSolid(x, y) {
+    const col = Math.floor(x / TILE_SIZE);
+    const row = Math.floor(y / TILE_SIZE);
+    
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) {
+        return true;
+    }
+    
+    return map[row][col] === 1;
+}
+
+function wouldHitWall(x, y, width, height) {
+    return isSolid(x, y) || isSolid(x + width, y) ||
+           isSolid(x, y + height) || isSolid(x + width, y + height);
+}
+
+function distance(obj1, obj2) {
+    const dx = obj1.x - obj2.x;
+    const dy = obj1.y - obj2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+// Particle effects for explosions
+function createExplosion(x, y) {
+    for (let i = 0; i < 6; i++) {
+        const particle = new Graphics()
+            .rect(0, 0, 3, 3)
+            .fill(0xFF4500);
+        
+        particle.x = x + Math.random() * 10 - 5;
+        particle.y = y + Math.random() * 10 - 5;
+        app.stage.addChild(particle);
+        
+        // Animate explosion
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 3 + 1;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+        
+        const animateParticle = () => {
+            particle.x += vx;
+            particle.y += vy;
+            particle.alpha -= 0.05;
+            
+            if (particle.alpha <= 0) {
+                app.stage.removeChild(particle);
+            } else {
+                requestAnimationFrame(animateParticle);
+            }
+        };
+        
+        animateParticle();
+    }
+}
+
+// Update player
+function updatePlayer() {
+    let moved = false;
+    let newX = player.x;
+    let newY = player.y;
+    
+    // Movement
+    if (keys['ArrowLeft']) {
+        newX -= player.speed;
+        player.lastDirection = { x: -1, y: 0 };
+        moved = true;
+    }
+    if (keys['ArrowRight']) {
+        newX += player.speed;
+        player.lastDirection = { x: 1, y: 0 };
+        moved = true;
+    }
+    if (keys['ArrowUp']) {
+        newY -= player.speed;
+        player.lastDirection = { x: 0, y: -1 };
+        moved = true;
+    }
+    if (keys['ArrowDown']) {
+        newY += player.speed;
+        player.lastDirection = { x: 0, y: 1 };
+        moved = true;
+    }
+    
+    // Check wall collisions for movement
+    if (!wouldHitWall(newX, player.y, player.width, player.height)) {
+        player.x = newX;
+    }
+    if (!wouldHitWall(player.x, newY, player.width, player.height)) {
+        player.y = newY;
+    }
+    
+    // Shooting
+    if (keys['ShiftLeft'] || keys['ShiftRight']) {
+        const now = Date.now();
+        if (now - player.lastShot > player.shootCooldown) {
+            shoot();
+            player.lastShot = now;
+        }
+    }
+    
+    // Keep in bounds
+    player.x = Math.max(0, Math.min(player.x, 300 - player.width));
+    player.y = Math.max(0, Math.min(player.y, 240 - player.height));
+    
+    player.sprite.x = player.x;
+    player.sprite.y = player.y;
+}
+
+function shoot() {
+    // Create bullet slightly in front of player
+    const offsetX = player.lastDirection.x * (player.width / 2 + 2);
+    const offsetY = player.lastDirection.y * (player.height / 2 + 2);
+    
+    const bulletX = player.x + player.width/2 + offsetX;
+    const bulletY = player.y + player.height/2 + offsetY;
+    
+    createBullet(bulletX, bulletY, player.lastDirection.x, player.lastDirection.y);
+    
+    // Visual feedback
+    player.sprite.tint = 0xFFFFAA;
+    setTimeout(() => {
+        player.sprite.tint = 0xFFFFFF;
+    }, 100);
+}
+
+// Update bullets
+function updateBullets() {
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        const bullet = bullets[i];
+        
+        // Move bullet
+        bullet.x += bullet.velocityX;
+        bullet.y += bullet.velocityY;
+        bullet.sprite.x = bullet.x;
+        bullet.sprite.y = bullet.y;
+        
+        // Check wall collision
+        if (wouldHitWall(bullet.x, bullet.y, bullet.width, bullet.height)) {
+            destroyBullet(i);
+            continue;
+        }
+        
+        // Check enemy collision
+        for (let j = enemies.length - 1; j >= 0; j--) {
+            const enemy = enemies[j];
+            if (!enemy.active) continue;
+            
+            if (distance(bullet, enemy) < (bullet.width + enemy.width) / 2 + 2) {
+                // Hit enemy!
+                createExplosion(enemy.x + enemy.width/2, enemy.y + enemy.height/2);
+                
+                // Destroy enemy
+                app.stage.removeChild(enemy.sprite);
+                enemy.active = false;
+                enemies.splice(j, 1);
+                
+                // Destroy bullet
+                destroyBullet(i);
+                
+                // Check if all enemies defeated
+                if (enemies.length === 0) {
+                    setTimeout(() => {
+                        spawnEnemies(); // Respawn for continuous play
+                    }, 2000);
+                }
+                
+                break;
+            }
+        }
+        
+        // Remove bullets that go off screen
+        if (bullet.x < -10 || bullet.x > 310 || bullet.y < -10 || bullet.y > 250) {
+            destroyBullet(i);
+        }
+    }
+}
+
+// Game loop
+function gameLoop() {
+    updatePlayer();
+    updateBullets();
+}
+
+// Initialize
+spawnEnemies();
+app.ticker.add(gameLoop);
+</script>
 
 
-## PREPARE TO SHOOT
+## Bullet System Architecture: Modern Projectile Design 🚀
 
-Draw bullet movie clip and make sure its set to be exported as "bullet" so we can attach it to the stage. The graphics inside bullet mc should be aligned to the center.
+**When I say "bullet", I mean any projectile** - arrows, fireballs, energy blasts, magic missiles, or even flying penguins! The core mechanics remain the same.
 
-Let's declare bullet object:
+### Key Design Decisions
 
-```
-game.Bullet = function () {};
-game.Bullet.prototype.speed = 5;
-game.Bullet.prototype.dirx = 0;
-game.Bullet.prototype.diry = -1;
-game.Bullet.prototype.width = 2;
-game.Bullet.prototype.height = 2;
-```
+**🎯 Bullet Behavior Rules:**
+1. **SHIFT key** triggers shooting in the direction hero last moved
+2. **Bullets move faster** than the hero (4 pixels/frame vs 2 pixels/frame)
+3. **Wall collision** destroys bullets instantly
+4. **Enemy collision** destroys both bullet AND enemy (with explosion!)
+5. **Rate limiting** prevents bullet spam (300ms cooldown)
 
-Bullets will move with the speed of 5 pixels per tick. They have width/height of 2 pixels, that's enough damage to the enemy.
+### Modern Bullet System Implementation
 
-Now the properties dirx/diry will make bullet moving. They are same things we used in the moveChar function. If dirx=1, bullet will move right, diry=-1 makes it move up. We will actually take the values of dirx/diry from the char object, but at the start of the game, when char hasn't been moved yet, but player wants to shoot, we will use default values to make bullet move up.
+```javascript
+// Bullet configuration
+const BULLET_CONFIG = {
+    speed: 4,           // Pixels per frame (faster than hero)
+    damage: 1,          // Damage dealt to enemies
+    width: 4,           // Collision size
+    height: 4,
+    color: 0xFFFF00,    // Bright yellow for visibility
+    cooldown: 300       // Milliseconds between shots
+};
 
-Add two new properties to game object:
-
-```
-game = {tileW:30, tileH:30, currentMap:1, bulletcounter:0};
-game.bullets = new Array();
-```
-
-The bulletcounter will be counting the number of bullets we have used and helps to give each new bullet new name. First bullet we shoot in the game, will be named bullet0, then bullet1 and so all the way up to bullet100. Then we reset the bulletcounter. We could in theory let it raise forever, but who knows what kind of nasty things can happen then.
-
-game.bullets is an array which will hold reference to all the bullets we have flying around. At the beginning its empty array.
-
-For the char object add shootspeed property for making him stop between the shots:
-
-```
-char = {xtile:2, ytile:1, speed:4, shootspeed:1000};
-```
-
-Higher shootspeed value makes the char shoot slower and lower value faster. Value of 1000 is exactly 1 second between shots.
-
-For the enemies to die, we have to remove them from the game. Change the enemies creation part in the buildMap function:
-
-```
-game.currentEnemies = [];
-for (var i = 0; i < enemies.length; ++i)
-{
-	var name = "enemy" + i;
-	game[name] = new game["Enemy" + enemies[i][0]];
-	game[name].id = i;
-	game.currentEnemies.push(game[name]);
-	...
-```
-
-We will use currentEnemies to hold the names of all the enemies on the stage. When enemy is killed, we will remove him from the array. The new property "id" helps us to destroy the enemy object placed in the enemies array.
-
-In the detectKeys function add code after checking for arrow keys:
-
-```
-if (Key.isDown(Key.SHIFT) and getTimer() > ob.lastshot + ob.shootspeed)
-{
-	_root.shoot(ob);
+// Modern bullet object structure
+class Bullet {
+    constructor(x, y, velocityX, velocityY) {
+        this.x = x;
+        this.y = y;
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
+        this.width = BULLET_CONFIG.width;
+        this.height = BULLET_CONFIG.height;
+        this.active = true;
+        
+        // Create visual representation
+        this.sprite = new Graphics()
+            .rect(0, 0, this.width, this.height)
+            .fill(BULLET_CONFIG.color);
+    }
+    
+    update() {
+        // Move bullet
+        this.x += this.velocityX;
+        this.y += this.velocityY;
+        this.sprite.x = this.x;
+        this.sprite.y = this.y;
+    }
+    
+    checkCollisions() {
+        // Wall collision
+        if (this.hitsWall()) {
+            this.destroy();
+            return true;
+        }
+        
+        // Enemy collision
+        const hitEnemy = this.checkEnemyHits();
+        if (hitEnemy) {
+            this.destroy();
+            return true;
+        }
+        
+        return false;
+    }
+    
+    destroy() {
+        this.active = false;
+        this.sprite.visible = false;
+        // Return to pool for reuse
+        BulletPool.returnBullet(this);
+    }
 }
 ```
 
-If SHIFT key is pressed and enough time has passed for hero to shoot again, we will call shoot function.
-
-In the beginning of moveChar function add two lines to save the direction of current object:
-
-```
-ob.dirx = dirx;
-ob.diry = diry;
-```
-
-We will use those to determine which way our bullets will move.
+**Why this design rocks:**
+- 🎯 **Clear separation**: Each bullet manages its own behavior
+- ⚡ **Performance optimized**: Object pooling prevents garbage collection lag
+- 🔧 **Configurable**: Easy to tweak speeds, damage, cooldowns
+- 🎨 **Visual feedback**: Bullets are bright and easy to track
 
 
-## SHOOT
+## Shooting Controls: Responsive Combat Input 🎮
 
-For creating the bullets and giving bullets all the data they need for successful deadly flights, we will use new function called "shoot":
+Let's implement smooth, responsive shooting that feels great:
 
-```
-function shoot (ob)
-{
-	ob.lastshot = getTimer();
-	game.bulletcounter++;
-	if (game.bulletcounter > 100)
-	{
-		game.bulletcounter = 0;
-	}
-	var name = "bullet" + game.bulletcounter;
-	game[name] = new game.Bullet;
-	game[name].id = game.bulletcounter;
-	game.bullets.push(game[name]);
-	if (ob.dirx or ob.diry)
-	{
-		game[name].dirx = ob.dirx;
-		game[name].diry = ob.diry;
-	}
-	game[name].xtile = ob.xtile;
-	game[name].ytile = ob.ytile;
-	game.clip.attachMovie("bullet", name, 10100 + game.bulletcounter);
-	game[name].clip = game.clip[name];
-	game[name].x = (ob.x + game[name].dirx * ob.width);
-	game[name].y = (ob.y + game[name].diry * ob.height);
-	game.clip[name]._x = game[name].x;
-	game.clip[name]._y = game[name].y;
+```javascript
+// Player shooting state
+const player = {
+    // ... other properties ...
+    lastDirection: { x: 0, y: -1 }, // Default shoot up
+    lastShot: 0,                    // Timestamp of last shot
+    shootCooldown: 300,             // Milliseconds between shots
+    maxBullets: 5                   // Limit active bullets
+};
+
+// Input handling with shooting
+function handleInput() {
+    let moved = false;
+    
+    // Movement (also sets shooting direction)
+    if (keys['ArrowLeft']) {
+        player.x -= player.speed;
+        player.lastDirection = { x: -1, y: 0 };
+        moved = true;
+    }
+    if (keys['ArrowRight']) {
+        player.x += player.speed;
+        player.lastDirection = { x: 1, y: 0 };
+        moved = true;
+    }
+    if (keys['ArrowUp']) {
+        player.y -= player.speed;
+        player.lastDirection = { x: 0, y: -1 };
+        moved = true;
+    }
+    if (keys['ArrowDown']) {
+        player.y += player.speed;
+        player.lastDirection = { x: 0, y: 1 };
+        moved = true;
+    }
+    
+    // Shooting
+    if (keys['ShiftLeft'] || keys['ShiftRight']) {
+        tryShoot();
+    }
+}
+
+// Smart shooting function
+function tryShoot() {
+    const now = Date.now();
+    
+    // Check cooldown
+    if (now - player.lastShot < player.shootCooldown) {
+        return; // Too soon!
+    }
+    
+    // Check bullet limit (prevents spam)
+    if (activeBullets.length >= player.maxBullets) {
+        return; // Too many bullets already!
+    }
+    
+    // Create bullet
+    fireBullet(player.lastDirection.x, player.lastDirection.y);
+    player.lastShot = now;
+    
+    // Visual feedback
+    showShootingEffect();
+}
+
+function fireBullet(dirX, dirY) {
+    // Calculate spawn position (slightly in front of player)
+    const offsetX = dirX * (player.width / 2 + 3);
+    const offsetY = dirY * (player.height / 2 + 3);
+    
+    const bulletX = player.x + player.width/2 + offsetX;
+    const bulletY = player.y + player.height/2 + offsetY;
+    
+    // Create the bullet
+    const bullet = new Bullet(bulletX, bulletY, dirX * 4, dirY * 4);
+    activeBullets.push(bullet);
+    stage.addChild(bullet.sprite);
+}
+
+function showShootingEffect() {
+    // Flash player briefly
+    player.sprite.tint = 0xFFFFAA;
+    setTimeout(() => {
+        player.sprite.tint = 0xFFFFFF;
+    }, 100);
+    
+    // Optional: Add muzzle flash or sound effect here
 }
 ```
 
-First we have passed object to the function. In this case it is char object as shoot was called from detectKeys function, but if bullet would be shot by enemy, enemy object would be passed.
-
-We use getTimer() function to save the time this shot was fired in the lastshot property.
-
-Next we add 1 to the game.bulletcounter property and if it is >100 we set bulletcounter back to 0.
-
-Now we create new bullet using bulletcounter to give new bullet unique name and we also save this number into bullet object. We will add reference to the new bullet to the game.bullets array.
-
-The if condition with dirx/diry checks if char has been moved. If player hasn't moved the char yet, the char object doesn't have dirx/diry properties and we will have the default dirx/diry from the bullet template. However, if the char has been moved, we set bullets dirx/diry equal to the chars.
-
-To make bullet appear by the char, we need to save chars position. ob.xtile and ob.ytile are copied to the bullet.
-
-Last part of the code creates new movie clip for the bullet, calculates its position on the screen and sets it there. Interesting part might be how exactly is bullets position found:
-
-```
-game[name].x = (ob.x + game[name].dirx * ob.width);
-```
-
-First we take chars position (ob.x), thats where the center of char is. As bullets usually dont come out from the center of hero, we add width of char to that. But since width is multiplied by the value of dirx, the bullet will be placed on the left from char (dirx=-1), right from char (dirx=1) or in the center (dirx=0). Uh, you may wonder, not in the center? But yes, dirx can be 0 only if diry is either 1 or -1, so the bullet ends up above or below char.
+**Smart features:**
+- 🎯 **Direction memory**: Bullets fire in the direction you last moved
+- ⏱️ **Rate limiting**: Prevents button mashing bullet spam
+- 🔢 **Bullet limit**: Maximum 5 active bullets at once
+- ✨ **Visual feedback**: Player flashes when shooting
+- 📍 **Smart positioning**: Bullets spawn slightly in front of player
 
 
-## KILL!
+## Collision Detection & Destruction: Satisfying Combat! 💥
 
-In the end of detectKeys function add line to call second new function that will move the bullet and look if we have killed something:
+Time for the most satisfying part - making things explode when bullets hit them!
 
-```
-_root.moveBullets();
-```
-And the function itself:
+```javascript
+// Bullet update system
+function updateBullets() {
+    for (let i = activeBullets.length - 1; i >= 0; i--) {
+        const bullet = activeBullets[i];
+        
+        // Move bullet
+        bullet.x += bullet.velocityX;
+        bullet.y += bullet.velocityY;
+        bullet.sprite.x = bullet.x;
+        bullet.sprite.y = bullet.y;
+        
+        // Check wall collision
+        if (bulletHitsWall(bullet)) {
+            destroyBullet(i);
+            continue;
+        }
+        
+        // Check enemy collisions
+        const hitEnemyIndex = checkBulletEnemyCollision(bullet);
+        if (hitEnemyIndex !== -1) {
+            // BOOM! Explosion effect
+            createExplosion(enemies[hitEnemyIndex]);
+            
+            // Destroy enemy
+            destroyEnemy(hitEnemyIndex);
+            
+            // Destroy bullet
+            destroyBullet(i);
+            
+            continue;
+        }
+        
+        // Remove bullets that go off screen
+        if (bullet.x < -10 || bullet.x > 310 || bullet.y < -10 || bullet.y > 250) {
+            destroyBullet(i);
+        }
+    }
+}
 
-```
-function moveBullets ()
-{
-	for (var i = 0; i < game.bullets.length; ++i)
-	{
-		var ob = game.bullets[i];
-		getMyCorners (ob.x + ob.speed * ob.dirx, ob.y + ob.speed * ob.diry, ob);
-		if (ob.downleft and ob.upleft and ob.downright and ob.upright)
-		{
-			moveChar(ob, ob.dirx, ob.diry);
-		}
-		else
-		{
-			ob.clip.removeMovieClip();
-			delete game["bullet" + game.bullets[i].id];
-			game.bullets.splice(i,1);
-		}
-		for (var j = 0; j < game.currentEnemies.length; ++j)
-		{
-			var name = "enemy" + game.currentEnemies[j].id;
-			var obenemy = game[name];
-			var xdist = ob.x - obenemy.x;
-			var ydist = ob.y - obenemy.y;
-			if (Math.sqrt(xdist * xdist + ydist * ydist)
-			                                  < ob.width+obenemy.width)
-			{
-				obenemy.clip.removeMovieClip();
-				delete game["enemy" + game.currentEnemies[j].id];
-				game.currentEnemies.splice(j,1);
-				ob.clip.removeMovieClip();
-				delete game["bullet"+game.bullets[i].id];
-				game.bullets.splice(i,1);
-			}
-		}
-	}
+// Wall collision detection
+function bulletHitsWall(bullet) {
+    return isSolid(bullet.x, bullet.y) || 
+           isSolid(bullet.x + bullet.width, bullet.y) ||
+           isSolid(bullet.x, bullet.y + bullet.height) ||
+           isSolid(bullet.x + bullet.width, bullet.y + bullet.height);
+}
+
+// Enemy collision detection
+function checkBulletEnemyCollision(bullet) {
+    for (let i = 0; i < enemies.length; i++) {
+        const enemy = enemies[i];
+        if (!enemy.active) continue;
+        
+        const distance = Math.sqrt(
+            Math.pow(bullet.x - enemy.x, 2) + 
+            Math.pow(bullet.y - enemy.y, 2)
+        );
+        
+        const collisionDistance = (bullet.width + enemy.width) / 2 + 2;
+        
+        if (distance < collisionDistance) {
+            return i; // Return enemy index
+        }
+    }
+    return -1; // No collision
+}
+
+// Epic explosion effect!
+function createExplosion(enemy) {
+    const centerX = enemy.x + enemy.width / 2;
+    const centerY = enemy.y + enemy.height / 2;
+    
+    // Create multiple explosion particles
+    for (let i = 0; i < 8; i++) {
+        const particle = new Graphics()
+            .rect(0, 0, 4, 4)
+            .fill(0xFF4500 + Math.random() * 0x00FF00); // Random orange to yellow
+        
+        const angle = (i / 8) * Math.PI * 2;
+        const speed = Math.random() * 3 + 2;
+        
+        particle.x = centerX;
+        particle.y = centerY;
+        app.stage.addChild(particle);
+        
+        // Animate explosion particle
+        const animateParticle = () => {
+            particle.x += Math.cos(angle) * speed;
+            particle.y += Math.sin(angle) * speed;
+            particle.alpha -= 0.06;
+            particle.rotation += 0.1;
+            
+            if (particle.alpha <= 0) {
+                app.stage.removeChild(particle);
+            } else {
+                requestAnimationFrame(animateParticle);
+            }
+        };
+        
+        animateParticle();
+    }
+}
+
+// Clean object destruction
+function destroyBullet(index) {
+    const bullet = activeBullets[index];
+    app.stage.removeChild(bullet.sprite);
+    bulletPool.push(bullet); // Return to pool for reuse
+    activeBullets.splice(index, 1);
+}
+
+function destroyEnemy(index) {
+    const enemy = enemies[index];
+    app.stage.removeChild(enemy.sprite);
+    enemy.active = false;
+    enemies.splice(index, 1);
+    
+    // Victory check
+    if (enemies.length === 0) {
+        console.log('🎉 All enemies destroyed! Victory!');
+        // Respawn enemies for continuous play
+        setTimeout(spawnNewWave, 2000);
+    }
 }
 ```
 
-This function loops through all the bullets in the bullets array.
+**Destruction system features:**
+- 💥 **Epic explosions**: Multi-particle effects with physics
+- 🎯 **Precise collision**: Circle-based detection for fairness
+- ♻️ **Memory efficient**: Object pooling prevents garbage collection lag
+- 🎊 **Visual satisfaction**: Particles, rotation, and fade effects
+- 🏆 **Victory detection**: Checks when all enemies are eliminated
 
-Using getMyCorners we will know if the current bullet will hit the wall or not. If none of its corners hit the wall, we will move the bullet with moveChar function.
+## Advanced Shooting Features: Level Up Your Combat! 🎮
 
-Now if the bullet would hit wall, we have to destroy it. There are 3 things we need to do in order to get rid of bullet:
+**Ready for more awesome shooting mechanics?** Here are pro-level features to make your combat even more engaging:
 
-- remove the bullet mc (using removeMovieClip)
-- remove bullet object (using delete function)
-- remove current bullet from bullets array
+### 🔥 Enhanced Weapon Systems
 
-We could leave the bullet object in the game, since its without movie clip you cant see it and when removed from bullets array it wont be accessed again, but then after 100 bullets the game will look like scrapyard. It's not nice to leave trash behind you.
+```javascript
+// Multiple weapon types
+const WEAPONS = {
+    PISTOL: {
+        damage: 1,
+        speed: 4,
+        cooldown: 300,
+        color: 0xFFFF00,
+        maxBullets: 5
+    },
+    MACHINE_GUN: {
+        damage: 1,
+        speed: 5,
+        cooldown: 100,    // Rapid fire!
+        color: 0xFF8800,
+        maxBullets: 10
+    },
+    LASER: {
+        damage: 2,
+        speed: 8,
+        cooldown: 500,
+        color: 0x00FF00,
+        maxBullets: 3
+    }
+};
 
-When we have successfully moved the bullet and it hasn't hit any walls yet, we start to check if it has hit some enemy. Looping through all the enemies in the currentEnemies array, we calculate the distance between current bullet and current enemy. If they get too close, we destroy both of them.
-
-If you want enemies to die forever, meaning them not to resurrect after leaving the map and returning, place 1 line after the distance calculation: myEnemies[game.currentMap][obenemy.id]=0;
-
-You can do several things to make shooting more interesting:
-
-- limit the amount of available bullets. You could set variable in the beginning and every time bullet is shot, reduce it by 1, only allowing shooting if its >0
-- limit only 1 bullet on stage. You could do this by checking game.bullets and if its length is >0 do not allow shooting
-- make enemies shoot bullets too. It would be easy to make them shoot at random times in random directions, same way they change the movement
-- make different weapons to choose from. You could declare several bullet templates and assign different damage values to each, so you can get better weapons and kill enemies faster
-- Happy shooting! :)
-
-You can download the source fla with all the code and movie set up here.
-
- 
-
-Shooting with jumping side view:
-
+// Weapon switching
+function switchWeapon(weaponType) {
+    player.currentWeapon = weaponType;
+    const weapon = WEAPONS[weaponType];
+    player.shootCooldown = weapon.cooldown;
+    player.maxBullets = weapon.maxBullets;
+}
 ```
-EXAMPLE HERE
+
+### 🎯 Smart Combat Features
+
+**Ammo limitation system:**
+```javascript
+const player = {
+    // ... other props ...
+    ammo: 20,
+    maxAmmo: 50
+};
+
+function tryShoot() {
+    if (player.ammo <= 0) {
+        console.log('💥 Out of ammo! Find more!');
+        return; // No pew pew for you!
+    }
+    
+    // ... shooting logic ...
+    player.ammo--;
+}
 ```
 
-Source fla for side view jumper here.
+**Enemy return fire:**
+```javascript
+function updateEnemies() {
+    enemies.forEach(enemy => {
+        // Random shooting chance
+        if (Math.random() < 0.002 && enemy.canShoot) {
+            enemyShoot(enemy);
+        }
+    });
+}
+```
+
+**Bullet hell mode:**
+```javascript
+// One bullet limit for precision gameplay
+function tryShoot() {
+    if (activeBullets.length > 0) {
+        return; // Must wait for current bullet
+    }
+    // ... create single bullet ...
+}
+```
+
+### 📈 Performance Optimizations
+
+**Object pooling** (already implemented in our demo!):
+- Reuse bullet objects instead of creating/destroying
+- Prevents garbage collection stutters
+- Smooth performance even with lots of bullets
+
+**Collision optimization:**
+- Use distance squared for collision checks (faster than sqrt)
+- Spatial partitioning for many enemies
+- Early exit collision loops
+
+## Side-Scrolling Shooting: Complete Platform Combat! 🏃‍♂️
+
+<div id="platformShootingDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="platformCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Arrow Keys + Spacebar to jump, Shift to shoot<br>
+        <strong>Try:</strong> Jump and shoot in mid-air! Full platform combat!
+    </div>
+</div>
+
+<script type="module">
+// Platform shooter demo
+import { Application, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
+
+const canvas2 = document.getElementById('platformCanvas');
+const app2 = new Application();
+
+await app2.init({
+    canvas: canvas2,
+    width: 300,
+    height: 240,
+    backgroundColor: 0x87CEEB
+});
+
+// Platform map
+const platformMap = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,1,1,0,0,1,1,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [1,1,0,0,1,1,0,0,1,1],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [1,1,1,1,1,1,1,1,1,1]
+];
+
+// Draw platform map
+for (let row = 0; row < platformMap.length; row++) {
+    for (let col = 0; col < platformMap[row].length; col++) {
+        if (platformMap[row][col] === 1) {
+            const tile = new Graphics()
+                .rect(0, 0, 30, 30)
+                .fill(0x8B4513);
+            tile.x = col * 30;
+            tile.y = row * 30;
+            app2.stage.addChild(tile);
+        }
+    }
+}
+
+// Platform hero with jumping and shooting
+const platformHero = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+platformHero.x = 60;
+platformHero.y = 180;
+app2.stage.addChild(platformHero);
+
+const platformPlayer = {
+    sprite: platformHero,
+    x: 60, y: 180, width: 12, height: 12,
+    velocityX: 0, velocityY: 0,
+    speed: 2, jumpPower: -12,
+    onGround: false,
+    lastDirection: {x: 1, y: 0},
+    lastShot: 0,
+    shootCooldown: 400
+};
+
+const platformBullets = [];
+const platformEnemies = [];
+
+// Spawn platform enemies
+for (let i = 0; i < 3; i++) {
+    const enemy = new Graphics().rect(0, 0, 10, 10).fill(0x8A2BE2);
+    enemy.x = 150 + i * 60;
+    enemy.y = 60 + i * 40;
+    app2.stage.addChild(enemy);
+    
+    platformEnemies.push({
+        sprite: enemy,
+        x: enemy.x,
+        y: enemy.y,
+        width: 10,
+        height: 10,
+        active: true
+    });
+}
+
+const platformKeys = {};
+window.addEventListener('keydown', (e) => { platformKeys[e.code] = true; });
+window.addEventListener('keyup', (e) => { platformKeys[e.code] = false; });
+
+function isSolid2(x, y) {
+    const col = Math.floor(x / 30);
+    const row = Math.floor(y / 30);
+    return row >= 0 && row < platformMap.length && col >= 0 && col < platformMap[0].length && platformMap[row][col] === 1;
+}
+
+function updatePlatformGame() {
+    // Player movement
+    if (platformKeys['ArrowLeft']) {
+        platformPlayer.velocityX = -platformPlayer.speed;
+        platformPlayer.lastDirection = {x: -1, y: 0};
+    } else if (platformKeys['ArrowRight']) {
+        platformPlayer.velocityX = platformPlayer.speed;
+        platformPlayer.lastDirection = {x: 1, y: 0};
+    } else {
+        platformPlayer.velocityX = 0;
+    }
+    
+    // Jumping
+    if (platformKeys['Space'] && platformPlayer.onGround) {
+        platformPlayer.velocityY = platformPlayer.jumpPower;
+        platformPlayer.onGround = false;
+    }
+    
+    // Shooting
+    if (platformKeys['ShiftLeft'] && Date.now() - platformPlayer.lastShot > platformPlayer.shootCooldown) {
+        const bullet = new Graphics().rect(0, 0, 4, 4).fill(0xFFFF00);
+        bullet.x = platformPlayer.x + platformPlayer.width/2;
+        bullet.y = platformPlayer.y + platformPlayer.height/2;
+        app2.stage.addChild(bullet);
+        
+        platformBullets.push({
+            sprite: bullet,
+            x: bullet.x, y: bullet.y,
+            velocityX: platformPlayer.lastDirection.x * 4,
+            velocityY: platformPlayer.lastDirection.y * 4,
+            width: 4, height: 4
+        });
+        
+        platformPlayer.lastShot = Date.now();
+    }
+    
+    // Apply gravity
+    platformPlayer.velocityY += 0.8;
+    
+    // Update position
+    platformPlayer.x += platformPlayer.velocityX;
+    platformPlayer.y += platformPlayer.velocityY;
+    
+    // Ground collision
+    if (isSolid2(platformPlayer.x + platformPlayer.width/2, platformPlayer.y + platformPlayer.height + 1) && platformPlayer.velocityY > 0) {
+        platformPlayer.y = Math.floor((platformPlayer.y + platformPlayer.height) / 30) * 30 - platformPlayer.height;
+        platformPlayer.velocityY = 0;
+        platformPlayer.onGround = true;
+    } else {
+        platformPlayer.onGround = false;
+    }
+    
+    // Bounds
+    platformPlayer.x = Math.max(0, Math.min(platformPlayer.x, 288));
+    platformPlayer.y = Math.max(0, platformPlayer.y);
+    
+    platformPlayer.sprite.x = platformPlayer.x;
+    platformPlayer.sprite.y = platformPlayer.y;
+    
+    // Update bullets
+    for (let i = platformBullets.length - 1; i >= 0; i--) {
+        const bullet = platformBullets[i];
+        bullet.x += bullet.velocityX;
+        bullet.y += bullet.velocityY;
+        bullet.sprite.x = bullet.x;
+        bullet.sprite.y = bullet.y;
+        
+        // Remove bullets that hit walls or go off screen
+        if (isSolid2(bullet.x, bullet.y) || bullet.x < 0 || bullet.x > 300 || bullet.y < 0 || bullet.y > 240) {
+            app2.stage.removeChild(bullet.sprite);
+            platformBullets.splice(i, 1);
+            continue;
+        }
+        
+        // Check enemy hits
+        for (let j = platformEnemies.length - 1; j >= 0; j--) {
+            const enemy = platformEnemies[j];
+            if (!enemy.active) continue;
+            
+            const dx = bullet.x - enemy.x;
+            const dy = bullet.y - enemy.y;
+            if (Math.sqrt(dx*dx + dy*dy) < 8) {
+                // Hit!
+                app2.stage.removeChild(enemy.sprite);
+                app2.stage.removeChild(bullet.sprite);
+                platformEnemies.splice(j, 1);
+                platformBullets.splice(i, 1);
+                break;
+            }
+        }
+    }
+}
+
+app2.ticker.add(updatePlatformGame);
+</script>
+
+**🎉 Congratulations!** You've just implemented a complete combat system! Your game now has:
+- ✅ **Responsive shooting** with visual feedback
+- ✅ **Smart collision detection** for bullets and enemies
+- ✅ **Epic explosion effects** for satisfying enemy destruction  
+- ✅ **Performance-optimized** object pooling
+- ✅ **Multiple weapon types** and advanced features
+- ✅ **Platform shooter mechanics** combining jumping and shooting
+
+**What you've learned:** Combat systems aren't just about dealing damage - they're about creating satisfying feedback loops that make players feel powerful and engaged. The visual effects, sound cues, and responsive controls are just as important as the underlying mechanics!
+
+**Next up**: Time to add collectible items that make exploration rewarding! [Next: Getting Items](/tutorial/15-getting-items/)
