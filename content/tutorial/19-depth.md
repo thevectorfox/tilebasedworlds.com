@@ -8,128 +8,230 @@ next = "/tutorial/20-mouse-to-move/"
 prev = "/tutorial/18-more-scrolling/"
 +++
 
-So far we have kept our game strictly two-dimensional. That means if some tile is in front of other tile, it will remain in front no matter what happens in the game. And for those poor unhappy tiles placed in the background will never make it to the front row. Luckily for the tiles on back and maybe not so luckily for the tiles currently in front, we can change the situation. To make our game look better, we will bring in the "depth", creating illusion of objects being closer or further. Here is an example (move the hero below and above same black wall tile):
+Walk below a pillar and you're in front of it. Walk above and the pillar covers you. That's depth - a 2D trick that makes your top-down world feel solid and three-dimensional. Try it:
 
+<div id="depthDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="depthCanvas" width="300" height="240" style="border: 2px solid #333; background: #5a8a3a;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Arrow Keys or WASD<br>
+        <strong>Notice:</strong> Walk above a pillar - it covers you. Walk below - you cover it!
+    </div>
+</div>
 
-```
-EXAMPLE HERE
-```
+<script type="module">
+import { Application, Graphics, Container } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
 
-## MANY LEVELS OF FLASH
+const canvas = document.getElementById('depthCanvas');
+const app = new Application();
+await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x5a8a3a });
 
-I'm sure you have noticed how some things you draw in the Flash cover up other things. If objects are on the same layer, then things you have drawn later are placed in front. You can also change the order of objects on the same layer with "bring to front/send to back" commands from the Modify>>Arrange menu.
+const TILE_SIZE = 30;
 
-Flash has also been kind enough to provide us layers. Layers are great to arrange objects, when you draw something on the layer above other layer, it will always remain in front of objects on the other layer.
+// 10×8 top-down map. 2 = tall pillar with depth sorting
+const map = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,2,0,0,0,2,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,2,0,0,0,2,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1],
+];
 
-![](/p20_2.gif)
+// sortableChildren tells PixiJS to re-sort by zIndex every frame
+const world = new Container();
+world.sortableChildren = true;
+app.stage.addChild(world);
 
-In the picture blue square and red square are both drawn on layer1. Blue square was drawn last, so its in front of red square. Yellow square is on layer2 and since layer2 is above layer1, yellow square covers both blue and red square.
-
-In the next picture red and green squares are in the movie clip "mc1", blue and yellow squares are inside movie clip "mc2".
-
-![](/p20_3.gif)
-
-Blue and yellow square always cover red and green because the parent mc2 is above mc1. Inside movie clips you can arrange the order of squares, but you cant place blue square in front of red and same time yellow behind red.
-
-So far everything we have looked at, are placed directly in Flash environment. As you know, the tile based games don't have tiles drawn directly on stage. No, no, no, we can't do anything so simple! Instead, we are using "attachMovie" command to place movie clips on stage dynamically. attachMovie command has syntax
-
-```
-anyMovieClip.attachMovie(idName, newname, depth);
-```
-
-You see, it has depth written in its syntax already. What is exactly that "depth" in its syntax? Everything you draw directly in the stage, are placed on _level0. That's the furthest it will go. Everything you attach dynamically (using attachMovie, duplicateMovieClip or loadMovie) will be placed in the higher levels, above _level0 . From now on we will only deal with movie clips attached to the stage. The other levels in Flash where only brought up to refresh your memory and make you more confused.
-
-
-## FINDING RIGHT DEPTH
-
-In picture A hero is covering part of wall, so hero looks like being closer to viewer then wall, but in the picture B part of the wall covers hero making hero standing further.
-
-![](/p20_4.gif)
-
-Now, whats the difference between those two pictures beside hero/wall coverup? The hero and wall are same. The wall is in the same spot. Yes, the hero has moved up. Now we will come to the very important conclusion: **object moves closer when its y-coordinate increases**. Its also worth to remember that we will consider higher depth being closer to viewer.
-
-How could we change the depth of hero? Flash has a command for it: "swapDepths". We can change depth of any movie clip until we know what its depth should be. From the picture above we can say that in most basic level objects depth is its y coordinate:
-
-```
-mc.swapDepths(mc._y)
-```
-
-Since we have rows of tiles, all in exactly same y coordinate, we also should take into account the x coordinate, since no two movie clips can share the same depth in Flash. If you swapDepth movie clip to the depth, where another movie clip already sits in, they swap depths (hm, that's where the name of swapDepths comes from) and we don't want that.
-
-```
-mc.swapDepths(mc._y*movie_width+mc._x)
-```
-
-![](/p20_5.gif)
-
-Tile in the left upper corner will be furthest, the depth of tiles increases (they will be closer) when moving right and down.
-
-
-## Z-SORTING
-
-z-sorting is fancier name for what we have done so far with depths. It comes from the 3D world, where every point has x, y and z coordinate. z coordinate determines how close or far the point is from viewer. We will make our tiles all have right depth and when the hero moves around, we will change its depth according to where he stands.
-
-Please make sure that both tiles and hero have registration point in the left top corner. Draw the parts you want to overlap other tiles above registration point.
-
-![](/p20_6.gif)
-
-Now let's declare char object:
-
-```
-char={xtile:2, ytile:1, speed:4, width:20, height:20};
-```
-
-The width and height should be predetermined and not read using _height because we want the hero to walk partly over the walls.
-
-Now to the buildMap function:
-
-```
-function buildMap (map)
-{
-	_root.attachMovie("empty", "tiles", 1);
-	_root.tiles.attachMovie("empty", "back", 0);
-	...
-```
-
-We will attach extra movie clip to the tiles mc. Thats where we will place all the ground tiles which cant overlap the hero. The tiles like walls and trees which can be also in front of hero, will be placed in the tiles mc directly. Since "back" movie clip is at level0 inside "tiles" mc, it will be always behind every other object, including hero and trees and walls. And everything inside "back" movie clip will also be behind all the other objects placed directly into "tiles" mc.
-
-In the loop to create tiles use this code:
-
-```
-var name = "t_" + i + "_" + j;
-game[name] = new game["Tile" + map[i][j]];
-if(game[name].walkable)
-{
-	var clip = game.clip.back;
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        if (map[row][col] === 1) {
+            // Border walls - flat tile, sorted by foot point
+            const wall = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            wall.x = col * TILE_SIZE;
+            wall.y = row * TILE_SIZE;
+            wall.zIndex = (row + 1) * TILE_SIZE;
+            world.addChild(wall);
+        } else if (map[row][col] === 2) {
+            // Pillar: 20px wide, 50px tall, extending 20px above its tile row
+            const pillar = new Graphics()
+                .rect(5, -20, 20, 50)   // y=-20 puts top 20px above the tile row
+                .fill(0x8B4513);
+            pillar.x = col * TILE_SIZE;
+            pillar.y = row * TILE_SIZE;
+            // Foot point = bottom of tile row - the key to correct depth
+            pillar.zIndex = (row + 1) * TILE_SIZE;
+            world.addChild(pillar);
+        }
+    }
 }
-else
-{
-	var clip = game.clip;
+
+const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+world.addChild(heroSprite);
+
+const player = {
+    sprite: heroSprite,
+    x: 120, y: 114,
+    width: 12, height: 12,
+    speed: 2
+};
+
+function isSolid(x, y) {
+    const col = Math.floor(x / TILE_SIZE);
+    const row = Math.floor(y / TILE_SIZE);
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return true;
+    return map[row][col] !== 0;
 }
-game[name].depth = i * game.tileH * 300 + j * game.tileW + 1;
-clip.attachMovie("tile", name, game[name].depth);
-clip[name]._x = (j * game.tileW);
-clip[name]._y = (i * game.tileH);
-clip[name].gotoAndStop(game[name].frame);
+
+const keys = {};
+window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+function gameLoop() {
+    let dx = 0, dy = 0;
+    if (keys['ArrowLeft']  || keys['KeyA']) dx = -player.speed;
+    if (keys['ArrowRight'] || keys['KeyD']) dx =  player.speed;
+    if (keys['ArrowUp']    || keys['KeyW']) dy = -player.speed;
+    if (keys['ArrowDown']  || keys['KeyS']) dy =  player.speed;
+
+    const newX = player.x + dx;
+    if (!isSolid(newX + 2, player.y + 2) &&
+        !isSolid(newX + player.width - 2, player.y + 2) &&
+        !isSolid(newX + 2, player.y + player.height - 2) &&
+        !isSolid(newX + player.width - 2, player.y + player.height - 2)) {
+        player.x = newX;
+    }
+
+    const newY = player.y + dy;
+    if (!isSolid(player.x + 2, newY + 2) &&
+        !isSolid(player.x + player.width - 2, newY + 2) &&
+        !isSolid(player.x + 2, newY + player.height - 2) &&
+        !isSolid(player.x + player.width - 2, newY + player.height - 2)) {
+        player.y = newY;
+    }
+
+    player.sprite.x = player.x;
+    player.sprite.y = player.y;
+
+    // Update depth every frame based on the foot point
+    player.sprite.zIndex = player.y + player.height;
+}
+
+app.ticker.add(gameLoop);
+</script>
+
+## THE ILLUSION 🎭
+
+Top-down games use a simple rule: **things lower on the screen are closer to the viewer**. Imagine looking down at a scene from above. A character further north (higher up on screen) is physically further away, so objects in the south overlap them.
+
+When two objects share the same screen space, the one with the lowest **foot point** (bottom edge) wins - it renders on top because it's "closer" to the camera.
+
+```
+         [pillar top]
+         [         ]     ← hero here: behind the pillar
+[hero]→→→[  pillar ]
+         [         ]     ← hero here: in front of the pillar
+         [foot]
 ```
 
-After we have created tile object, we check if it is walkable tile (ground type) and if it is, we place it in the back movie clip. Next we calculate the depth of the tile. We will add 1 to the depth to avoid tile at x=0, y=0 being attached to the level0, where we have our "back" movie clip. If we would allow this, then "tile0_0" would replace "back" movie clip.
+This technique is called **Y-sorting** (or z-sorting, borrowing the depth axis from 3D graphics).
 
-Now let's calculate the depth of hero too:
+## HOW PIXI SORTS OBJECTS 🖼️
+
+PixiJS draws container children in the order they were added - later additions appear on top. In a static scene this is fine, but a moving player needs its render position to change dynamically.
+
+Two PixiJS features solve this:
+
+- **`zIndex`** - a number on every display object. Higher = drawn in front.
+- **`sortableChildren`** - a flag on containers. When `true`, PixiJS re-sorts children by `zIndex` every frame before drawing.
+
+```js
+const world = new Container();
+world.sortableChildren = true; // enable Z-sorting for all children
+
+// Now zIndex controls who's in front
+wallTile.zIndex = 90;    // renders behind the player (when player is south of it)
+player.sprite.zIndex = 102; // renders in front (player's foot is lower)
+```
+
+Enable `sortableChildren` once at setup - PixiJS handles the sorting automatically every frame.
+
+## THE FOOT POINT RULE 👣
+
+Every object needs a consistent sorting key. We use the **foot point** - the y coordinate of the bottom edge. Whoever's feet are lower on screen is drawn on top.
 
 ```
-ob.depth = ob.y * 300 + ob.x + 1;
-game.clip.attachMovie("char", "char", ob.depth);
+footPoint = y + height
 ```
 
-And since the hero will change its depth in every step, add to the end of moveChar function:
+For a tile in row 2 (TILE_SIZE = 30): `footPoint = (2 + 1) × 30 = 90`
+For the player at y=95, height=12: `footPoint = 95 + 12 = 107`
 
+Since 107 > 90, the player renders in front - they're south of the tile, so they're closer.
+
+Tiles get their `zIndex` set once when the map is built. The player's `zIndex` updates every single frame:
+
+```js
+// Build map - set tile zIndex once
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        if (map[row][col] === 1) {
+            const tile = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            tile.x = col * TILE_SIZE;
+            tile.y = row * TILE_SIZE;
+            tile.zIndex = (row + 1) * TILE_SIZE; // foot of this tile row
+            world.addChild(tile);
+        }
+    }
+}
+
+// Game loop - update player zIndex each frame
+function gameLoop() {
+    // ... movement and collision ...
+    player.sprite.zIndex = player.y + player.height; // ← the key line
+}
 ```
-ob.depth = ob.y * 300 + ob.x + 1;
-ob.clip.swapDepths(ob.depth);
-return (true);
+
+## DRAWING TALL OBJECTS 🌲
+
+For the effect to be visible, objects need to extend **above** their foot point. A 30×30 tile that fits perfectly inside its grid cell won't visually overlap a player in the row above - there's nothing to overlap.
+
+Draw the tall portion above the tile's grid position using a negative y offset in the `Graphics` rectangle:
+
+```js
+// A pillar: grid position is row × TILE_SIZE, but it extends 20px above that
+const pillar = new Graphics()
+    .rect(5, -20, 20, 50)   // x=5 (centered), y=-20 (above cell), 20px wide × 50px tall
+    .fill(0x8B4513);
+
+pillar.x = col * TILE_SIZE;
+pillar.y = row * TILE_SIZE;          // grid position (the foot row)
+pillar.zIndex = (row + 1) * TILE_SIZE; // foot point at bottom of tile
+world.addChild(pillar);
 ```
 
-Now each time moveChar function is run, the depth of object is updated. If you would happen to use other moving objects, they too would update their depth to correct value. But if you add more moving objects, you should make sure they cant have exactly same x/y coordinate.
+The collision box still covers the tile grid (player can't walk through it), but the visual stretches up. When the player walks just north of the pillar, the pillar's upper half overlaps the player's sprite - the depth effect clicks into place.
 
-You can download the source fla with all the code and movie set up here.
+## WHAT ABOUT GROUND TILES? 🌿
+
+Ground tiles (grass, floor, dirt) should always render behind everything. Set them to `zIndex = 0`, or skip adding them as sprites entirely and use the canvas background color instead:
+
+```js
+// Option A: set zIndex = 0 for ground tiles
+groundTile.zIndex = 0;
+
+// Option B: just set the background color in app.init and skip drawing ground tiles
+await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x5a8a3a });
+```
+
+Option B is simpler and slightly faster - fewer sprites, same visual result.
+
+**What you've built:**
+
+- ✅ Y-sort depth using PixiJS `zIndex` and `sortableChildren = true`
+- ✅ Foot-point rule for consistent render ordering
+- ✅ Tall objects that extend above their grid cell for visible depth
+- ✅ Per-frame player `zIndex` update for smooth depth transitions
+
+**Next up**: Point and click to move! [Next: Mouse to Move](/tutorial/20-mouse-to-move/)
