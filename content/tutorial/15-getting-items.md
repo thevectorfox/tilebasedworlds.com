@@ -8,140 +8,503 @@ next = "/tutorial/16-moving-tiles/"
 prev = "/tutorial/14-shoot-him/"
 +++
 
-In this chapter we will look how to make our hero pick up some items from the ground. You know the stuff: crystals, coins, dead spiders, healing potions, ammunition:
+Time to get rewarded! 🌟 Collectibles are the heartbeat of so many classic games - coins in Mario, rupees in Zelda, rings in Sonic. That satisfying *ding* when your score ticks up? Pure dopamine. Let's build that item pickup system!
 
-```
-EXAMPLE HERE
-```
+<div id="itemsDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="itemsCanvas" width="300" height="240" style="border: 2px solid #333; background: #1a1a2e;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Arrow Keys to move<br>
+        <strong>Mission:</strong> Collect all the coins and gems! 🪙💎
+    </div>
+</div>
 
-Items are different in what they actually do. Some items increase your score, some increase your health or give you more bullets. In this example all items do only one thing - they give you more points. It's up to you to create other kind of items.
+<script type="module">
+import { Application, Graphics, Text, TextStyle } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
 
-We will start with the movie from the Open the Door tutorial so we don't have too much code to make things hard to understand.
+const canvas = document.getElementById('itemsCanvas');
+const app = new Application();
+await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x1a1a2e });
 
-First draw your items movie clip. Place graphics of different items in the frames inside it. Like hero and enemies, all items should be aligned in the center. In the first frame add "Stop" action to prevent mc from playing all the lovely graphics. Make sure this mc linkage is set to "Export this symbol" and its identifier is "items". Having items in the separate movie clip allows us to place same item on any background tile without the need to draw tiles again.
+const TILE_SIZE = 30;
 
-
-## WHAT'S YOUR POINT?
-
-To show the collected points draw dynamic text box on the screen. Position this text box outside from tiles area so tiles wont cover it. The dynamic text box should show variable "points":
-
-![](/p16_2.gif)
-
-The variable "points" will need to remember the current points even when we change maps. We can safely attach it to the game object. In declaring game object add property points and set it to 0 (most games start with 0 points).
-
-```
-game = {tileW:30, tileH:30, currentMap:1, points:0};
-```
-
-## SOMETHING TO PICK UP
-
-Like with everything else, first we will declare the items objects and create array to hold positions of items in different maps:
-
-```
-myItems = [
-[0],
-[[1,1,1],[1,1,2],[2,1,3]],
-[[2,1,3],[2,6,3],[1,5,4]]
+const map = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,0,0,0,1,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,1,1,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,0,0,0,1,0,1],
+    [1,1,1,1,1,1,1,1,1,1]
 ];
 
-
-game.Item1 = function () {};
-game.Item1.prototype.points = 1;
-
-
-game.Item2 = function () {};
-game.Item2.prototype.points = 10;
-```
-
-myItems array is built same way as enemies array (page 13 ). It has array for each of the maps. We havent used map0 so first array is empty. For map1 we have set 3 items: [1,1,1],[1,1,2],[2,1,3]. Each item has 3 numbers, first number is the type of item (1 or 2 here) and it is also the number of frame to be shown in the attached items movie clip. Second and third number determine tile it will be placed. Lets look at the last item: we know it is type 2 and it will be placed on the tile x=1, y=3.
-
-Last part of code declares two types of items. Currently they only have one property "points". That's how much points player gets for picking the item. Type1 item will add 1 to the players score, type2 item gives whopping 10 points.
-
-Now let's modify the buildMap function to add items when map is created. Add this code before char creation:
-
-```
-game.items = myItems[game.currentMap];
-for (var i = 0; i < game.items.length; ++i)
-{
-	var name = "item" + game.items[i][2] + "_" + game.items[i][1];
-	game[name] = new game["Item" + game.items[i][0]];
-	game[name].position = i;
-	game.clip.attachMovie("items", name, 10001 + i);
-	game[name].clip = game.clip[name];
-	game[name].clip._x = (game.items[i][1] * game.tileW) + game.tileW / 2;
-	game[name].clip._y = (game.items[i][2] * game.tileH) + game.tileH / 2;
-	game[name].clip.gotoAndStop(game.items[i][0]);
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        if (map[row][col] === 1) {
+            const tile = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x4a3728);
+            tile.x = col * TILE_SIZE;
+            tile.y = row * TILE_SIZE;
+            app.stage.addChild(tile);
+        }
+    }
 }
-_root.points=game.points;
+
+const ITEM_TYPES = {
+    1: { points: 1,  color: 0xFFD700, size: 5 },
+    2: { points: 10, color: 0x00BFFF, size: 4 }
+};
+
+const game = { currentRoom: 1, tileSize: TILE_SIZE, points: 0 };
+
+const myItems = [
+    [],
+    [[1,2,1],[1,5,1],[1,7,1],[2,1,3],[2,8,3],[1,3,5],[1,6,5],[2,4,6]]
+];
+
+const activeItems = new Map();
+
+const pointsStyle = new TextStyle({ fill: 0xFFFFFF, fontSize: 12, fontFamily: 'monospace' });
+const pointsDisplay = new Text({ text: 'Points: 0', style: pointsStyle });
+pointsDisplay.x = 8;
+pointsDisplay.y = 8;
+
+function buildItems() {
+    activeItems.forEach(item => app.stage.removeChild(item.sprite));
+    activeItems.clear();
+
+    for (const [type, tileX, tileY] of myItems[game.currentRoom]) {
+        const itemType = ITEM_TYPES[type];
+        const sprite = new Graphics().circle(0, 0, itemType.size).fill(itemType.color);
+        sprite.x = tileX * TILE_SIZE + TILE_SIZE / 2;
+        sprite.y = tileY * TILE_SIZE + TILE_SIZE / 2;
+        app.stage.addChild(sprite);
+        activeItems.set(`${tileX}_${tileY}`, { sprite, type, tileX, tileY, pointValue: itemType.points });
+    }
+
+    app.stage.addChild(pointsDisplay);
+}
+
+const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+const player = { sprite: heroSprite, x: 60, y: 180, width: 12, height: 12, speed: 2 };
+app.stage.addChild(heroSprite);
+
+function isSolid(x, y) {
+    const col = Math.floor(x / TILE_SIZE);
+    const row = Math.floor(y / TILE_SIZE);
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return true;
+    return map[row][col] === 1;
+}
+
+function checkItemPickup() {
+    const tileX = Math.floor((player.x + player.width / 2) / TILE_SIZE);
+    const tileY = Math.floor((player.y + player.height / 2) / TILE_SIZE);
+    const item = activeItems.get(`${tileX}_${tileY}`);
+
+    if (item) {
+        game.points += item.pointValue;
+        pointsDisplay.text = `Points: ${game.points}`;
+        app.stage.removeChild(item.sprite);
+        activeItems.delete(`${tileX}_${tileY}`);
+        myItems[game.currentRoom] = myItems[game.currentRoom].filter(
+            ([, tx, ty]) => !(tx === item.tileX && ty === item.tileY)
+        );
+        player.sprite.tint = 0xFFFFAA;
+        setTimeout(() => { player.sprite.tint = 0xFFFFFF; }, 120);
+    }
+}
+
+const keys = {};
+window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+function gameLoop() {
+    let newX = player.x;
+    let newY = player.y;
+    if (keys['ArrowLeft'])  newX -= player.speed;
+    if (keys['ArrowRight']) newX += player.speed;
+    if (keys['ArrowUp'])    newY -= player.speed;
+    if (keys['ArrowDown'])  newY += player.speed;
+
+    if (!isSolid(newX, player.y) && !isSolid(newX + player.width, player.y) &&
+        !isSolid(newX, player.y + player.height) && !isSolid(newX + player.width, player.y + player.height)) {
+        player.x = newX;
+    }
+    if (!isSolid(player.x, newY) && !isSolid(player.x + player.width, newY) &&
+        !isSolid(player.x, newY + player.height) && !isSolid(player.x + player.width, newY + player.height)) {
+        player.y = newY;
+    }
+
+    player.sprite.x = player.x;
+    player.sprite.y = player.y;
+    checkItemPickup();
+}
+
+buildItems();
+app.ticker.add(gameLoop);
+</script>
+
+Items are different in what they do - coins add a little to your score, gems are worth ten times more. That's the same trick games use to reward you for exploring off the beaten path. In this tutorial all items just give points, but the same pattern works for health potions, ammo pickups, power-ups, or anything else you want to create!
+
+We'll start from the multi-room setup in the [Open the Door](/tutorial/08-open-the-door/) tutorial so we're not buried in unrelated code.
+
+## TRACKING YOUR SCORE 💰
+
+Add a `points` property to your `game` object. Storing it here means the score survives room transitions - the player doesn't lose their hard-earned coins just by walking through a door.
+
+```js
+const game = {
+    currentRoom: 1,
+    tileSize: 30,
+    points: 0    // Score lives here, safe across all rooms
+};
 ```
 
-First we make copy of the myItems array for the current map. This array called "game.items" will hold the information about items on the current map. We then loop through all the elements in the items array.
+To show the score on screen, use a PixiJS `Text` object positioned in the top-left corner, outside the tile area so walls can't cover it:
 
-From the line:
+```js
+import { Text, TextStyle } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
 
+const pointsStyle = new TextStyle({ fill: 0xFFFFFF, fontSize: 14, fontFamily: 'monospace' });
+const pointsDisplay = new Text({ text: 'Points: 0', style: pointsStyle });
+pointsDisplay.x = 8;
+pointsDisplay.y = 8;
+app.stage.addChild(pointsDisplay);
+
+// Call this whenever points change:
+pointsDisplay.text = `Points: ${game.points}`;
 ```
-var name = "item" + game.items[i][2] + "_" + game.items[i][1];
+
+## SOMETHING TO PICK UP 🪙💎
+
+Like enemies, items are stored in a data array - one sub-array per room. Each item is three numbers: `[type, tileX, tileY]`.
+
+```js
+// myItems[roomIndex] = [[type, tileX, tileY], ...]
+const myItems = [
+    [],                             // Room 0 - unused
+    [[1,1,1],[1,1,2],[2,1,3]],     // Room 1: 3 items
+    [[2,1,3],[2,6,3],[1,5,4]]      // Room 2: 3 items
+];
 ```
 
-we will get name for new item. Its name will follow the same rules as names of our tiles, item on the tile x=1, y=3 will be named "item3_1".
+Then define what each type looks like and what it's worth:
 
-After creating new item object from the templates we made earlier, we save position into that new object. What position is that? Its counter "i" and by saving it in the item object we will know which item in the items array this object represents. This will be very handy when we start to pick up items. Let's see: when we make map1 and i=1, we are creating item from the data [1,1,2], thats second element for the map1 items array. Item will be named "item2_1" and we can access its position in the array with item2_1.position. More about this when we remove items.
-
-After that we place new instance of items movie clip on stage and place it in the correct coordinates. Last line in the loop sends new movie clip to the frame equal with the type of item. All type1 items will show frame 1 for example.
-
-Finally we update the points variable to show correct number of points player has. In the beginning of the game he probably has 0 points, but when changing maps we still use same function and by that time player might have been lucky and collected some points.
-
-
-## FIND IT
-
-We have items, we have hero, now we have to make sure hero knows when he has stepped on something. Add to the end of moveChar function following code:
-
+```js
+// Item type definitions - add as many as you like!
+const ITEM_TYPES = {
+    1: { points: 1,  color: 0xFFD700, size: 5, label: 'coin' },  // Gold coin
+    2: { points: 10, color: 0x00BFFF, size: 4, label: 'gem'  }   // Blue gem
+};
 ```
-var itemname = game["item" + ob.ytile + "_" + ob.xtile];
-if (itemname and ob == _root.char)
-{
-	game.points = game.points + itemname.points;
-	_root.points = game.points;
-	removeMovieClip(itemname.clip);
-	game.items[itemname.position] = 0;
-	delete game["item" + ob.ytile + "_" + ob.xtile];
+
+The type number in `myItems` is the key into `ITEM_TYPES`. So `[2,6,3]` means "a gem (type 2) at tile column 6, row 3". Type 1 gives 1 point, type 2 gives 10 - go hunt those gems!
+
+## PLACING ITEMS ON THE MAP 🗺️
+
+When you call `buildMap()`, loop through the items for the current room and create a PixiJS graphic for each one. Store everything in a JavaScript `Map` object keyed by tile position so you can do instant lookups during pickup checks.
+
+```js
+// Active items on screen: key = "tileX_tileY", value = item data + sprite
+const activeItems = new Map();
+
+function buildItems() {
+    const roomItems = myItems[game.currentRoom];
+
+    for (const [type, tileX, tileY] of roomItems) {
+        const itemType = ITEM_TYPES[type];
+
+        // Draw a colored circle for the item
+        const sprite = new Graphics()
+            .circle(0, 0, itemType.size)
+            .fill(itemType.color);
+
+        // Center it inside its tile
+        sprite.x = tileX * game.tileSize + game.tileSize / 2;
+        sprite.y = tileY * game.tileSize + game.tileSize / 2;
+
+        app.stage.addChild(sprite);
+
+        // Store by tile position for instant lookup
+        const key = `${tileX}_${tileY}`;
+        activeItems.set(key, { sprite, type, tileX, tileY, pointValue: itemType.points });
+    }
+
+    // Show current score (player may already have points from other rooms)
+    pointsDisplay.text = `Points: ${game.points}`;
 }
 ```
 
-The variable itemname will have value based on the current position of hero. When hero stands on the tile x=4, y=9, it will look for "item9_4". If such object exists, itemname will refer to that object, but in the unlucky case of not having item in that tile, itemname will have no value.
+The key is just `"tileX_tileY"` - for example a gem at column 6, row 3 gets the key `"6_3"`. When the hero steps on that tile you can check `activeItems.get("6_3")` instantly, no looping required.
 
-If we have found item object and we are moving hero, we will first add points from the item object to the game.points and then update variable _root.points too to show them.
+## COLLECTING ITEMS 🎯
 
-Now it's time to remove item from the stage. Each item has to be removed from 3 places: its movie clip, from items array and its object. Currently we don't delete it from the items array, we just set 0 in the position of this item. And don't forget, items array is only copy of myItems array, if we leave the map and return, all items would appear again. For prevent such bad idea, we will update the changeMap function.
+Add this check at the end of your movement function. After every step, look up the player's current tile in `activeItems`:
 
-Add to the beginning of changeMap function:
+```js
+function checkItemPickup() {
+    // Which tile is the center of the player on?
+    const tileX = Math.floor((player.x + player.width / 2) / game.tileSize);
+    const tileY = Math.floor((player.y + player.height / 2) / game.tileSize);
 
-```
-var tempitems = [];
-for (var i = 0; i < game.items.length; ++i)
-{
-	if(game.items[i])
-	{
-		var name = "item" + game.items[i][2] + "_" + game.items[i][1];
-		delete game[name];
-		tempitems.push(game.items[i]);
-	}
+    const item = activeItems.get(`${tileX}_${tileY}`);
+
+    if (item) {
+        // 🎉 Got one! Add points and update display
+        game.points += item.pointValue;
+        pointsDisplay.text = `Points: ${game.points}`;
+
+        // Remove the sprite from screen
+        app.stage.removeChild(item.sprite);
+
+        // Remove from the tracking map
+        activeItems.delete(`${tileX}_${tileY}`);
+
+        // Remove from source data so it won't respawn
+        myItems[game.currentRoom] = myItems[game.currentRoom].filter(
+            ([, tx, ty]) => !(tx === item.tileX && ty === item.tileY)
+        );
+    }
 }
-myItems[game.currentMap] = tempitems;
 ```
 
-Here we use temporary array "tempitems" to copy items not yet picked up back from items array to the myItems array. When element in the position i is not 0, that means item was not picked up and we will save it to be shown next time player enters this map. But to make sure the item object wont appear in next map, we have to delete it first. However when item was picked up, it will not appear again when players comes back.
+Each collected item needs to vanish from **three places**:
 
-You can download the source fla with all the code and movie set up here.
+1. **The screen** → `app.stage.removeChild(item.sprite)`
+2. **The active tracking map** → `activeItems.delete(key)`
+3. **The source data** → filter it out of `myItems`
 
- 
+That third step is the critical one. Without it the item reappears every time the player re-enters the room!
 
-And here I have set up side scroller with everything talked so far:
+## KEEPING ITEMS GONE WHEN YOU LEAVE 🚪
 
+When the player uses a door, save the current state of the room's items before building the new one. Add this to the start of your `changeMap` function:
+
+```js
+function changeMap(newRoom) {
+    // Save which items are still uncollected on the current map
+    myItems[game.currentRoom] = [...activeItems.values()].map(
+        item => [item.type, item.tileX, item.tileY]
+    );
+
+    // Remove item sprites from the old room
+    activeItems.forEach(item => app.stage.removeChild(item.sprite));
+    activeItems.clear();
+
+    // Switch rooms and rebuild
+    game.currentRoom = newRoom;
+    buildMap();
+}
 ```
-EXAMPLE HERE
-```
 
-Download the source fla for side scroller with all the code and movie set up here.
+This rebuilds `myItems[currentRoom]` from whatever's still in `activeItems`. Anything already collected won't be in there, so it won't come back. Return to any room and you'll find it exactly as you left it!
 
-  
+## SIDE-SCROLLING ITEMS: PLATFORM PICKUPS 🏃‍♂️
+
+The same system works perfectly in a side-scrolling platformer. Here's the complete picture - jumping, enemies, shooting, and now items all together:
+
+<div id="platformDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="platformCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Arrow Keys + Space to jump, Shift to shoot<br>
+        <strong>Score:</strong> Grab gold coins (+1) and blue gems (+10)! 🪙💎
+    </div>
+</div>
+
+<script type="module">
+import { Application, Graphics, Text, TextStyle } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
+
+const canvas = document.getElementById('platformCanvas');
+const app = new Application();
+await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x87CEEB });
+
+const TILE_SIZE = 30;
+const GRAVITY = 0.6;
+
+const map = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,1,1,0,0,1,1,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [1,1,0,0,1,1,0,0,1,1],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [1,1,1,1,1,1,1,1,1,1]
+];
+
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        if (map[row][col] === 1) {
+            const tile = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            tile.x = col * TILE_SIZE;
+            tile.y = row * TILE_SIZE;
+            app.stage.addChild(tile);
+        }
+    }
+}
+
+const ITEM_TYPES = {
+    1: { points: 1,  color: 0xFFD700, size: 5 },
+    2: { points: 10, color: 0x00BFFF, size: 4 }
+};
+
+const game = { currentRoom: 1, tileSize: TILE_SIZE, points: 0 };
+
+const myItems = [
+    [],
+    [[1,1,0],[2,3,0],[1,5,0],[2,7,0],[1,2,1],[1,6,1],[2,4,3],[1,0,3],[1,8,3]]
+];
+
+const activeItems = new Map();
+
+const pointsStyle = new TextStyle({ fill: 0x000000, fontSize: 11, fontFamily: 'monospace' });
+const pointsDisplay = new Text({ text: 'Points: 0', style: pointsStyle });
+pointsDisplay.x = 8;
+pointsDisplay.y = 8;
+
+function buildItems() {
+    for (const [type, tileX, tileY] of myItems[game.currentRoom]) {
+        const itemType = ITEM_TYPES[type];
+        const sprite = new Graphics().circle(0, 0, itemType.size).fill(itemType.color);
+        sprite.x = tileX * TILE_SIZE + TILE_SIZE / 2;
+        sprite.y = tileY * TILE_SIZE + TILE_SIZE / 2;
+        app.stage.addChild(sprite);
+        activeItems.set(`${tileX}_${tileY}`, { sprite, type, tileX, tileY, pointValue: itemType.points });
+    }
+    app.stage.addChild(pointsDisplay);
+}
+
+const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+app.stage.addChild(heroSprite);
+
+const player = {
+    sprite: heroSprite,
+    x: 60, y: 180,
+    width: 12, height: 12,
+    velocityX: 0, velocityY: 0,
+    speed: 2, jumpPower: -10,
+    onGround: false,
+    lastDirection: { x: 1, y: 0 },
+    lastShot: 0, shootCooldown: 350
+};
+
+const bullets = [];
+const enemies = [];
+
+// Spawn some enemies
+for (let i = 0; i < 3; i++) {
+    const s = new Graphics().rect(0, 0, 10, 10).fill(0x8A2BE2);
+    app.stage.addChild(s);
+    enemies.push({ sprite: s, x: 120 + i * 60, y: 60 + i * 30, width: 10, height: 10, active: true });
+}
+
+function isSolid(x, y) {
+    const col = Math.floor(x / TILE_SIZE);
+    const row = Math.floor(y / TILE_SIZE);
+    return row >= 0 && row < map.length && col >= 0 && col < map[0].length && map[row][col] === 1;
+}
+
+function checkItemPickup() {
+    const tileX = Math.floor((player.x + player.width / 2) / TILE_SIZE);
+    const tileY = Math.floor((player.y + player.height / 2) / TILE_SIZE);
+    const item = activeItems.get(`${tileX}_${tileY}`);
+    if (item) {
+        game.points += item.pointValue;
+        pointsDisplay.text = `Points: ${game.points}`;
+        app.stage.removeChild(item.sprite);
+        activeItems.delete(`${tileX}_${tileY}`);
+        player.sprite.tint = 0xFFFFAA;
+        setTimeout(() => { player.sprite.tint = 0xFFFFFF; }, 120);
+    }
+}
+
+const keys = {};
+window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+function gameLoop() {
+    // Input
+    if (keys['ArrowLeft']) { player.velocityX = -player.speed; player.lastDirection = { x: -1, y: 0 }; }
+    else if (keys['ArrowRight']) { player.velocityX = player.speed; player.lastDirection = { x: 1, y: 0 }; }
+    else { player.velocityX = 0; }
+
+    if ((keys['Space'] || keys['ArrowUp']) && player.onGround) {
+        player.velocityY = player.jumpPower;
+        player.onGround = false;
+    }
+
+    if ((keys['ShiftLeft'] || keys['ShiftRight']) && Date.now() - player.lastShot > player.shootCooldown) {
+        const bSprite = new Graphics().rect(0, 0, 4, 4).fill(0xFFFF00);
+        bSprite.x = player.x + player.width / 2;
+        bSprite.y = player.y + player.height / 2;
+        app.stage.addChild(bSprite);
+        bullets.push({ sprite: bSprite, x: bSprite.x, y: bSprite.y, velocityX: player.lastDirection.x * 5, velocityY: 0, width: 4, height: 4 });
+        player.lastShot = Date.now();
+    }
+
+    // Physics
+    player.velocityY += GRAVITY;
+    player.x += player.velocityX;
+    player.y += player.velocityY;
+
+    // Ground collision
+    if (player.velocityY > 0 && isSolid(player.x + player.width / 2, player.y + player.height)) {
+        player.y = Math.floor((player.y + player.height) / TILE_SIZE) * TILE_SIZE - player.height;
+        player.velocityY = 0;
+        player.onGround = true;
+    } else {
+        player.onGround = false;
+    }
+    if (player.velocityY < 0 && isSolid(player.x + player.width / 2, player.y)) {
+        player.y = Math.ceil(player.y / TILE_SIZE) * TILE_SIZE;
+        player.velocityY = 0;
+    }
+
+    player.x = Math.max(0, Math.min(player.x, 288));
+    player.y = Math.max(0, player.y);
+    player.sprite.x = player.x;
+    player.sprite.y = player.y;
+    checkItemPickup();
+
+    // Bullets
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i];
+        b.x += b.velocityX;
+        b.sprite.x = b.x;
+        if (isSolid(b.x, b.y) || b.x < 0 || b.x > 300) {
+            app.stage.removeChild(b.sprite);
+            bullets.splice(i, 1);
+            continue;
+        }
+        for (let j = enemies.length - 1; j >= 0; j--) {
+            const e = enemies[j];
+            if (!e.active) continue;
+            const dx = b.x - e.x, dy = b.y - e.y;
+            if (Math.sqrt(dx*dx + dy*dy) < 9) {
+                app.stage.removeChild(e.sprite);
+                app.stage.removeChild(b.sprite);
+                enemies.splice(j, 1);
+                bullets.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    enemies.forEach(e => { e.sprite.x = e.x; e.sprite.y = e.y; });
+}
+
+buildItems();
+app.ticker.add(gameLoop);
+</script>
+
+**🎉 Congratulations!** Your game world now has collectibles! Everything in this tutorial is the same pattern whether it's a top-down RPG or a side-scrolling platformer - the key idea is always: store items in a data array, render sprites for the current room, check tile position on every frame, and remove collected items from all three places.
+
+**What you've built:**
+- ✅ **Score tracking** that persists across room transitions
+- ✅ **Multiple item types** with different point values
+- ✅ **Instant pickup detection** using tile-position lookup
+- ✅ **Permanent collection** - items don't respawn when you revisit rooms
+- ✅ **Platform item pickups** working alongside jumping, enemies, and shooting
+
+**What you've learned:** Items aren't just about score - they teach players to explore. Hidden gems reward curious players, scattered coins build a trail that guides beginners. How you place items is part of your game's design!
+
+**Next up**: Ready to make your world feel alive? [Next: Moving Tiles](/tutorial/16-moving-tiles/)
