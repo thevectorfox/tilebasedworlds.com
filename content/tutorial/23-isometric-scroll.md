@@ -8,72 +8,271 @@ next = "/tutorial/24-rotate-hero/"
 prev = "/tutorial/22-isometric-mouse/"
 +++
 
-Isometric scrolling is no different from the normal top-down view. With very little trouble we can easily combine scrolling engine (chapter 17) with isometric (chapter 21). This will result into isometric scrolling with diamond shaped view:
+A 5×5 isometric map is a proof of concept. A real game needs room to breathe. Combine the World Container from the scrolling tutorials with the isometric transform and you get a large diamond world that follows the player:
 
-```
-EXAMPLE HERE
-```
+<div id="isoScrollDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="isoScrollCanvas" width="300" height="240" style="border: 2px solid #333; background: #1a1a2e;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Arrow Keys or WASD<br>
+        <strong>Notice:</strong> The camera follows the player — explore the full 8×8 world
+    </div>
+</div>
 
-We will count the movement of the char exactly like in the normal scroll and when tile has gone too far, we will move it to the other side. And after all the calculations are done and positions found, we convert it to the isometric view. I'm not going into exact code here, as the idea is explained before and you can look it up from the fla too.
+<script type="module">
+import { Application, Graphics, Container } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
 
-You can download the source fla with all the code and movie set up here.
+const canvas = document.getElementById('isoScrollCanvas');
+const app = new Application();
+await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x1a1a2e });
 
-Diamond view has 1 big flaw: its shaped like diamond. Yes, diamonds are girls best friend and I have nothing against them personally, just your monitor is not shaped like diamond (or if it is, could you please send me picture of it). Your game will be shaped like rectangle too. Surely you can just create more tiles to cover the whole stage area, plus lot of tiles outside the stage.
+const TILE_SIZE = 30;
+const SCREEN_W = 300;
+const SCREEN_H = 240;
+const SMOOTH = 0.1;
 
-![](/p24_2.gif)
+// 8×8 map - wider than the 300px viewport in iso space
+const map = [
+    [1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,1],
+    [1,0,0,1,0,0,0,1],
+    [1,0,0,0,0,1,0,1],
+    [1,0,1,0,0,0,0,1],
+    [1,0,0,0,1,0,0,1],
+    [1,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1],
+];
 
-It doesn't look bad in the picture, but it will get worse when you make your game bigger. More extra tiles will be around to eat away those precious CPU cycles. If your game is small enough and you don't want to bother too much with the more complex system, use simple isometric scroll. Rest of us, let's move on.
+// World Container - no static OFFSET, the container position handles centering
+const world = new Container();
+world.sortableChildren = true;
+app.stage.addChild(world);
 
-
-## SHAPE IT LIKE RECTANGLE
-
-We can get rid of all the extra tiles with some more work. This movie doesn't create tiles in the same way as earlier examples, you can see the tiles being moved behind the gray frame:
-
-```
-EXAMPLE HERE
-```
-
-The code behind this movie is getting long and complicated so I try to explain the idea with less code samples. Please download the fla for the working actionscript.
-
-The basic idea here is to fill the visible area with isometric tiles and not to have more tiles, that cant be viewed:
-
-![](/p24_4.gif)
-
-There is one extra row of tiles (marked with blue dots) and one column (red dots) to make sure tiles can be moved and they still fill the visible area. Now when our tiles have been moved right enough, we will take the whole column and move it straight across the stage (not in isometric angle!) to the left side. Same way with up/down movement.
-
-![](/p24_5.gif)
-
-To achieve this, we will set up bunch of new objects to hold information about the tiles. When building the map in the beginning the tile in the center (where hero stands) becomes "t_0_0" no matter on which tile the hero actually stands on.
-
-```
-if(y%2 != 0)
-{
-  var noisox = x * game.tileW * 2 + game.tileW + ob.xiso;
+// No OFFSET_X/OFFSET_Y here - the container handles all positioning
+function isoToScreen(worldX, worldY) {
+    return {
+        x: worldX - worldY,
+        y: (worldX + worldY) / 2
+    };
 }
-else
-{
-  var noisox = x * game.tileW * 2 + ob.xiso;
+
+function makeGroundTile() {
+    return new Graphics()
+        .poly([30, 0, 60, 15, 30, 30, 0, 15])
+        .fill(0x3d6b47);
+}
+
+function makeWallTile() {
+    const WH = 20;
+    const g = new Graphics();
+    g.poly([30, -WH, 60, 15 - WH, 30, 30 - WH, 0, 15 - WH]).fill(0xA07840);
+    g.poly([0, 15 - WH, 30, 30 - WH, 30, 30, 0, 15]).fill(0x5C4020);
+    g.poly([30, 30 - WH, 60, 15 - WH, 60, 15, 30, 30]).fill(0x7A5528);
+    return g;
+}
+
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        const worldX = col * TILE_SIZE;
+        const worldY = row * TILE_SIZE;
+        const screen = isoToScreen(worldX, worldY);
+        const tile = map[row][col] === 0 ? makeGroundTile() : makeWallTile();
+        tile.x = screen.x - TILE_SIZE;
+        tile.y = screen.y - TILE_SIZE / 2;
+        tile.zIndex = worldX + worldY;
+        world.addChild(tile);
+    }
+}
+
+const heroSprite = new Graphics()
+    .poly([8, 0, 16, 4, 8, 8, 0, 4])
+    .fill(0xff4444);
+world.addChild(heroSprite);
+
+const player = {
+    sprite: heroSprite,
+    worldX: 45, worldY: 45,
+    width: 12, height: 12,
+    speed: 2
+};
+
+// Initialise camera at player's starting iso position
+const startScreen = isoToScreen(player.worldX, player.worldY);
+let camX = startScreen.x;
+let camY = startScreen.y;
+
+function isSolid(wx, wy) {
+    const col = Math.floor(wx / TILE_SIZE);
+    const row = Math.floor(wy / TILE_SIZE);
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return true;
+    return map[row][col] !== 0;
+}
+
+const keys = {};
+window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+function gameLoop() {
+    let dx = 0, dy = 0;
+    if (keys['ArrowRight'] || keys['KeyD']) dx =  player.speed;
+    if (keys['ArrowLeft']  || keys['KeyA']) dx = -player.speed;
+    if (keys['ArrowDown']  || keys['KeyS']) dy =  player.speed;
+    if (keys['ArrowUp']    || keys['KeyW']) dy = -player.speed;
+
+    const newX = player.worldX + dx;
+    if (!isSolid(newX + 2, player.worldY + 2) &&
+        !isSolid(newX + player.width - 2, player.worldY + 2) &&
+        !isSolid(newX + 2, player.worldY + player.height - 2) &&
+        !isSolid(newX + player.width - 2, player.worldY + player.height - 2)) {
+        player.worldX = newX;
+    }
+
+    const newY = player.worldY + dy;
+    if (!isSolid(player.worldX + 2, newY + 2) &&
+        !isSolid(player.worldX + player.width - 2, newY + 2) &&
+        !isSolid(player.worldX + 2, newY + player.height - 2) &&
+        !isSolid(player.worldX + player.width - 2, newY + player.height - 2)) {
+        player.worldY = newY;
+    }
+
+    // Render player inside the world container (no offset - container handles that)
+    const screen = isoToScreen(player.worldX, player.worldY);
+    player.sprite.x = screen.x - 8;
+    player.sprite.y = screen.y - 4;
+    player.sprite.zIndex = player.worldX + player.worldY + TILE_SIZE / 2;
+
+    // Smooth camera: ease toward the player's iso screen position
+    camX += (screen.x - camX) * SMOOTH;
+    camY += (screen.y - camY) * SMOOTH;
+
+    // Shift the container so the camera target stays centred on screen
+    world.x = Math.round(SCREEN_W / 2 - camX);
+    world.y = Math.round(SCREEN_H / 2 - camY);
+}
+
+app.ticker.add(gameLoop);
+</script>
+
+Notice the diamond shape visible against the dark background at the edges. That's the one catch with isometric scroll — the viewport is rectangular but the world is diamond-shaped.
+
+## WORLD CONTAINER IN ISO 🌍
+
+The World Container pattern from tutorials 17–18 carries over directly. The only change from tutorials 21–22 is dropping the static `OFFSET_X`/`OFFSET_Y` — the container's own position handles the centering instead:
+
+```js
+// Tutorials 21 & 22: static offset baked into isoToScreen()
+function isoToScreen(worldX, worldY) {
+    return {
+        x: (worldX - worldY) + OFFSET_X,  // ← fixed center baked in
+        y: (worldX + worldY) / 2 + OFFSET_Y
+    };
+}
+
+// Tutorial 23: no static offset - the container moves instead
+function isoToScreen(worldX, worldY) {
+    return {
+        x: worldX - worldY,               // ← raw iso coords only
+        y: (worldX + worldY) / 2
+    };
 }
 ```
 
-`var noisoy = y * game.tileW / 2 + ob.yiso;`
-Because we want the isometric tiles to tile up nicely, we have to shift every other row to the right by half the actual tile width.
+Build the whole isometric world inside a `Container`. Every tile and the player sprite use the offset-free `isoToScreen()`. The container shifts the entire scene each frame:
 
-Next we will use the formulas from the iso mouse tutorial to find out which tile in isometric space should be shown it that position.
-
-```
-var ytile = ((2 * noisoy - noisox) / 2);
-var xtile = (noisox + ytile);
-ytile = Math.round(ytile / game.tileW);
-xtile = Math.round(xtile / game.tileW);
+```js
+const world = new Container();
+world.sortableChildren = true;
+app.stage.addChild(world);
 ```
 
-We continue same way as in non scrolling isometric system, create new isometric object from the map data, find out its depth etc. But in addition we also create non_iso object, that remembers all the connections between isometric and normal objects and movie clips.
+## THE CAMERA TARGET 📷
 
-When moving the row or column of tiles over the stage with changeTile function, we use same method: move tile into new position, find out which tile should be shown there, create new objects and delete the old ones.
+The camera tracks the player's **isometric screen position** inside the container — not their world coordinates. Convert `worldX`/`worldY` to iso coords first, then smooth-follow that:
 
-Now 2 warnings to look out for. First, since we have used another movie clip for the walkable tiles to avoid all the depth problems (game.clip.back), we might find that new position of the moved tile needs to be not walkable. Then we have to actually delete the old movie clip and attach new one in the game.clip. That is handled by saving the tiles _parent clip name with the no_iso object and comparing it later with new position for that tile movie clip.
+```js
+// Initialise camera at the player's starting position
+const startScreen = isoToScreen(player.worldX, player.worldY);
+let camX = startScreen.x;
+let camY = startScreen.y;
 
-Second problem is that Flash doesn't like movie clips in the negative depth ([read more here](https://www.kirupa.com/developer/actionscript/depths.htm)). Tiles can actually be placed in negative depths, but we won't be able to remove them later. Some of our tiles might end up in the depths like -3456. To avoid this problem I have added +100000 to each depth calculation (don't forget the hero too).
+const SMOOTH = 0.1;
 
-You can download the source fla with all the code and movie set up here.
+function gameLoop() {
+    // ... movement and collision in world space ...
+
+    // Player's iso position inside the container
+    const screen = isoToScreen(player.worldX, player.worldY);
+    player.sprite.x = screen.x - halfSpriteW;
+    player.sprite.y = screen.y - halfSpriteH;
+
+    // Ease the camera toward the player's iso position
+    camX += (screen.x - camX) * SMOOTH;
+    camY += (screen.y - camY) * SMOOTH;
+
+    // Shift the container to keep the camera target centred on screen
+    world.x = Math.round(SCREEN_W / 2 - camX);
+    world.y = Math.round(SCREEN_H / 2 - camY);
+}
+```
+
+This is identical to the `updateCamera()` from tutorial 17 — just targeting `screen.x`/`screen.y` from the iso transform instead of `player.x`/`player.y` directly.
+
+## THE DIAMOND SHAPE PROBLEM 🔷
+
+Here is the one genuine challenge with isometric scroll: the map is diamond-shaped, but the viewport is rectangular. The background shows through the corners as the player moves:
+
+```text
+┌────────────────────────┐
+│      [background]      │
+│        /‾‾‾‾‾‾‾\       │
+│       /  tiles  \      │
+│      /   world   \     │
+│      \           /     │
+│       \         /      │
+│        \_______/       │
+│      [background]      │
+└────────────────────────┘
+```
+
+Three approaches, in order of complexity:
+
+**Option 1 — Embrace the diamond.** Use a dark or thematic background colour. The diamond edges look intentional. Works great for space games, cave maps, or any dark-aesthetic game. This is what the demo above does.
+
+**Option 2 — Extra border tiles.** Extend the map with enough extra rows and columns so the diamond fully covers the rectangle at all camera positions. Simple, but you're building and sorting tiles the player will never see.
+
+**Option 3 — Clip with a PixiJS mask.** Create a rectangle Graphics object and assign it as `world.mask`. PixiJS only renders what's inside the mask — the diamond corners vanish cleanly:
+
+```js
+const viewMask = new Graphics()
+    .rect(0, 0, SCREEN_W, SCREEN_H)
+    .fill(0xffffff);
+app.stage.addChild(viewMask);
+world.mask = viewMask; // container only renders within this rectangle
+```
+
+The mask moves with the canvas (not the world container), so it stays fixed at the viewport bounds regardless of camera movement. This is the cleanest solution for a polished shipped game.
+
+## DEPTH SORTING IN A CONTAINER ↕️
+
+`sortableChildren` belongs on the container, not the stage. All depth relationships between tiles and the player stay correct as the camera scrolls:
+
+```js
+const world = new Container();
+world.sortableChildren = true;  // ← on the container
+
+// Tiles - set once when building the map
+tile.zIndex = worldX + worldY;
+
+// Player - updated every frame
+player.sprite.zIndex = player.worldX + player.worldY + TILE_SIZE / 2;
+```
+
+The `+ TILE_SIZE / 2` offset ensures the player always renders in front of the floor tile they're standing on, even when their `worldX + worldY` value equals a tile's exactly.
+
+**What you've built:**
+
+- ✅ Isometric world in a World Container — raw iso coords, container handles the centering
+- ✅ Camera target derived from the player's iso screen position, not world position
+- ✅ Smooth camera easing identical to the orthographic scrolling tutorials
+- ✅ Three options for the diamond viewport problem: embrace it, fill it, or mask it
+
+**Next up**: Give your hero a sense of direction. [Next: Rotate Hero](/tutorial/24-rotate-hero/)

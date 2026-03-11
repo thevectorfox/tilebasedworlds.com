@@ -8,77 +8,340 @@ next = "/tutorial/23-isometric-scroll/"
 prev = "/tutorial/21-isometric-view/"
 +++
 
-Now that we know how to make isometric view and how to control the hero with mouse, we should go to sleep and forget all about those... Wait, no, I wanted to say we should now combine isometrics and mouse. Hey, wake up!
+You know how to move in isometric. You know how to click-to-move. Now combine them. The tricky part isn't the movement — it's figuring out which diamond tile the mouse is actually over:
+
+<div id="isoMouseDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="isoMouseCanvas" width="300" height="240" style="border: 2px solid #333; background: #1a1a2e; cursor: crosshair;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Click any green tile<br>
+        <strong>Notice:</strong> The diamond highlight follows the mouse exactly
+    </div>
+</div>
+
+<script type="module">
+import { Application, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
+
+const canvas = document.getElementById('isoMouseCanvas');
+const app = new Application();
+await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x1a1a2e });
+
+const TILE_SIZE = 30;
+const OFFSET_X = 150;
+const OFFSET_Y = 20;
+const CENTER = (TILE_SIZE - 12) / 2; // 9px - center offset for 12px player in 30px tile
+
+const map = [
+    [1,1,1,1,1],
+    [1,0,0,0,1],
+    [1,0,1,0,1],
+    [1,0,0,0,1],
+    [1,1,1,1,1],
+];
+
+app.stage.sortableChildren = true;
+
+function isoToScreen(worldX, worldY) {
+    return {
+        x: (worldX - worldY) + OFFSET_X,
+        y: (worldX + worldY) / 2 + OFFSET_Y
+    };
+}
+
+function screenToWorld(mx, my) {
+    const relX = mx - OFFSET_X;
+    const relY = my - OFFSET_Y;
+    return {
+        worldX: (relX + 2 * relY) / 2,
+        worldY: (2 * relY - relX) / 2
+    };
+}
+
+function makeGroundTile() {
+    return new Graphics()
+        .poly([30, 0, 60, 15, 30, 30, 0, 15])
+        .fill(0x3d6b47);
+}
+
+function makeWallTile() {
+    const WH = 20;
+    const g = new Graphics();
+    g.poly([30, -WH, 60, 15-WH, 30, 30-WH, 0, 15-WH]).fill(0xA07840);
+    g.poly([0, 15-WH, 30, 30-WH, 30, 30, 0, 15]).fill(0x5C4020);
+    g.poly([30, 30-WH, 60, 15-WH, 60, 15, 30, 30]).fill(0x7A5528);
+    return g;
+}
+
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        const worldX = col * TILE_SIZE;
+        const worldY = row * TILE_SIZE;
+        const screen = isoToScreen(worldX, worldY);
+        const tile = map[row][col] === 0 ? makeGroundTile() : makeWallTile();
+        tile.x = screen.x - TILE_SIZE;
+        tile.y = screen.y - TILE_SIZE / 2;
+        tile.zIndex = worldX + worldY;
+        app.stage.addChild(tile);
+    }
+}
+
+// Diamond-shaped cursor highlight
+const cursor = new Graphics()
+    .poly([30, 0, 60, 15, 30, 30, 0, 15])
+    .fill({ color: 0xffff00, alpha: 0.4 });
+cursor.visible = false;
+cursor.zIndex = 9999;
+app.stage.addChild(cursor);
+
+// Target crosshair marker
+const targetMarker = new Graphics();
+targetMarker.visible = false;
+targetMarker.zIndex = 9999;
+app.stage.addChild(targetMarker);
+
+const heroSprite = new Graphics()
+    .poly([8, 0, 16, 4, 8, 8, 0, 4])
+    .fill(0xff4444);
+app.stage.addChild(heroSprite);
+
+const player = {
+    sprite: heroSprite,
+    worldX: 1 * TILE_SIZE + CENTER, worldY: 1 * TILE_SIZE + CENTER,
+    tileX: 1, tileY: 1,
+    dirX: 0, dirY: 0,
+    width: 12, height: 12,
+    speed: 2,
+    moving: false,
+    targetTileX: 1, targetTileY: 1
+};
+
+// Sync sprite to initial position
+const initScreen = isoToScreen(player.worldX, player.worldY);
+player.sprite.x = initScreen.x - 8;
+player.sprite.y = initScreen.y - 4;
+player.sprite.zIndex = player.worldX + player.worldY + TILE_SIZE / 2;
+
+function isWalkable(col, row) {
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return false;
+    return map[row][col] === 0;
+}
+
+let mouseCol = -1, mouseRow = -1;
+
+canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    // Convert screen position to world, then to tile
+    const world = screenToWorld(mx, my);
+    mouseCol = Math.round(world.worldX / TILE_SIZE);
+    mouseRow = Math.round(world.worldY / TILE_SIZE);
+
+    if (isWalkable(mouseCol, mouseRow)) {
+        const screen = isoToScreen(mouseCol * TILE_SIZE, mouseRow * TILE_SIZE);
+        cursor.x = screen.x - TILE_SIZE;
+        cursor.y = screen.y - TILE_SIZE / 2;
+        cursor.visible = true;
+    } else {
+        cursor.visible = false;
+    }
+});
+
+canvas.addEventListener('mouseleave', () => {
+    cursor.visible = false;
+    mouseCol = -1;
+    mouseRow = -1;
+});
+
+canvas.addEventListener('click', () => {
+    if (!isWalkable(mouseCol, mouseRow)) return;
+
+    player.targetTileX = mouseCol;
+    player.targetTileY = mouseRow;
+    player.moving = true;
+
+    const screen = isoToScreen(mouseCol * TILE_SIZE, mouseRow * TILE_SIZE);
+    const cx = screen.x;
+    const cy = screen.y;
+    targetMarker.clear()
+        .moveTo(cx - 5, cy).lineTo(cx + 5, cy)
+        .moveTo(cx, cy - 5).lineTo(cx, cy + 5)
+        .stroke({ color: 0xffff00, width: 2 });
+    targetMarker.visible = true;
+});
+
+function movePlayer() {
+    if (!player.moving) return;
+
+    const atCenter = player.worldX % TILE_SIZE === CENTER &&
+                     player.worldY % TILE_SIZE === CENTER;
+
+    if (atCenter) {
+        player.tileX = Math.floor(player.worldX / TILE_SIZE);
+        player.tileY = Math.floor(player.worldY / TILE_SIZE);
+
+        if (player.tileX === player.targetTileX && player.tileY === player.targetTileY) {
+            player.moving = false;
+            targetMarker.visible = false;
+            return;
+        }
+
+        player.dirX = 0;
+        player.dirY = 0;
+        if (player.tileX < player.targetTileX && isWalkable(player.tileX + 1, player.tileY)) {
+            player.dirX = 1;
+        } else if (player.tileX > player.targetTileX && isWalkable(player.tileX - 1, player.tileY)) {
+            player.dirX = -1;
+        } else if (player.tileY < player.targetTileY && isWalkable(player.tileX, player.tileY + 1)) {
+            player.dirY = 1;
+        } else if (player.tileY > player.targetTileY && isWalkable(player.tileX, player.tileY - 1)) {
+            player.dirY = -1;
+        } else {
+            player.moving = false;
+            targetMarker.visible = false;
+            return;
+        }
+    }
+
+    player.worldX += player.dirX * player.speed;
+    player.worldY += player.dirY * player.speed;
+
+    const screen = isoToScreen(player.worldX, player.worldY);
+    player.sprite.x = screen.x - 8;
+    player.sprite.y = screen.y - 4;
+    player.sprite.zIndex = player.worldX + player.worldY + TILE_SIZE / 2;
+}
+
+app.ticker.add(movePlayer);
+</script>
+
+## THE CHALLENGE 🤔
+
+In the previous mouse tutorial, converting a click to a tile was simple division:
+
+```js
+const tileCol = Math.floor(mx / TILE_SIZE);
+const tileRow = Math.floor(my / TILE_SIZE);
+```
+
+In isometric, tiles are placed at angles. The same screen pixel could be in completely different logical tiles depending on whether you're looking at it as a row or column. Simple division doesn't work anymore.
+
+The diamond tile that lives at logical position (2, 1) appears at a completely different screen location than the tile at (1, 2) — even though both might be at the same screen Y coordinate. You need to invert the `isoToScreen()` transform.
+
+## INVERTING THE FORMULA 🔄
+
+The forward transform is:
+
+```js
+screenX = (worldX - worldY) + OFFSET_X
+screenY = (worldX + worldY) / 2 + OFFSET_Y
+```
+
+To invert it, solve for `worldX` and `worldY`. First, strip the offsets:
+
+```js
+relX = screenX - OFFSET_X  →  relX = worldX - worldY       ... (1)
+relY = screenY - OFFSET_Y  →  relY = (worldX + worldY) / 2 ... (2)
+```
+
+Add equation (1) to `2 × equation (2)`:
 
 ```
-EXAMPLE HERE
+relX + 2 × relY = (worldX - worldY) + (worldX + worldY) = 2 × worldX
+∴ worldX = (relX + 2 × relY) / 2
 ```
 
-Nothing really new here, we take [isometric](21-isometric-view.md) tutorial and change keyboard control to the [mouse](20-mouse-to-move.md) control.
-
-
-## CONVERTING FROM ISOMETRIC
-
-The only interesting question in this chapter is how to convert mouse coordinates from the screen to the tiles so we know which tile player has clicked. As you might remember from the previous chapter, we used:
+Subtract equation (1) from `2 × equation (2)`:
 
 ```
-game.xmouse = Math.round((_root._xmouse - game.tileW / 2) / game.tileW);
-game.ymouse = Math.round((_root._ymouse - game.tileH / 2) / game.tileH);
+2 × relY - relX = (worldX + worldY) - (worldX - worldY) = 2 × worldY
+∴ worldY = (2 × relY - relX) / 2
 ```
 
-If you ever wondered why we used those lines, then no, it's not because the code looks good and is long enough to impress your girlfriend. The reason we used that code was mainly because we had placed the hero on correct place using lines:
+In code:
 
-```
-char.x = (char.xtile * game.tileW) + game.tileW / 2;
-char.y = (char.ytile * game.tileW) + game.tileW / 2;
-```
-
-Don't be shy, look at the two pairs. I can even rewrite the lines for clarity. Let's take the code with char.x, if we replace strange names with simple letters, it says:
-
-`a = b * c + d`
-
-now for us to find mouse coordinates, we need to get letter "b" from that equation:
-
-`b = (a - d) / c`
-
-and this is exactly, what we have used for mouse. OK, but we were here to talk about isometric. In isometric view we cant get the tile clicked with mouse using same code because we have placed tiles in different way. All the tiles are placed in isometric using code:
-
-`xiso = x - y`
-`yiso = (x + y) / 2`
-
-In order to find out, what tile has been clicked, we need to find variables "x" and "y" from those equations. Let's rewrite first line:
-
-`x = xiso + y`
-
-now replace the equation for x into second line:
-
-`yiso = (xiso + y + y) / 2`
-
-which can be rewritten couple of times:
-
-`yiso = (xiso + 2 * y) / 2`
-`2 * yiso = xiso + 2*y`
-`2 * y = 2 * yiso - xiso`
-`y = (2 * yiso - xiso) / 2`
-
-And we have created two lines to calculate tile in isometric space from the screen coordinates:
-
-`y = (2 * yiso - xiso) / 2`
-`x = xiso + y`
-
-## ACTUAL CODE
-
-In the work function use this code to find out the isometric tile under the mouse:
-
-```
-var ymouse = ((2 * game.clip._ymouse - game.clip._xmouse) / 2);
-var xmouse = (game.clip._xmouse + ymouse);
-game.ymouse = Math.round(ymouse / game.tileW);
-game.xmouse = Math.round(xmouse / game.tileW) - 1;
+```js
+function screenToWorld(mx, my) {
+    const relX = mx - OFFSET_X;
+    const relY = my - OFFSET_Y;
+    return {
+        worldX: (relX + 2 * relY) / 2,
+        worldY: (2 * relY - relX) / 2
+    };
+}
 ```
 
-I'm sure you can see the similarities with 2 lines we created before. Variables xmouse and ymouse have values where mouse would have been, if we wouldn't be silly enough to start with all this isometric stuff.
+Then round `worldX / TILE_SIZE` and `worldY / TILE_SIZE` to get tile coordinates:
 
-Remember, don't use _root._xmouse because our "tiles" movie clip was moved (game.clip._x=150) and we want to get mouse inside "tiles" movie clip. If you use _root._xmouse, then the tile with x=0 would be placed in the left side of the stage, but isometric view places that tile about in the center of stage.
+```js
+canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
 
-You can download the source fla with all the code and movie set up here.
+    const world = screenToWorld(mx, my);
+    mouseCol = Math.round(world.worldX / TILE_SIZE);
+    mouseRow = Math.round(world.worldY / TILE_SIZE);
+});
+```
+
+`Math.round` (not `Math.floor`) gives the nearest tile center, which feels right for isometric picking.
+
+## THE DIAMOND CURSOR 🔶
+
+A rectangular highlight rectangle looks wrong on diamond tiles. Draw the cursor as a diamond polygon matching the tile shape exactly:
+
+```js
+// Matches makeGroundTile() exactly - same polygon, just semi-transparent
+const cursor = new Graphics()
+    .poly([30, 0, 60, 15, 30, 30, 0, 15])
+    .fill({ color: 0xffff00, alpha: 0.4 });
+cursor.zIndex = 9999; // always on top
+app.stage.addChild(cursor);
+
+canvas.addEventListener('mousemove', (e) => {
+    // ... get mouseCol, mouseRow via screenToWorld() ...
+
+    if (isWalkable(mouseCol, mouseRow)) {
+        // Position using the same formula as regular tiles
+        const screen = isoToScreen(mouseCol * TILE_SIZE, mouseRow * TILE_SIZE);
+        cursor.x = screen.x - TILE_SIZE;
+        cursor.y = screen.y - TILE_SIZE / 2;
+        cursor.visible = true;
+    } else {
+        cursor.visible = false;
+    }
+});
+```
+
+The cursor polygon is identical to the ground tile polygon - it just snaps to the nearest valid tile as the mouse moves.
+
+## THE MOVEMENT CODE 🚶
+
+The tile-by-tile movement from tutorial 20 works unchanged in world space. `worldX % TILE_SIZE === CENTER` still detects tile centers, `dirX`/`dirY` still control horizontal/vertical movement - it's all the same. Only the final render step changes:
+
+```js
+function movePlayer() {
+    // ... same atCenter check, same direction picking as tutorial 20 ...
+
+    player.worldX += player.dirX * player.speed;
+    player.worldY += player.dirY * player.speed;
+
+    // Convert world position to isometric screen coords
+    const screen = isoToScreen(player.worldX, player.worldY);
+    player.sprite.x = screen.x - 8;  // center 16px sprite
+    player.sprite.y = screen.y - 4;  // center 8px sprite
+    player.sprite.zIndex = player.worldX + player.worldY + TILE_SIZE / 2;
+}
+```
+
+The player visually glides diagonally along the isometric grid while internally moving on the flat world grid.
+
+**What you've built:**
+
+- ✅ `screenToWorld()` inverse transform derived from the forward formula
+- ✅ Diamond-shaped tile cursor that snaps to the nearest tile
+- ✅ Click-to-move that targets isometric tiles correctly
+- ✅ Tile-by-tile movement adapted to render in isometric space
+
+**Next up**: The iso world gets bigger than the screen. [Next: Isometric Scroll](/tutorial/23-isometric-scroll/)

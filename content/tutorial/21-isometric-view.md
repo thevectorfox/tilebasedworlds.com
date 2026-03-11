@@ -8,92 +8,258 @@ next = "/tutorial/22-isometric-mouse/"
 prev = "/tutorial/20-mouse-to-move/"
 +++
 
-Isometric view is great to add depth into your game. Many famous games use this view, because it's simple to do, but looks good. And best thing about isometric view is how easy it is to create based same old tile based approach. Like this:
+Tilt your world 45 degrees and you get the iconic look behind Pokémon, Age of Empires, and Diablo. Isometric view makes a flat tile grid feel like a real 3D space. Best of all, it's just two lines of math on top of everything you've already built:
 
+<div id="isoDemo" style="text-align: center; margin: 20px 0;">
+    <canvas id="isoCanvas" width="300" height="240" style="border: 2px solid #333; background: #1a1a2e;"></canvas>
+    <div style="margin-top: 10px;">
+        <strong>Controls:</strong> Arrow Keys or WASD<br>
+        <strong>Notice:</strong> Walk around the pillar - it covers you when you're north, you cover it when you're south
+    </div>
+</div>
+
+<script type="module">
+import { Application, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
+
+const canvas = document.getElementById('isoCanvas');
+const app = new Application();
+await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x1a1a2e });
+
+const TILE_SIZE = 30;
+const OFFSET_X = 150; // center of 300px canvas
+const OFFSET_Y = 20;  // vertical margin
+
+const map = [
+    [1,1,1,1,1],
+    [1,0,0,0,1],
+    [1,0,1,0,1],  // internal pillar at col 2, row 2
+    [1,0,0,0,1],
+    [1,1,1,1,1],
+];
+
+app.stage.sortableChildren = true;
+
+function isoToScreen(worldX, worldY) {
+    return {
+        x: (worldX - worldY) + OFFSET_X,
+        y: (worldX + worldY) / 2 + OFFSET_Y
+    };
+}
+
+function makeGroundTile() {
+    return new Graphics()
+        .poly([30, 0, 60, 15, 30, 30, 0, 15])
+        .fill(0x3d6b47);
+}
+
+function makeWallTile() {
+    const WH = 20;
+    const g = new Graphics();
+    g.poly([30, -WH, 60, 15-WH, 30, 30-WH, 0, 15-WH]).fill(0xA07840);
+    g.poly([0, 15-WH, 30, 30-WH, 30, 30, 0, 15]).fill(0x5C4020);
+    g.poly([30, 30-WH, 60, 15-WH, 60, 15, 30, 30]).fill(0x7A5528);
+    return g;
+}
+
+for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+        const worldX = col * TILE_SIZE;
+        const worldY = row * TILE_SIZE;
+        const screen = isoToScreen(worldX, worldY);
+
+        const tile = map[row][col] === 0 ? makeGroundTile() : makeWallTile();
+        tile.x = screen.x - TILE_SIZE;      // TILE_SIZE = half of diamond width
+        tile.y = screen.y - TILE_SIZE / 2;  // TILE_SIZE/2 = half of diamond height
+        tile.zIndex = worldX + worldY;
+        app.stage.addChild(tile);
+    }
+}
+
+const heroSprite = new Graphics()
+    .poly([8, 0, 16, 4, 8, 8, 0, 4])
+    .fill(0xff4444);
+app.stage.addChild(heroSprite);
+
+const player = {
+    sprite: heroSprite,
+    worldX: 45, worldY: 45,
+    width: 12, height: 12,
+    speed: 2
+};
+
+function isSolid(wx, wy) {
+    const col = Math.floor(wx / TILE_SIZE);
+    const row = Math.floor(wy / TILE_SIZE);
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return true;
+    return map[row][col] !== 0;
+}
+
+const keys = {};
+window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+function gameLoop() {
+    let dx = 0, dy = 0;
+    if (keys['ArrowRight'] || keys['KeyD']) dx =  player.speed;
+    if (keys['ArrowLeft']  || keys['KeyA']) dx = -player.speed;
+    if (keys['ArrowDown']  || keys['KeyS']) dy =  player.speed;
+    if (keys['ArrowUp']    || keys['KeyW']) dy = -player.speed;
+
+    const newX = player.worldX + dx;
+    if (!isSolid(newX + 2, player.worldY + 2) &&
+        !isSolid(newX + player.width - 2, player.worldY + 2) &&
+        !isSolid(newX + 2, player.worldY + player.height - 2) &&
+        !isSolid(newX + player.width - 2, player.worldY + player.height - 2)) {
+        player.worldX = newX;
+    }
+
+    const newY = player.worldY + dy;
+    if (!isSolid(player.worldX + 2, newY + 2) &&
+        !isSolid(player.worldX + player.width - 2, newY + 2) &&
+        !isSolid(player.worldX + 2, newY + player.height - 2) &&
+        !isSolid(player.worldX + player.width - 2, newY + player.height - 2)) {
+        player.worldY = newY;
+    }
+
+    const screen = isoToScreen(player.worldX, player.worldY);
+    player.sprite.x = screen.x - 8;
+    player.sprite.y = screen.y - 4;
+    player.sprite.zIndex = player.worldX + player.worldY + TILE_SIZE / 2;
+}
+
+app.ticker.add(gameLoop);
+</script>
+
+Walk north of the pillar - it covers you. Walk south - you cover it. All game logic (movement, collision) runs in the flat world grid. Only the final render step converts to the diamond view.
+
+## THE ISOMETRIC TRICK 🔷
+
+Isometric view is a two-step visual transformation applied to a normal square tile:
+
+1. **Rotate 45 degrees** - the square becomes a diamond
+2. **Squash height by half** - the diamond is compressed to a 2:1 width-to-height ratio
+
+```text
+Normal tile:     Rotated 45°:     Squashed (2:1):
+┌──────┐             /\               /\
+│      │            /  \            /    \
+│      │            \  /            \    /
+└──────┘             \/               \/
+  30×30              42×42           60×30
 ```
-EXAMPLE HERE
+
+The result is the classic isometric tile used in countless games. Every grid square maps to one of these diamonds on screen.
+
+## THE TRANSFORMATION 📐
+
+Two lines convert any world coordinate to its isometric screen position:
+
+```js
+const OFFSET_X = 150; // horizontal center of the canvas
+const OFFSET_Y = 20;  // vertical margin from top
+
+function isoToScreen(worldX, worldY) {
+    return {
+        x: (worldX - worldY) + OFFSET_X,
+        y: (worldX + worldY) / 2 + OFFSET_Y
+    };
+}
 ```
 
+Why does this work? Moving right in the world (increasing `worldX`) shifts the screen position right *and* down - that's the southeast diamond direction. Moving down in the world (increasing `worldY`) shifts the screen position left *and* down - southwest. The diamond grid emerges naturally from the subtraction and addition of those two axes.
 
-## THEORY
+For tile at (col, row):
 
-First you should know, that actual isometric view (from the mathematics) is little more complicated and never used in games. Now that you know it, forget it. From here on, we only talk about simple isometrics. Maybe best way to imagine isometric, is to look, what happens to the normal square, when its transformed into isometric view:
-
-![](/p21_2.gif)
-
-First we rotate the square by 45 degrees and then we make its height half the width. That was simple. Now let's create our tiles and hero:
-
-![](/p21_3.gif)
-
-It's important to place graphics to the registration point (little cross, where Flash starts to count coordinates from) like shown in the picture. The wall tile you can draw as high as you want. For the hero, I have left the tile in the picture so you hopefully understand its position better, don't place that rectangle in the final graphics of hero. It would only look strange, if hero walks around, rectangle around him.
-
-
-## CHANGES TO THE CODE
-
-First thing to change, is size of tiles and size of hero. But wait, what size? So far it was clear, width and height of movie clip, but in isometric view the height of movie clip can be almost anything.
-
-![](/p21_4.gif)
-
-So, value of tileW variable is half the width of actual tile graphics. For the hero, its width and height properties are equal and half of its graphics actual width. Write it down:
-
-```
-game = {tileW:30};
-char = {xtile:2, ytile:1, speed:4, width:16, height:16};
+```js
+const worldX = col * TILE_SIZE;
+const worldY = row * TILE_SIZE;
+const screen = isoToScreen(worldX, worldY);
 ```
 
-Biggest change in the code will be actual placement of movie clips on screen. In normal view, we used clip._x=x and clip._y=y, to make same x/y appear in isometric view, we will use:
+## TWO COORDINATE SYSTEMS 🗺️
 
-```
-clip._x = x - y;
-clip._y = (x + y) / 2;
-```
+The most important architectural rule in isometric games: **keep all game logic in world space**.
 
-In the buildMap function change placement of tiles:
+Collision detection, movement, pathfinding, enemy AI - all of it uses the flat `worldX`/`worldY` grid. The isometric transform only runs at the very end, when positioning sprites for rendering:
 
-```
-clip[name]._x = (j - i) * game.tileW;
-clip[name]._y = (j + i) * game.tileW / 2;
-```
+```js
+function gameLoop() {
+    // All logic runs in flat world space - unchanged from every previous tutorial
+    resolveCollisions();  // uses worldX, worldY, map[row][col]
+    handleInput();        // modifies worldX, worldY
 
-Tiles depth is calculated same way as before, but we wont use x/y, we will use tiles new coordinates in isometric view:
-
-```
-game[name].depth = (j + i) * game.tileW / 2 * 300 + (j - i) * game.tileW + 1;
-```
-
-And same thing for the hero:
-
-```
-var ob = char;
-ob.x = ob.xtile * game.tileW;
-ob.y = ob.ytile * game.tileW;
-ob.xiso = ob.x - ob.y;
-ob.yiso = (ob.x + ob.y) / 2;
-ob.depthshift = (game.tileW - ob.height) / 2;
-ob.depth = (ob.yiso - ob.depthshift) * 300 + ob.xiso + 1;
-game.clip.attachMovie("char", "char", ob.depth);
-ob.clip = game.clip.char;
-ob.clip._x = ob.xiso;
-ob.clip._y = ob.yiso;
+    // Only the final render step converts to isometric screen coords
+    const screen = isoToScreen(player.worldX, player.worldY);
+    player.sprite.x = screen.x - halfSpriteWidth;
+    player.sprite.y = screen.y - halfSpriteHeight;
+}
 ```
 
-As you can see, new properties xiso and yiso will hold the coordinates of char in the isometric view, but we still have properties x/y. Variable depthshift is needed since our char is not drawn on the center of the tile (look the picture with char), it is shifted up.
+Your `isSolid()` function doesn't change at all - it still divides by `TILE_SIZE` to find which grid cell the player is in. The diamond view is purely a visual layer on top.
 
-**All the collision and movements are calculated in normal way, but in the end position of movie clip is converted into isometric view**. In the end of moveChar function change the char placement same way:
+## DRAWING DIAMOND TILES 💎
 
+`Graphics.poly()` draws any polygon from a flat array of `[x1, y1, x2, y2, ...]` vertices. A flat ground diamond:
+
+```js
+// TILE_SIZE = 30: diamond is 60px wide (2 × TILE_SIZE) and 30px tall
+function makeGroundTile(color) {
+    return new Graphics()
+        .poly([30, 0,   // top vertex
+               60, 15,  // right vertex
+               30, 30,  // bottom vertex
+               0,  15]) // left vertex
+        .fill(color);
+}
+
+// Position so diamond center aligns with the screen coords
+tile.x = screen.x - TILE_SIZE;      // screen.x - 30 = left edge of bounding box
+tile.y = screen.y - TILE_SIZE / 2;  // screen.y - 15 = top edge of bounding box
 ```
-ob.xiso = ob.x - ob.y;
-ob.yiso = (ob.x + ob.y) / 2;
-ob.clip._x = ob.xiso;
-ob.clip._y = ob.yiso;
-ob.clip.gotoAndStop(dirx + diry * 2 + 3);
-ob.xtile = Math.floor(ob.x / game.tileW);
-ob.ytile = Math.floor(ob.y / game.tileW);
-ob.depth = (ob.yiso - ob.depthshift) * 300 + (ob.xiso) + 1;
-ob.clip.swapDepths(ob.depth);
+
+For wall tiles that look like 3D boxes, draw three faces with different shades:
+
+```js
+function makeWallTile() {
+    const WH = 20; // visual height of the wall in pixels
+    const g = new Graphics();
+
+    // Top face: diamond shifted up by WH pixels
+    g.poly([30, -WH,    60, 15-WH, 30, 30-WH, 0, 15-WH]).fill(0xA07840);
+    // Left face: parallelogram going down-left
+    g.poly([0,  15-WH,  30, 30-WH, 30, 30,    0, 15   ]).fill(0x5C4020);
+    // Right face: parallelogram going down-right
+    g.poly([30, 30-WH,  60, 15-WH, 60, 15,    30, 30  ]).fill(0x7A5528);
+
+    return g;
+}
 ```
 
-After we have moved the char, detected the collisions with walls and probably placed char near the wall, properties x and y will hold correct position in non-isometric view. Now we only calculate new values for isometric view.
+Three shades of the same color (light top, dark left, medium right) create the 3D illusion.
 
-You can download the source fla with all the code and movie set up here.
+## DEPTH SORTING ↕️
 
+From tutorial 19 you know the foot-point rule: objects further south render in front. In isometric, the sort key is `worldX + worldY` - objects further along both world axes are closer to the viewer:
+
+```js
+app.stage.sortableChildren = true;
+
+// When building tiles - set once
+tile.zIndex = worldX + worldY;   // = (col + row) * TILE_SIZE
+
+// In the game loop - update player each frame
+player.sprite.zIndex = player.worldX + player.worldY + TILE_SIZE / 2;
+// The + TILE_SIZE/2 keeps the player in front of floor tiles at the same depth
+```
+
+`worldX + worldY` is proportional to `screenY` (since `screenY = (worldX + worldY) / 2 + offset`) - so this is the same Y-sort from tutorial 19, just expressed in world coordinates.
+
+**What you've built:**
+
+- ✅ Two-line `isoToScreen()` transform applied at render time only
+- ✅ World-space game logic: collision and movement code unchanged
+- ✅ Diamond tiles drawn with `Graphics.poly()`
+- ✅ 3-face wall boxes with light/dark/medium shading
+- ✅ Depth sorting using `worldX + worldY`
+
+**Next up**: The mouse clicks in screen space. How do you find which tile it actually hit? [Next: Isometric Mouse](/tutorial/22-isometric-mouse/)
