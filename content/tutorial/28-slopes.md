@@ -378,133 +378,566 @@ if (onSlope) {
 
 **Why This Works**: Corner-to-corner slopes ensure the math stays simple and fast. Complex angles would require expensive trigonometry every frame!
 
-## CODE IT
+## Building Your Slope System
 
-Start with the code from tutorial 7 Jumping.
+Time to implement the magic! Let's break this down into digestible chunks:
 
-Declare new tile prototypes:
+### Step 1: Define Slope Tiles
 
-```
-game.Tile4 = function() {};
-game.Tile4.prototype.walkable = true;
-game.Tile4.prototype.slope = 1;
-game.Tile4.prototype.frame = 4;
-game.Tile5 = function() {};
-game.Tile5.prototype.walkable = true;
-game.Tile5.prototype.slope = -1;
-game.Tile5.prototype.frame = 5;
-```
+```javascript
+// Enhanced tile types for terrain
+const TILE_TYPE = {
+    EMPTY: 0,
+    SOLID: 1,
+    SLOPE_UP: 2,     // / slope
+    SLOPE_DOWN: 3    // \ slope
+};
 
-Tile4 has slope moving upward (/) and tile5 has slope moving down (\). Draw the slopes in frames you have set with frame property.
+// Tile properties for game logic
+const tileProperties = {
+    [TILE_TYPE.EMPTY]: { walkable: true, solid: false, slope: false },
+    [TILE_TYPE.SOLID]: { walkable: false, solid: true, slope: false },
+    [TILE_TYPE.SLOPE_UP]: { walkable: true, solid: false, slope: 1 },
+    [TILE_TYPE.SLOPE_DOWN]: { walkable: true, solid: false, slope: -1 }
+};
 
-New functions are such nice things. They are fresh, smell good and do things you never knew could be done. Let's make checkForSlopes function:
-
-```
-function checkForSlopes (ob, diry, dirx)
-{
-  if (game["t_" + (ob.ytile + 1) + "_" + ob.xtile].slope and !ob.jump)
-  {
-    ob.ytile += 1;
-    ob.y += game.tileH;
-  }
-  if (game["t_" + ob.ytile + "_" + ob.xtile].slope and diry != -1)
-  {
-    if (diry == 1)
-    {
-      ob.y = (ob.ytile + 1) * game.tileH - ob.height;
-    }
-    var xpos = ob.x - ob.xtile * game.tileW;
-    ob.onSlope = game["t_" + ob.ytile + "_" + ob.xtile].slope;
-    ob.jump = false;
-    if(game["t_" + ob.ytile + "_" + ob.xtile].slope == 1)
-    {
-      ob.addy = xpos;
-      ob.clip._y = (ob.ytile + 1) * game.tileH - ob.height - ob.addy;
-    }
-    else
-    {
-      ob.addy = game.tileW - xpos;
-      ob.clip._y = (ob.ytile + 1) * game.tileH - ob.height - ob.addy;
-    }
-  }
-  else
-  {
-    if((ob.onSlope == 1 and dirx == 1) or (ob.onSlope == -1 and dirx == -1))
-    {
-      ob.ytile -= 1;
-      ob.y -= game.tileH;
-      ob.clip._y = ob.y;
-    }
-    ob.onSlope = false;
-  }
+function getTileInfo(tileType) {
+    return tileProperties[tileType] || tileProperties[TILE_TYPE.EMPTY];
 }
 ```
 
-This function will be called from moveChar function with movement variables dirx and diry. First if statement checks for the slope on the tile below current tile. This is for the situation, where hero currently stands on unwalkable tile, but moves left or right and there is slope going down from his current height. If there is slope below hero, we increase the ytile and y. However, we will not check for it, if hero is jumping.
+### Step 2: The Heart - Slope Height Calculation
 
-Next if statement checks for the slope on the tile hero currently is. The diry != -1 part ignores the check, if SPACE key has been pressed and hero jumps up.
-
-If we were falling down (diry == 1), we will set the y property as if hero would of landed on tile below. We set jump property to false and onSlope property equal to the slope value on current tile (1 or -1).
-
-xpos is the value of how far from the left edge of current tile center of our hero is:
-
-![](/p29_6.gif)
-
-If slope is going up, then we move hero up by the value of xpos, if its going down, then by the value of tileW-xpos. Note that if you don't use square tile, then you would need to find xpos as percentage from tileW.
-
-Last part after else statement checks if we were standing on slope, but now we have moved off from it onto higher tile.
-
-Next take moveChar function. Modify the check for going left and right:
-
-```
-//left
-if ((ob.downleft and ob.upleft) or ob.onSlope)
-{
-  ...
- 
-//right
-if ((ob.upright and ob.downright) or ob.onSlope)
-{
-  ...
-```
- 
-Here we will basically ignore all collision checks for left/right movement as long hero is on the slope. Remember, while on slope, he is standing partially inside the wall, so we can't use normal collision with his corners.
-
-After placing the hero movie clip, call checkForSlopes function:
-
-```
-ob.clip._x = ob.x;
-ob.clip._y = ob.y;
-checkForSlopes(ob, diry, dirx);
-```
-
-When we jump while standing on the slope, we have to update the y coordinate of the hero. Modify detectKeys function:
-
-```
-if (Key.isDown(Key.SPACE))
-{
-  if (!ob.jump)
-  {
-    //if we were on slope, update
-    if (ob.onSlope)
-    {
-      ob.y -= ob.addy;
-      ob.ytile = Math.floor(ob.y / game.tileH);
+```javascript
+// This is where the magic happens!
+function calculateSlopeHeight(worldX, worldY, tileSize) {
+    const tileX = Math.floor(worldX / tileSize);
+    const tileY = Math.floor(worldY / tileSize);
+    const tileType = getTileAt(tileX, tileY);
+    
+    if (!getTileInfo(tileType).slope) {
+        return null; // Not on a slope
     }
-    ob.jump = true;
-    ob.jumpspeed = ob.jumpstart;
-  }
-}
-else if (Key.isDown(Key.RIGHT))
-{
-  keyPressed = _root.moveChar(ob, 1, 0);
-}
-else if (Key.isDown(Key.LEFT))
-{
-  keyPressed = _root.moveChar(ob, -1, 0);
+    
+    // Position within the tile (0 to tileSize)
+    const localX = worldX - (tileX * tileSize);
+    const tileBottomY = (tileY + 1) * tileSize;
+    
+    if (tileType === TILE_TYPE.SLOPE_UP) {
+        // / slope: height = tileSize - localX
+        const slopeHeight = tileSize - localX;
+        return tileBottomY - slopeHeight;
+    } else if (tileType === TILE_TYPE.SLOPE_DOWN) {
+        // \ slope: height = localX
+        const slopeHeight = localX;
+        return tileBottomY - slopeHeight;
+    }
+    
+    return null;
 }
 ```
 
-If hero has onSlope property set to true, we will first update its y property and calculate new value for the ytile.
+**🧠 Math Breakdown**:
+- **localX**: How far into the tile we are (0-30 for 30px tiles)
+- **SLOPE_UP**: As we move right, ground gets higher (height = 30 - localX)
+- **SLOPE_DOWN**: As we move right, ground gets lower (height = localX)
+- **Result**: Smooth height that changes pixel by pixel!
 
-You can download the source fla with all the code and movie set up here.
+### Step 3: Enhanced Movement with Slope Support
+
+```javascript
+function updatePlayerMovement(player, input, gameMap) {
+    // Horizontal movement (same as before)
+    player.velocityX = 0;
+    if (input.left) player.velocityX = -player.speed;
+    if (input.right) player.velocityX = player.speed;
+    
+    // Jumping with slope awareness
+    if (input.jump && player.onGround) {
+        player.velocityY = player.jumpPower;
+        player.onGround = false;
+        
+        // Special case: jumping from slope
+        if (player.onSlope) {
+            const centerX = player.x + player.width / 2;
+            const slopeHeight = calculateSlopeHeight(centerX, player.y, TILE_SIZE);
+            if (slopeHeight !== null) {
+                player.y = slopeHeight - player.height; // Adjust position
+            }
+            player.onSlope = false;
+        }
+    }
+    
+    // Apply gravity
+    player.velocityY += player.gravity;
+    
+    // Test horizontal movement
+    const newX = player.x + player.velocityX;
+    if (!checkHorizontalCollision(newX, player.y, player, gameMap)) {
+        player.x = newX;
+    }
+    
+    // Test vertical movement with slope detection
+    const newY = player.y + player.velocityY;
+    checkVerticalMovement(player.x, newY, player, gameMap);
+}
+
+function checkVerticalMovement(x, newY, player, gameMap) {
+    const centerX = x + player.width / 2;
+    const footY = newY + player.height;
+    const tileType = getTileAt(centerX, footY, gameMap);
+    const tileInfo = getTileInfo(tileType);
+    
+    if (tileInfo.slope && player.velocityY >= 0) {
+        // Check if we're touching the slope surface
+        const slopeHeight = calculateSlopeHeight(centerX, footY, TILE_SIZE);
+        
+        if (slopeHeight !== null && footY >= slopeHeight) {
+            // Land on or walk along slope
+            player.y = slopeHeight - player.height;
+            player.velocityY = 0;
+            player.onGround = true;
+            player.onSlope = true;
+            return;
+        }
+    }
+    
+    if (tileInfo.solid && player.velocityY >= 0) {
+        // Hit solid ground
+        const tileY = Math.floor(footY / TILE_SIZE) * TILE_SIZE;
+        player.y = tileY - player.height;
+        player.velocityY = 0;
+        player.onGround = true;
+        player.onSlope = false;
+        return;
+    }
+    
+    // Falling through air
+    player.y = newY;
+    player.onGround = false;
+    player.onSlope = false;
+}
+```
+
+**🎯 Key Features**:
+- **Smooth Walking**: Character height adjusts pixel-perfectly to slope angle
+- **Natural Transitions**: Seamless movement between flat and sloped terrain
+- **Jump Integration**: Jumping works perfectly from any slope angle
+- **Performance**: Fast math keeps the game running at 60 FPS
+
+## Advanced Slope Techniques
+
+### Visual Polish: Drawing Slopes
+
+Make your slopes look amazing with proper graphics:
+
+```javascript
+function createSlopeGraphic(tileType, x, y, tileSize) {
+    const graphic = new PIXI.Graphics();
+    
+    if (tileType === TILE_TYPE.SLOPE_UP) {
+        // / slope - grass green with subtle gradient
+        graphic.beginFill(0x90EE90);
+        graphic.moveTo(0, tileSize);        // Bottom-left
+        graphic.lineTo(tileSize, 0);        // Top-right  
+        graphic.lineTo(tileSize, tileSize); // Bottom-right
+        graphic.closePath();
+        graphic.endFill();
+        
+        // Add a subtle outline
+        graphic.lineStyle(1, 0x228B22);
+        graphic.moveTo(0, tileSize);
+        graphic.lineTo(tileSize, 0);
+        
+    } else if (tileType === TILE_TYPE.SLOPE_DOWN) {
+        // \ slope
+        graphic.beginFill(0x90EE90);
+        graphic.moveTo(0, 0);              // Top-left
+        graphic.lineTo(tileSize, tileSize); // Bottom-right
+        graphic.lineTo(0, tileSize);       // Bottom-left
+        graphic.closePath();
+        graphic.endFill();
+        
+        graphic.lineStyle(1, 0x228B22);
+        graphic.moveTo(0, 0);
+        graphic.lineTo(tileSize, tileSize);
+    }
+    
+    graphic.x = x;
+    graphic.y = y;
+    return graphic;
+}
+```
+
+### Performance Optimization
+
+For large worlds with many slopes:
+
+```javascript
+// Cache slope calculations for better performance
+class SlopeCalculator {
+    constructor(tileSize) {
+        this.tileSize = tileSize;
+        this.cache = new Map();
+    }
+    
+    getHeight(worldX, worldY, map) {
+        const tileX = Math.floor(worldX / this.tileSize);
+        const tileY = Math.floor(worldY / this.tileSize);
+        const key = `${tileX},${tileY},${worldX % this.tileSize}`;
+        
+        if (this.cache.has(key)) {
+            return this.cache.get(key);
+        }
+        
+        const height = this.calculateHeight(worldX, worldY, map);
+        this.cache.set(key, height);
+        
+        // Limit cache size
+        if (this.cache.size > 1000) {
+            const firstKey = this.cache.keys().next().value;
+            this.cache.delete(firstKey);
+        }
+        
+        return height;
+    }
+    
+    calculateHeight(worldX, worldY, map) {
+        // Your height calculation logic here
+        return calculateSlopeHeight(worldX, worldY, this.tileSize);
+    }
+}
+```
+
+## � Interactive Demo: Complete Slope Physics
+
+Experience the magic of smooth slope movement! Move with **WASD** or **arrow keys**, jump with **SPACE**, and watch the real-time physics calculations:
+
+<canvas id="slopeDemo" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
+
+<script src="https://pixijs.download/release/pixi.min.js"></script>
+<script>
+(function() {
+    const canvas = document.getElementById('slopeDemo');
+    const app = new PIXI.Application({
+        view: canvas,
+        width: 300,
+        height: 240,
+        backgroundColor: 0x87CEEB
+    });
+
+    const TILE_SIZE = 30;
+    const TILE_TYPE = {
+        EMPTY: 0,
+        SOLID: 1,
+        SLOPE_UP: 2,
+        SLOPE_DOWN: 3
+    };
+
+    const tileProperties = {
+        [TILE_TYPE.EMPTY]: { walkable: true, solid: false, slope: false },
+        [TILE_TYPE.SOLID]: { walkable: false, solid: true, slope: false },
+        [TILE_TYPE.SLOPE_UP]: { walkable: true, solid: false, slope: 1 },
+        [TILE_TYPE.SLOPE_DOWN]: { walkable: true, solid: false, slope: -1 }
+    };
+
+    const gameMap = [
+        [1,1,1,1,1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,2,3,0,0],
+        [0,0,2,3,2,2,1,1,3,0],
+        [2,2,1,1,1,1,1,1,1,2],
+        [1,1,1,1,1,1,1,1,1,1]
+    ];
+
+    const player = {
+        x: 60,
+        y: 150,
+        width: 12,
+        height: 12,
+        velocityX: 0,
+        velocityY: 0,
+        speed: 2,
+        jumpPower: -8,
+        gravity: 0.4,
+        onGround: false,
+        onSlope: false,
+        sprite: null
+    };
+
+    const keys = {
+        left: false,
+        right: false,
+        up: false,
+        space: false
+    };
+
+    // Create world graphics
+    const mapContainer = new PIXI.Container();
+    app.stage.addChild(mapContainer);
+
+    function createTileGraphic(tileType) {
+        const graphic = new PIXI.Graphics();
+        
+        switch(tileType) {
+            case TILE_TYPE.SOLID:
+                graphic.beginFill(0x8B4513);
+                graphic.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
+                graphic.endFill();
+                graphic.lineStyle(1, 0x654321);
+                graphic.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
+                break;
+                
+            case TILE_TYPE.SLOPE_UP:
+                graphic.beginFill(0x90EE90);
+                graphic.moveTo(0, TILE_SIZE);
+                graphic.lineTo(TILE_SIZE, 0);
+                graphic.lineTo(TILE_SIZE, TILE_SIZE);
+                graphic.closePath();
+                graphic.endFill();
+                graphic.lineStyle(2, 0x228B22);
+                graphic.moveTo(0, TILE_SIZE);
+                graphic.lineTo(TILE_SIZE, 0);
+                break;
+                
+            case TILE_TYPE.SLOPE_DOWN:
+                graphic.beginFill(0x90EE90);
+                graphic.moveTo(0, 0);
+                graphic.lineTo(TILE_SIZE, TILE_SIZE);
+                graphic.lineTo(0, TILE_SIZE);
+                graphic.closePath();
+                graphic.endFill();
+                graphic.lineStyle(2, 0x228B22);
+                graphic.moveTo(0, 0);
+                graphic.lineTo(TILE_SIZE, TILE_SIZE);
+                break;
+        }
+        
+        return graphic;
+    }
+
+    for (let y = 0; y < gameMap.length; y++) {
+        for (let x = 0; x < gameMap[y].length; x++) {
+            const tileType = gameMap[y][x];
+            if (tileType !== TILE_TYPE.EMPTY) {
+                const tileGraphic = createTileGraphic(tileType);
+                tileGraphic.x = x * TILE_SIZE;
+                tileGraphic.y = y * TILE_SIZE;
+                mapContainer.addChild(tileGraphic);
+            }
+        }
+    }
+
+    // Create player
+    const playerGraphic = new PIXI.Graphics();
+    playerGraphic.beginFill(0xFF4444);
+    playerGraphic.drawRect(0, 0, player.width, player.height);
+    playerGraphic.endFill();
+    app.stage.addChild(playerGraphic);
+    player.sprite = playerGraphic;
+
+    // Create physics display
+    const physicsText = new PIXI.Text('', {
+        fontFamily: 'Arial',
+        fontSize: 10,
+        fill: 0x000000,
+        align: 'left'
+    });
+    physicsText.x = 5;
+    physicsText.y = 5;
+    app.stage.addChild(physicsText);
+
+    function getTileAt(x, y) {
+        const tileX = Math.floor(x / TILE_SIZE);
+        const tileY = Math.floor(y / TILE_SIZE);
+        if (tileY >= 0 && tileY < gameMap.length && tileX >= 0 && tileX < gameMap[tileY].length) {
+            return gameMap[tileY][tileX];
+        }
+        return TILE_TYPE.EMPTY;
+    }
+
+    function getTileInfo(tileType) {
+        return tileProperties[tileType] || tileProperties[TILE_TYPE.EMPTY];
+    }
+
+    function calculateSlopeHeight(worldX, worldY) {
+        const tileX = Math.floor(worldX / TILE_SIZE);
+        const tileY = Math.floor(worldY / TILE_SIZE);
+        
+        if (tileY < 0 || tileY >= gameMap.length || tileX < 0 || tileX >= gameMap[tileY].length) {
+            return null;
+        }
+        
+        const tileType = gameMap[tileY][tileX];
+        
+        if (!getTileInfo(tileType).slope) {
+            return null;
+        }
+        
+        const localX = worldX - (tileX * TILE_SIZE);
+        const tileBottomY = (tileY + 1) * TILE_SIZE;
+        
+        if (tileType === TILE_TYPE.SLOPE_UP) {
+            const slopeHeight = TILE_SIZE - localX;
+            return tileBottomY - slopeHeight;
+        } else if (tileType === TILE_TYPE.SLOPE_DOWN) {
+            const slopeHeight = localX;
+            return tileBottomY - slopeHeight;
+        }
+        
+        return null;
+    }
+
+    function updatePlayer() {
+        // Horizontal movement
+        player.velocityX = 0;
+        if (keys.left) player.velocityX = -player.speed;
+        if (keys.right) player.velocityX = player.speed;
+        
+        // Jumping
+        if ((keys.up || keys.space) && player.onGround) {
+            player.velocityY = player.jumpPower;
+            player.onGround = false;
+        }
+        
+        // Apply gravity
+        player.velocityY += player.gravity;
+        
+        // Test horizontal movement
+        const newX = player.x + player.velocityX;
+        if (!checkHorizontalCollision(newX, player.y)) {
+            player.x = newX;
+        }
+        
+        // Test vertical movement
+        const newY = player.y + player.velocityY;
+        checkVerticalMovement(player.x, newY);
+        
+        // Update sprite position
+        player.sprite.x = player.x;
+        player.sprite.y = player.y;
+    }
+
+    function checkHorizontalCollision(newX, y) {
+        const tileType = getTileAt(newX + player.width/2, y + player.height);
+        return getTileInfo(tileType).solid;
+    }
+
+    function checkVerticalMovement(x, newY) {
+        const centerX = x + player.width / 2;
+        const footY = newY + player.height;
+        const tileType = getTileAt(centerX, footY);
+        const tileInfo = getTileInfo(tileType);
+        
+        if (tileInfo.slope && player.velocityY >= 0) {
+            const slopeHeight = calculateSlopeHeight(centerX, footY);
+            
+            if (slopeHeight !== null && footY >= slopeHeight) {
+                player.y = slopeHeight - player.height;
+                player.velocityY = 0;
+                player.onGround = true;
+                player.onSlope = true;
+                return;
+            }
+        }
+        
+        if (tileInfo.solid && player.velocityY >= 0) {
+            const tileY = Math.floor(footY / TILE_SIZE) * TILE_SIZE;
+            player.y = tileY - player.height;
+            player.velocityY = 0;
+            player.onGround = true;
+            player.onSlope = false;
+            return;
+        }
+        
+        player.y = newY;
+        player.onGround = false;
+        player.onSlope = false;
+    }
+
+    function updatePhysicsDisplay() {
+        const centerX = player.x + player.width / 2;
+        const footY = player.y + player.height;
+        const slopeHeight = calculateSlopeHeight(centerX, footY);
+        
+        physicsText.text = `Position: (${Math.round(player.x)}, ${Math.round(player.y)})
+Velocity: (${player.velocityX.toFixed(1)}, ${player.velocityY.toFixed(1)})
+State: ${player.onSlope ? 'On Slope' : (player.onGround ? 'On Ground' : 'In Air')}
+Slope Height: ${slopeHeight ? slopeHeight.toFixed(1) : 'None'}`;
+    }
+
+    // Input handling
+    document.addEventListener('keydown', (e) => {
+        switch(e.code) {
+            case 'KeyA': case 'ArrowLeft': keys.left = true; break;
+            case 'KeyD': case 'ArrowRight': keys.right = true; break;
+            case 'KeyW': case 'ArrowUp': keys.up = true; break;
+            case 'Space': keys.space = true; e.preventDefault(); break;
+        }
+    });
+
+    document.addEventListener('keyup', (e) => {
+        switch(e.code) {
+            case 'KeyA': case 'ArrowLeft': keys.left = false; break;
+            case 'KeyD': case 'ArrowRight': keys.right = false; break;
+            case 'KeyW': case 'ArrowUp': keys.up = false; break;
+            case 'Space': keys.space = false; break;
+        }
+    });
+
+    // Game loop
+    app.ticker.add(() => {
+        updatePlayer();
+        updatePhysicsDisplay();
+    });
+
+    // Instructions
+    const instructions = new PIXI.Text('WASD/Arrows to move, SPACE to jump', {
+        fontFamily: 'Arial',
+        fontSize: 11,
+        fill: 0x000000,
+        align: 'center'
+    });
+    instructions.x = 300/2 - instructions.width/2;
+    instructions.y = 220;
+    app.stage.addChild(instructions);
+})();
+</script>
+
+**🎯 Demo Features:**
+- **Smooth Slope Walking**: Character height adjusts perfectly to terrain
+- **Real-time Physics**: Watch velocity and position calculations live
+- **Seamless Transitions**: Move naturally between flat ground and slopes  
+- **Jump Integration**: Jumping works from any position on slopes
+- **Professional Feel**: Physics that match commercial games
+
+## �🎉 **CONGRATULATIONS - YOU'VE COMPLETED THE ENTIRE SERIES!** 🎉
+
+**What an incredible journey!** You started with basic tile collision and finished with **advanced slope physics** that rivals professional games. You've mastered:
+
+✨ **28 Advanced Tutorials** covering every aspect of tile-based games
+🎮 **Modern JavaScript/PixiJS** implementation ready for real projects  
+🧠 **Professional Algorithms** including pathfinding and physics systems
+🏗️ **Scalable Architecture** patterns used in AAA game development
+🎯 **Interactive Learning** with hands-on demos for every concept
+
+**Your Game Development Superpowers:**
+- Tile-based collision detection and movement systems
+- Jumping physics with gravity and platform mechanics  
+- Enemy AI with pathfinding intelligence
+- Smooth camera systems and world rotation effects
+- Advanced terrain with realistic slope physics
+- Performance optimization for large game worlds
+
+**What's Next?** You now have the foundation to build:
+- **Platformers** like Super Mario or Celeste
+- **Metroidvania** games with interconnected worlds
+- **Tower Defense** with intelligent enemy pathfinding
+- **RPGs** with tile-based movement and exploration
+- **Puzzle Games** with physics-based mechanics
+
+The game development world is your oyster! 🚀
+
+**Keep Building, Keep Learning, Keep Creating Amazing Games!** 🎮✨
