@@ -5,7 +5,7 @@ weight = -1
 draft = false
 +++
 
-A comprehensive guide to building tile-based games using JavaScript and p5.js. This series covers everything from basic programming concepts to advanced techniques like pathfinding and isometric graphics.
+A comprehensive guide to building tile-based games using JavaScript and PixiJS This series covers everything from basic programming concepts to advanced techniques like pathfinding and isometric graphics.
 
 ## Getting Started
 
@@ -59,4 +59,4 @@ A comprehensive guide to building tile-based games using JavaScript and p5.js. T
 
 ---
 
-*Originally inspired by Tonypa's tile-based tutorials, modernized for JavaScript and p5.js.*
+*Originally inspired by Tonypa's tile-based tutorials, modernized for JavaScript and Pixi.js.*
