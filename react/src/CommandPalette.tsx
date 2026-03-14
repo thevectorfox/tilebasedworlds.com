@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   KBarProvider, KBarPortal, KBarPositioner,
-  KBarAnimator, KBarSearch, KBarResults, useMatches,
+  KBarAnimator, KBarSearch, KBarResults, useMatches, useRegisterActions,
   type Action,
 } from 'kbar'
 
@@ -37,7 +37,7 @@ function Results() {
   )
 }
 
-export function CommandPalette() {
+function DynamicActions() {
   const [navActions, setNavActions] = useState<Action[]>([])
 
   useEffect(() => {
@@ -50,32 +50,37 @@ export function CommandPalette() {
           subtitle: p.section,
           keywords: (p.tags ?? []).join(' '),
           perform: () => { window.location.href = p.url },
-          section: p.section || 'Pages',
+          section: 'Tutorials',
         }))
         setNavActions(actions)
       })
   }, [])
 
-  const staticActions: Action[] = [
-    {
-      id: 'home',
-      name: 'Home',
-      shortcut: ['g', 'h'],
-      keywords: 'home start',
-      perform: () => { window.location.href = '/' },
-      section: 'Navigation',
-    },
-    {
-      id: 'theme-dark',
-      name: 'Dark Mode',
-      keywords: 'theme dark',
-      perform: () => document.documentElement.classList.add('dark'),
-      section: 'Preferences',
-    },
-  ]
+  useRegisterActions(navActions, [navActions])
+  return null
+}
 
+const staticActions: Action[] = [
+  {
+    id: 'home',
+    name: 'Home',
+    shortcut: ['g', 'h'],
+    keywords: 'home start',
+    perform: () => { window.location.href = '/' },
+    section: 'Navigation',
+  },
+  // {
+  //   id: 'theme-dark',
+  //   name: 'Dark Mode',
+  //   keywords: 'theme dark',
+  //   perform: () => document.documentElement.classList.add('dark'),
+  //   section: 'Preferences',
+  // },
+]
+
+export function CommandPalette() {
   return (
-    <KBarProvider actions={[...staticActions, ...navActions]}>
+    <KBarProvider actions={staticActions}>
       <KBarPortal>
         <KBarPositioner style={{ zIndex: 9999, background: 'rgba(0,0,0,0.6)' }}>
           <KBarAnimator style={{
@@ -94,6 +99,7 @@ export function CommandPalette() {
           </KBarAnimator>
         </KBarPositioner>
       </KBarPortal>
+      <DynamicActions />
     </KBarProvider>
   )
 }
