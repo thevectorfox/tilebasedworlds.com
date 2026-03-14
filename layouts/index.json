@@ -1,0 +1,12 @@
+{{- $pages := .Site.RegularPages -}}
+[
+  {{- range $i, $page := $pages -}}
+  {
+    "id":      {{ $page.File.UniqueID | jsonify }},
+    "title":   {{ $page.Title | jsonify }},
+    "url":     {{ $page.RelPermalink | jsonify }},
+    "section": {{ $page.Section | jsonify }},
+    "tags":    {{ $page.Params.tags | jsonify }}
+  }{{ if lt $i (sub (len $pages) 1) }},{{ end }}
+  {{- end }}
+]

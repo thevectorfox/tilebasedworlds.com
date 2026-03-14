@@ -1,0 +1,14 @@
+{{- $code := .Inner | htmlEscape -}}
+{{- $title := .Get "title" | default "" -}}
+
+<div
+  data-sandpack
+  data-code="{{ $code }}"
+  data-title="{{ $title }}"
+  style="min-height: 460px; background: #1a1a2e; border-radius: 8px;"
+>
+  <!-- Placeholder shown before React hydrates -->
+  <div style="padding: 2rem; opacity: 0.4; font-family: monospace;">
+    Loading editor…
+  </div>
+</div>

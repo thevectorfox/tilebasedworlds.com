@@ -146,6 +146,9 @@
     </style>
 </head>
 <body>
+    <!-- kbar mounts itself into this portal root -->
+    <div id="kbar-root"></div>
+
     <nav>
         <a href="{{ "/" | relURL }}" class="home-link">◢ {{ site.Title }} ◣</a>
         <a href="{{ "/tutorial" | relURL }}">Tutorials</a>
@@ -156,5 +159,8 @@
     <div class="tech-footer">
         ◢ {{ site.Title }} ◣ - {{ site.Params.description }}
     </div>
+
+    <!-- React islands bundle — deferred, non-blocking -->
+    <script type="module" src="/js/islands.js" defer></script>
 </body>
 </html>
