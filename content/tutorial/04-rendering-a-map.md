@@ -23,12 +23,8 @@ Each 1 becomes a solid wall, each 0 becomes walkable space!
 
 The result should look like this:
 
-<div id="map-demo" style="border: 2px solid #00ff41; border-radius: 8px; margin: 20px 0; background: #000;"></div>
-
-<script>
-// Wait for page to load
-window.addEventListener('load', async function() {
-    // Create PixiJS application (v8 requires async initialization)
+{{< pixidemo title="Rendering a Map" >}}
+(async function() {
     const app = new PIXI.Application();
     await app.init({
         width: 240,
@@ -36,11 +32,9 @@ window.addEventListener('load', async function() {
         backgroundColor: 0x2c3e50,
         antialias: true
     });
-    
-    // Add the canvas to our demo div
-    document.getElementById('map-demo').appendChild(app.canvas);
-    
-    // Our map data
+
+    document.body.appendChild(app.canvas);
+
     const myMap = [
         [1, 1, 1, 1, 1, 1, 1, 1],
         [1, 0, 0, 0, 0, 0, 0, 1],
@@ -49,17 +43,14 @@ window.addEventListener('load', async function() {
         [1, 0, 0, 0, 0, 0, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1]
     ];
-    
+
     const TILE_SIZE = 30;
-    
-    // Create simple colored rectangles for tiles
+
     function createTileGraphics(tileType) {
         const graphics = new PIXI.Graphics();
         if (tileType === 1) {
-            // Wall tile - green
             graphics.beginFill(0x00ff41);
         } else {
-            // Floor tile - dark green
             graphics.beginFill(0x003311);
         }
         graphics.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
@@ -68,8 +59,7 @@ window.addEventListener('load', async function() {
         graphics.endFill();
         return graphics;
     }
-    
-    // Render the map
+
     for (let row = 0; row < myMap.length; row++) {
         for (let col = 0; col < myMap[row].length; col++) {
             const tile = createTileGraphics(myMap[row][col]);
@@ -78,8 +68,8 @@ window.addEventListener('load', async function() {
             app.stage.addChild(tile);
         }
     }
-});
-</script>
+})();
+{{< /pixidemo >}}
 
 First, let's set up our map data and tile definitions using modern JavaScript:
 
