@@ -98,10 +98,22 @@ function updateStatus() {
     statusElement.textContent = status;
 }
 
-// Input handling
+// Input handling with browser scroll prevention
 const keys = {};
-window.addEventListener('keydown', (e) => { keys[e.code] = true; });
-window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+window.addEventListener('keydown', (e) => { 
+    keys[e.code] = true; 
+    // Prevent default browser behavior (especially spacebar scrolling!)
+    if (['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
+        e.preventDefault();
+    }
+});
+window.addEventListener('keyup', (e) => { 
+    keys[e.code] = false; 
+    // Prevent default for consistency
+    if (['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
+        e.preventDefault();
+    }
+});
 
 // Collision detection
 function checkTileCollision(x, y) {
@@ -269,10 +281,20 @@ const keys = {};
 
 window.addEventListener('keydown', (e) => {
     keys[e.code] = true;
+    
+    // Prevent browser's default behavior for game controls
+    if (['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
+        e.preventDefault();
+    }
 });
 
 window.addEventListener('keyup', (e) => {
     keys[e.code] = false;
+    
+    // Prevent default for consistency
+    if (['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
+        e.preventDefault();
+    }
 });
 
 function handleInput() {
@@ -299,6 +321,8 @@ function handleInput() {
 ```
 
 **Anti-double-jump protection**: Notice how we check `player.onGround` before allowing a jump. This prevents infinite air-jumping unless you specifically want that mechanic!
+
+**🚫 Browser interference fix**: The `e.preventDefault()` calls are crucial! Without them, pressing spacebar scrolls the webpage instead of making your hero jump. Always prevent default behavior for game controls to keep focus in your game!
 
 **Pro tip**: You can create different jump feels by varying the `jumpPower` based on how long spacebar is held, or add coyote time (brief jump window after leaving a platform). These small touches make huge differences in game feel!
 

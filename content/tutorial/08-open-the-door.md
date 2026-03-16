@@ -10,10 +10,8 @@ prev = "/tutorial/07-hit-the-wall/"
 
 Ready to build your first WORLD? 🗺️ One room was just the beginning - now you're about to create interconnected spaces like the dungeons in Zelda, the sprawling stations in Metroid, or the mysterious houses in classic RPGs. You're about to become a world builder! ✨
 
-<div id="door-demo" style="border: 2px solid #00ff41; border-radius: 8px; margin: 20px 0; background: #000;"></div>
-
-<script>
-window.addEventListener('load', async function() {
+{{< pixidemo title="Multi-Room World Explorer" >}}
+(async function() {
     // Create PixiJS application for room transition demo
     const app = new PIXI.Application();
     await app.init({
@@ -23,7 +21,7 @@ window.addEventListener('load', async function() {
         antialias: true
     });
     
-    document.getElementById('door-demo').appendChild(app.canvas);
+    document.body.appendChild(app.canvas);
     
     // Multiple rooms to explore!
     const rooms = {
@@ -166,37 +164,17 @@ window.addEventListener('load', async function() {
         }
     }
     
-    // Movement with door detection
-    const keys = {
-        ArrowUp: false,
-        ArrowDown: false,
-        ArrowLeft: false,
-        ArrowRight: false
-    };
-    
-    window.addEventListener('keydown', (e) => {
-        if (keys.hasOwnProperty(e.code)) {
-            keys[e.code] = true;
-            e.preventDefault();
-        }
-    });
-    
-    window.addEventListener('keyup', (e) => {
-        if (keys.hasOwnProperty(e.code)) {
-            keys[e.code] = false;
-            e.preventDefault();
-        }
-    });
-    
-    function updateMovement() {
+    // Discrete movement - one tile per keypress!
+    function moveHero(deltaX, deltaY) {
         const currentMap = rooms[game.currentRoom].map;
-        let newTileX = hero.tileX;
-        let newTileY = hero.tileY;
+        let newTileX = hero.tileX + deltaX;
+        let newTileY = hero.tileY + deltaY;
         
-        if (keys.ArrowUp && newTileY > 0) newTileY--;
-        else if (keys.ArrowDown && newTileY < currentMap.length - 1) newTileY++;
-        else if (keys.ArrowLeft && newTileX > 0) newTileX--;
-        else if (keys.ArrowRight && newTileX < currentMap[0].length - 1) newTileX++;
+        // Check boundaries
+        if (newTileX < 0 || newTileX >= currentMap[0].length || 
+            newTileY < 0 || newTileY >= currentMap.length) {
+            return; // Out of bounds
+        }
         
         // Check if new position is walkable (not a wall)
         const newTileType = currentMap[newTileY][newTileX];
@@ -208,12 +186,35 @@ window.addEventListener('load', async function() {
         }
     }
     
-    app.ticker.add(updateMovement);
+    // Handle individual keypresses
+    window.addEventListener('keydown', (e) => {
+        // Prevent key repeat when holding down keys
+        if (e.repeat) return;
+        
+        switch(e.code) {
+            case 'ArrowUp':
+                moveHero(0, -1);
+                e.preventDefault();
+                break;
+            case 'ArrowDown':
+                moveHero(0, 1);
+                e.preventDefault();
+                break;
+            case 'ArrowLeft':
+                moveHero(-1, 0);
+                e.preventDefault();
+                break;
+            case 'ArrowRight':
+                moveHero(1, 0);
+                e.preventDefault();
+                break;
+        }
+    });
     
     // Start in room 1
     buildRoom(1);
-});
-</script>
+})();
+{{< /pixidemo >}}
 
 **Try it!** Move around with arrow keys and walk into the yellow doors to explore different rooms! 🚪✨
 
