@@ -2,11 +2,18 @@
 <article>
     <h1>{{ .Title }}</h1>
     <div class="post-meta">
-        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+        <time class="date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
         {{ if .Section }}
             {{ if eq .Section "tutorial" }}
                 <span class="tutorial-series">Tutorial Series</span>
             {{ end }}
+        {{ end }}
+        {{ with .GetTerms "tags" }}
+            <span class="post-tags">
+                {{ range . }}
+                    <a class="tag" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+                {{ end }}
+            </span>
         {{ end }}
     </div>
     {{ .Content }}
