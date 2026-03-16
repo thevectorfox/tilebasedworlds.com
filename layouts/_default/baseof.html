@@ -6,6 +6,14 @@
     <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} - {{ site.Title }}{{ end }}</title>
     <meta name="description" content="{{ if .IsHome }}{{ site.Params.description }}{{ else }}{{ .Description }}{{ end }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.13.2/pixi.min.js" integrity="sha512-rOMqai9NIPaFWpmvHUjdOa2dSuaaYo6i7E19jS1ZW9rjnrl4qAOOtsOeTk0QgIflFCe2ZYi/7or3CRF6VfBk9g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Restore theme before CSS paints to prevent flash -->
+    <script>
+      function setTheme(t) {
+        document.documentElement.setAttribute('data-theme', t);
+        localStorage.setItem('theme', t);
+      }
+      setTheme(localStorage.getItem('theme') || 'light');
+    </script>
     <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
@@ -15,6 +23,11 @@
     <nav>
         <a href="{{ "/" | relURL }}" class="home-link">◢ {{ site.Title }} ◣</a>
         <a href="{{ "/tutorial" | relURL }}">Tutorials</a>
+        <div class="theme-switcher" role="group" aria-label="Theme">
+            <button class="theme-btn" data-theme="light" onclick="setTheme('light')">Light</button>
+            <button class="theme-btn" data-theme="dark"  onclick="setTheme('dark')">Dark</button>
+            <button class="theme-btn" data-theme="retro" onclick="setTheme('retro')">Retro</button>
+        </div>
     </nav>
     <main class="content">
         {{ block "main" . }}{{ end }}
