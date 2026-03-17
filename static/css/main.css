@@ -287,11 +287,7 @@ nav a:hover {
 
 /* ── Content areas ─────────────────────────────────────────── */
 .content {
-    background: var(--surface);
-    padding: 30px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-content);
+
 }
 .post-meta {
     color: var(--muted);
