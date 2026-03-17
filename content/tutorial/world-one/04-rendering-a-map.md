@@ -128,7 +128,7 @@ In modern JavaScript, we use objects to define our tile types instead of prototy
 This approach is much cleaner than the old Flash prototype system and makes it easy to add new tile types later!
 
 
-## LET'S RENDER OUR MAP! 🚀
+## Let's' Render Our Map!
 
 Time to make those tiles appear on screen! This is where the real magic happens. We'll create a `buildMap` function that transforms your data into a playable world. You can use this same function to build different levels by passing in different map arrays. 
 
