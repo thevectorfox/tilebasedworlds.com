@@ -4,8 +4,8 @@ date = 2026-03-09T10:00:00+11:00
 weight = 14
 draft = false
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/15-getting-items/"
-prev = "/tutorial/13-enemy-on-platform/"
+next = "/tutorial/world-one/15-getting-items/"
+prev = "/tutorial/world-one/13-enemy-on-platform/"
 +++
 
 Time to fight back! 🔫 There's nothing quite like the satisfaction of blasting enemies that have been chasing you around! Whether you're firing arrows like Link, blasting with a mega buster like Mega Man, or launching fireballs like Mario - giving players offensive weapons transforms passive avoidance into active, strategic combat!
@@ -979,4 +979,4 @@ app2.ticker.add(updatePlatformGame);
 
 **What you've learned:** Combat systems aren't just about dealing damage - they're about creating satisfying feedback loops that make players feel powerful and engaged. The visual effects, sound cues, and responsive controls are just as important as the underlying mechanics!
 
-**Next up**: Time to add collectible items that make exploration rewarding! [Next: Getting Items](/tutorial/15-getting-items/)
+**Next up**: Time to add collectible items that make exploration rewarding! [Next: Getting Items](/tutorial/world-one/15-getting-items/)

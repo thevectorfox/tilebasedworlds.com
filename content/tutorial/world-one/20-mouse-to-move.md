@@ -4,8 +4,8 @@ date = 2026-03-09T16:00:00+11:00
 weight = 20
 draft = false
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/21-isometric-view/"
-prev = "/tutorial/19-depth/"
+next = "/tutorial/world-one/21-isometric-view/"
+prev = "/tutorial/world-one/19-depth/"
 +++
 
 Put down the keyboard and click anywhere on the map. The hero walks there. Click-to-move is the movement style behind countless RPGs, strategy games, and point-and-click adventures. Let's build it!
@@ -347,4 +347,4 @@ For open maps, puzzle games, or games where the player can see obstacles before 
 - ✅ Tile-by-tile movement using modulo center detection
 - ✅ Greedy pathfinding: close horizontal gap first, then vertical
 
-**Next up**: Rotate the whole world 45 degrees. [Next: Isometric View](/tutorial/21-isometric-view/)
+**Next up**: Rotate the whole world 45 degrees. [Next: Isometric View](/tutorial/world-one/21-isometric-view/)

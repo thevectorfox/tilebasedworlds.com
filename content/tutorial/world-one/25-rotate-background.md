@@ -4,8 +4,8 @@ date = 2026-03-09T21:00:00+11:00
 weight = 25
 draft = false
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/26-pathfinding-breadth-first/"
-prev = "/tutorial/24-rotate-hero/"
+next = "/tutorial/world-one/26-pathfinding-breadth-first/"
+prev = "/tutorial/world-one/24-rotate-hero/"
 +++
 
 Ready for some serious game magic? In the last tutorial, your hero learned to rotate and move in any direction. Now we're taking it to the next level: **the world itself will rotate around your hero!** 

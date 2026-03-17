@@ -5,7 +5,7 @@ weight = 28
 draft = false
 tags = ["advanced", "optimization", "tutorial"]
 next = ""
-prev = "/tutorial/27-pathfinding-best-first/"
+prev = "/tutorial/world-one/27-pathfinding-best-first/"
 +++
 
 🎉 **Welcome to the GRAND FINALE!** 🎉

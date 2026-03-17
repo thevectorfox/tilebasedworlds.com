@@ -4,8 +4,8 @@ date = 2026-03-09T04:00:00+11:00
 weight = 8
 draft = false
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/09-jumping/"
-prev = "/tutorial/07-hit-the-wall/"
+next = "/tutorial/world-one/09-jumping/"
+prev = "/tutorial/world-one/07-hit-the-wall/"
 +++
 
 Ready to build your first WORLD? 🗺️ One room was just the beginning - now you're about to create interconnected spaces like the dungeons in Zelda, the sprawling stations in Metroid, or the mysterious houses in classic RPGs. You're about to become a world builder! ✨
@@ -455,4 +455,4 @@ You've just mastered the art of creating interconnected game worlds! This is the
 - ✅ Professional state management
 - ✅ The foundation for epic adventures!
 
-Ready to add some vertical action to your world? Next up: jumping mechanics that'll make your hero soar! [Next: Jumping](/tutorial/09-jumping/)
+Ready to add some vertical action to your world? Next up: jumping mechanics that'll make your hero soar! [Next: Jumping](/tutorial/world-one/09-jumping/)

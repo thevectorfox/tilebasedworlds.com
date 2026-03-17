@@ -4,8 +4,8 @@ date = 2026-03-09T20:00:00+11:00
 weight = 24
 draft = false
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/25-rotate-background/"
-prev = "/tutorial/23-isometric-scroll/"
+next = "/tutorial/world-one/25-rotate-background/"
+prev = "/tutorial/world-one/23-isometric-scroll/"
 +++
 
 Ready to make your hero feel more alive? So far our character has been limited to walking in just four directions - up, down, left, and right. That's fine for a retro RPG, but what if you want to create a top-down shooter, a racing game, or a spaceship adventure? Time to unlock the magic of **360-degree movement**!

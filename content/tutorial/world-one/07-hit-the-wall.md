@@ -4,8 +4,8 @@ date = 2026-03-09T03:00:00+11:00
 weight = 7
 draft = false
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/08-open-the-door/"
-prev = "/tutorial/06-keys-to-move/"
+next = "/tutorial/world-one/08-open-the-door/"
+prev = "/tutorial/world-one/06-keys-to-move/"
 +++
 
 Time to make your game world SOLID! 💥 Collision detection is what separates real games from slideshows - it's the magic that makes walls feel solid, platforms feel sturdy, and your hero feel like they truly exist in the world. You're about to master one of the most crucial skills in game development!
@@ -406,4 +406,4 @@ You've just mastered one of the most important systems in game development! Your
 - ✅ Professional collision system architecture
 - ✅ The foundation for physics-based games!
 
-Ready to make your world more interactive? Next up: doors, switches, and interactive objects! [Next: Open the Door](/tutorial/08-open-the-door/)
+Ready to make your world more interactive? Next up: doors, switches, and interactive objects! [Next: Open the Door](/tutorial/world-one/08-open-the-door/)

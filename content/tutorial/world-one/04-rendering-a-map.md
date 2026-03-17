@@ -4,8 +4,8 @@ date = 2026-03-09T00:00:00+11:00
 weight = 4
 draft = false
 tags = ["beginner", "tiles", "tutorial"]
-next = "/tutorial/05-the-hero/"
-prev = "/tutorial/03-more-maps/"
+next = "/tutorial/world-one/05-the-hero/"
+prev = "/tutorial/world-one/03-more-maps/"
 +++
 
 Time to witness some MAGIC! 🎮 You're about to transform those boring arrays of numbers into a living, breathing game world. By the end of this chapter, you'll watch your map data come alive on screen - just like the pros do it! This is the moment where your game starts feeling real.
@@ -236,4 +236,4 @@ const mapApp = await buildMap(myMap, 'my-canvas-container');
 
 Ready to add some life to this world? Next up: creating a hero character who can explore your newly created level! Time to make your world truly interactive! 🚀
 
-[Next: The Hero](/tutorial/05-the-hero/)
+[Next: The Hero](/tutorial/world-one/05-the-hero/)

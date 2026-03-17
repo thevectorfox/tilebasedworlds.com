@@ -26,7 +26,7 @@
                         <a href="{{ .Params.prev }}" class="prev-link">← Previous</a>
                     {{ end }}
                     
-                    <a href="/tutorial/" class="index-link">Tutorial Index</a>
+                    <a href="{{ .Parent.RelPermalink }}" class="index-link">Series Index</a>
                     
                     {{ if .Params.next }}
                         <a href="{{ .Params.next }}" class="next-link">Next →</a>

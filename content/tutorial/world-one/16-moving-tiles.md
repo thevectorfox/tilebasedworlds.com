@@ -4,8 +4,8 @@ date = 2026-03-09T12:00:00+11:00
 weight = 16
 draft = false
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/17-scrolling/"
-prev = "/tutorial/15-getting-items/"
+next = "/tutorial/world-one/17-scrolling/"
+prev = "/tutorial/world-one/15-getting-items/"
 +++
 
 Moving platforms! 🏃‍♂️ They're in every great platformer - the swinging platforms in Donkey Kong Country, the cloud lifts in Mario, the crumbling bridges in Crash Bandicoot. They transform a flat level into a dynamic puzzle that rewards timing and skill. Let's build them!
@@ -545,4 +545,4 @@ Now that you can build moving platforms, here's how pros use them:
 
 **Multiple tiles**: Add more entries to `myMovingTiles` to fill a room. A gauntlet of precisely timed platforms at different speeds creates the kind of challenge players remember.
 
-**Next up**: Your world is getting dynamic - now let's make it *big*. [Next: Scrolling](/tutorial/17-scrolling/)
+**Next up**: Your world is getting dynamic - now let's make it *big*. [Next: Scrolling](/tutorial/world-one/17-scrolling/)

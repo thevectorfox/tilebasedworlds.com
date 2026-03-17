@@ -4,8 +4,8 @@ date = 2026-03-09T17:00:00+11:00
 weight = 21
 draft = false
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/22-isometric-mouse/"
-prev = "/tutorial/20-mouse-to-move/"
+next = "/tutorial/world-one/22-isometric-mouse/"
+prev = "/tutorial/world-one/20-mouse-to-move/"
 +++
 
 Tilt your world 45 degrees and you get the iconic look behind Pokémon, Age of Empires, and Diablo. Isometric view makes a flat tile grid feel like a real 3D space. Best of all, it's just two lines of math on top of everything you've already built:
@@ -262,4 +262,4 @@ player.sprite.zIndex = player.worldX + player.worldY + TILE_SIZE / 2;
 - ✅ 3-face wall boxes with light/dark/medium shading
 - ✅ Depth sorting using `worldX + worldY`
 
-**Next up**: The mouse clicks in screen space. How do you find which tile it actually hit? [Next: Isometric Mouse](/tutorial/22-isometric-mouse/)
+**Next up**: The mouse clicks in screen space. How do you find which tile it actually hit? [Next: Isometric Mouse](/tutorial/world-one/22-isometric-mouse/)

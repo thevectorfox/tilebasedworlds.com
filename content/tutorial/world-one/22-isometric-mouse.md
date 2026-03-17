@@ -4,8 +4,8 @@ date = 2026-03-09T18:00:00+11:00
 weight = 22
 draft = false
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/23-isometric-scroll/"
-prev = "/tutorial/21-isometric-view/"
+next = "/tutorial/world-one/23-isometric-scroll/"
+prev = "/tutorial/world-one/21-isometric-view/"
 +++
 
 You know how to move in isometric. You know how to click-to-move. Now combine them. The tricky part isn't the movement — it's figuring out which diamond tile the mouse is actually over:
@@ -344,4 +344,4 @@ The player visually glides diagonally along the isometric grid while internally 
 - ✅ Click-to-move that targets isometric tiles correctly
 - ✅ Tile-by-tile movement adapted to render in isometric space
 
-**Next up**: The iso world gets bigger than the screen. [Next: Isometric Scroll](/tutorial/23-isometric-scroll/)
+**Next up**: The iso world gets bigger than the screen. [Next: Isometric Scroll](/tutorial/world-one/23-isometric-scroll/)

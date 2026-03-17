@@ -4,8 +4,8 @@ date = 2026-03-09T15:00:00+11:00
 weight = 19
 draft = false
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/20-mouse-to-move/"
-prev = "/tutorial/18-more-scrolling/"
+next = "/tutorial/world-one/20-mouse-to-move/"
+prev = "/tutorial/world-one/18-more-scrolling/"
 +++
 
 Walk below a pillar and you're in front of it. Walk above and the pillar covers you. That's depth - a 2D trick that makes your top-down world feel solid and three-dimensional. Try it:
@@ -234,4 +234,4 @@ Option B is simpler and slightly faster - fewer sprites, same visual result.
 - ✅ Tall objects that extend above their grid cell for visible depth
 - ✅ Per-frame player `zIndex` update for smooth depth transitions
 
-**Next up**: Point and click to move! [Next: Mouse to Move](/tutorial/20-mouse-to-move/)
+**Next up**: Point and click to move! [Next: Mouse to Move](/tutorial/world-one/20-mouse-to-move/)

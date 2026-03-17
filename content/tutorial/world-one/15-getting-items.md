@@ -4,8 +4,8 @@ date = 2026-03-09T11:00:00+11:00
 weight = 15
 draft = false
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/16-moving-tiles/"
-prev = "/tutorial/14-shoot-him/"
+next = "/tutorial/world-one/16-moving-tiles/"
+prev = "/tutorial/world-one/14-shoot-him/"
 +++
 
 Time to get rewarded! 🌟 Collectibles are the heartbeat of so many classic games - coins in Mario, rupees in Zelda, rings in Sonic. That satisfying *ding* when your score ticks up? Pure dopamine. Let's build that item pickup system!
@@ -145,7 +145,7 @@ app.ticker.add(gameLoop);
 
 Items are different in what they do - coins add a little to your score, gems are worth ten times more. That's the same trick games use to reward you for exploring off the beaten path. In this tutorial all items just give points, but the same pattern works for health potions, ammo pickups, power-ups, or anything else you want to create!
 
-We'll start from the multi-room setup in the [Open the Door](/tutorial/08-open-the-door/) tutorial so we're not buried in unrelated code.
+We'll start from the multi-room setup in the [Open the Door](/tutorial/world-one/08-open-the-door/) tutorial so we're not buried in unrelated code.
 
 ## TRACKING YOUR SCORE 💰
 
@@ -507,4 +507,4 @@ app.ticker.add(gameLoop);
 
 **What you've learned:** Items aren't just about score - they teach players to explore. Hidden gems reward curious players, scattered coins build a trail that guides beginners. How you place items is part of your game's design!
 
-**Next up**: Ready to make your world feel alive? [Next: Moving Tiles](/tutorial/16-moving-tiles/)
+**Next up**: Ready to make your world feel alive? [Next: Moving Tiles](/tutorial/world-one/16-moving-tiles/)

@@ -4,8 +4,8 @@ date = 2026-03-09T13:00:00+11:00
 weight = 17
 draft = false
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/18-more-scrolling/"
-prev = "/tutorial/16-moving-tiles/"
+next = "/tutorial/world-one/18-more-scrolling/"
+prev = "/tutorial/world-one/16-moving-tiles/"
 +++
 
 Your world is bigger than one screen. Scrolling is how you show it - it's the technique behind every side-scroller ever made, from the original Super Mario Bros to Hollow Knight. The camera follows the hero, and the whole world slides past. Let's build it!
@@ -270,4 +270,4 @@ function recycleColumn(oldCol, newCol) {
 
 **When do you need this?** If you can't feel your game stuttering, you don't need it. Premature optimization is the root of all evil - start with the simple container approach, and only add recycling if you hit a real performance problem.
 
-**Next up**: The camera works, but walk to the edge of the map and you'll see the problem. [Next: More Scrolling](/tutorial/18-more-scrolling/)
+**Next up**: The camera works, but walk to the edge of the map and you'll see the problem. [Next: More Scrolling](/tutorial/world-one/18-more-scrolling/)

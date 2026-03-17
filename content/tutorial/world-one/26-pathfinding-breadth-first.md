@@ -4,8 +4,8 @@ date = 2026-03-09T22:00:00+11:00
 weight = 26
 draft = false
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/27-pathfinding-best-first/"
-prev = "/tutorial/25-rotate-background/"
+next = "/tutorial/world-one/27-pathfinding-best-first/"
+prev = "/tutorial/world-one/25-rotate-background/"
 +++
 
 Time to give your characters some serious brains! 🧠 So far, your hero has been pretty... let's say "directionally challenged." Tell them to go left, they go left - even straight into a wall! But what if they could think for themselves and find clever paths around obstacles?

@@ -4,8 +4,8 @@ date = 2026-03-09T01:00:00+11:00
 weight = 5
 draft = false
 tags = ["beginner", "tiles", "tutorial"]
-next = "/tutorial/06-keys-to-move/"
-prev = "/tutorial/04-rendering-a-map/"
+next = "/tutorial/world-one/06-keys-to-move/"
+prev = "/tutorial/world-one/04-rendering-a-map/"
 +++
 
 Time to create your HERO! 🦸 Every legendary game needs a protagonist - someone the player connects with, controls, and cheers for. Whether it's Mario jumping through pipes, Link exploring Hyrule, or Celeste climbing mountains, the hero makes the game come alive. You're about to bring your first character into your tile-based world!
@@ -228,4 +228,4 @@ You've just accomplished something amazing - you created your first interactive 
 - ✅ PixiJS sprite creation and positioning
 - ✅ The foundation for ALL character movement!
 
-Ready to make your hero MOVE? Next up: keyboard controls that'll bring your character to life! [Next: Keys to Move](/tutorial/06-keys-to-move/)
+Ready to make your hero MOVE? Next up: keyboard controls that'll bring your character to life! [Next: Keys to Move](/tutorial/world-one/06-keys-to-move/)

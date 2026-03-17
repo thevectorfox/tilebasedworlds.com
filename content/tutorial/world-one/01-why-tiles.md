@@ -4,7 +4,7 @@ date = 2026-03-08T21:00:00+11:00
 weight = 1
 draft = false
 tags = ["beginner", "tiles", "tutorial"]
-next = "/tutorial/02-map-format/"
+next = "/tutorial/world-one/02-map-format/"
 prev = ""
 +++
 
@@ -30,4 +30,4 @@ Imagine creating:
 - **Puzzle games** where tiles can be pushed, destroyed, or transformed
 - **Infinite runners** that generate new challenges on the fly
 
-Ready to start building? Let's dive into how we store and organize these magical tile-based worlds! [Next: Map Format](/tutorial/02-map-format)
+Ready to start building? Let's dive into how we store and organize these magical tile-based worlds! [Next: Map Format](/tutorial/world-one/02-map-format)

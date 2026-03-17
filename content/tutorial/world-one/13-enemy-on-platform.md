@@ -4,8 +4,8 @@ date = 2026-03-09T09:00:00+11:00
 weight = 13
 draft = false
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/14-shoot-him/"
-prev = "/tutorial/12-stupid-enemy/"
+next = "/tutorial/world-one/14-shoot-him/"
+prev = "/tutorial/world-one/12-stupid-enemy/"
 +++
 
 Time to make your enemies SMART! 🧠 While basic wall-bouncing enemies are useful, platform-aware enemies that don't fall off edges create much more interesting and unpredictable gameplay. Think of the Goombas in Mario that patrol platforms, or the security robots in Mega Man that never fall into pits - these enemies feel more alive and create better spatial challenges!
@@ -529,7 +529,7 @@ Your enemies now feel **intentional and alive** rather than mindlessly bouncing 
 - Use different AI personalities to create variety without complexity
 - Edge detection only for horizontal movement saves processing power
 
-**Next up**: Time to give players a way to fight back against these smart enemies! [Next: Shoot Him](/tutorial/14-shoot-him/)
+**Next up**: Time to give players a way to fight back against these smart enemies! [Next: Shoot Him](/tutorial/world-one/14-shoot-him/)
 </script>
 
 ### Random Direction Algorithm

@@ -4,8 +4,8 @@ date = 2026-03-09T19:00:00+11:00
 weight = 23
 draft = false
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/24-rotate-hero/"
-prev = "/tutorial/22-isometric-mouse/"
+next = "/tutorial/world-one/24-rotate-hero/"
+prev = "/tutorial/world-one/22-isometric-mouse/"
 +++
 
 A 5×5 isometric map is a proof of concept. A real game needs room to breathe. Combine the World Container from the scrolling tutorials with the isometric transform and you get a large diamond world that follows the player:
@@ -275,4 +275,4 @@ The `+ TILE_SIZE / 2` offset ensures the player always renders in front of the f
 - ✅ Smooth camera easing identical to the orthographic scrolling tutorials
 - ✅ Three options for the diamond viewport problem: embrace it, fill it, or mask it
 
-**Next up**: Give your hero a sense of direction. [Next: Rotate Hero](/tutorial/24-rotate-hero/)
+**Next up**: Give your hero a sense of direction. [Next: Rotate Hero](/tutorial/world-one/24-rotate-hero/)

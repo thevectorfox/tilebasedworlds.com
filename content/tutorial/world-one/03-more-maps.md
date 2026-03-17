@@ -4,8 +4,8 @@ date = 2026-03-08T23:00:00+11:00
 weight = 3
 draft = false
 tags = ["beginner", "tiles", "tutorial"]
-next = "/tutorial/04-rendering-a-map/"
-prev = "/tutorial/02-map-format/"
+next = "/tutorial/world-one/04-rendering-a-map/"
+prev = "/tutorial/world-one/02-map-format/"
 +++
 
 Now that you know how 2D arrays work, let's explore your options! Different games need different map strategies - choosing the right one can save you hundreds of hours of development time and make your game run like butter. By the end of this chapter, you'll know exactly which approach fits your dream game!
@@ -121,5 +121,5 @@ function generateChunk(chunkX, chunkY) {
 
 The best part? You can always start simple and upgrade later! Many successful games began with basic 2D arrays and evolved as they grew.
 
-Ready to see your maps come to life? Let's move on to rendering these data structures as actual game worlds! [Next: Rendering a Map](/tutorial/04-rendering-a-map/)
+Ready to see your maps come to life? Let's move on to rendering these data structures as actual game worlds! [Next: Rendering a Map](/tutorial/world-one/04-rendering-a-map/)
 

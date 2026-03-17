@@ -4,8 +4,8 @@ date = 2026-03-09T08:00:00+11:00
 weight = 12
 draft = false
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/13-enemy-on-platform/"
-prev = "/tutorial/11-ladders/"
+next = "/tutorial/world-one/13-enemy-on-platform/"
+prev = "/tutorial/world-one/11-ladders/"
 +++
 
 Time to add some DANGER to your world! 👾 A game without enemies is like a movie without conflict - technically possible, but nowhere near as exciting! You're about to breathe life into your levels with patrolling enemies that turn peaceful exploration into heart-pounding challenge. Even "stupid" enemies can create incredible tension and satisfaction!
@@ -536,4 +536,4 @@ app.ticker.add(gameLoop);
 
 **🎊 Boom!** Your peaceful world is now alive with danger and challenge! These simple patrolling enemies transform static levels into dynamic puzzles. Players must now time their movements, find safe paths, and feel the thrill of narrowly avoiding threats!
 
-**Coming next**: We'll make these enemies even smarter by adding platform awareness and more sophisticated patrol behaviors! [Next: Enemy on Platform](/tutorial/13-enemy-on-platform/)
+**Coming next**: We'll make these enemies even smarter by adding platform awareness and more sophisticated patrol behaviors! [Next: Enemy on Platform](/tutorial/world-one/13-enemy-on-platform/)

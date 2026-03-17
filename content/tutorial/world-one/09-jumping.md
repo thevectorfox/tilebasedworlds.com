@@ -4,8 +4,8 @@ date = 2026-03-09T05:00:00+11:00
 weight = 9
 draft = false
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/10-clouds/"
-prev = "/tutorial/08-open-the-door/"
+next = "/tutorial/world-one/10-clouds/"
+prev = "/tutorial/world-one/08-open-the-door/"
 +++
 
 Time to add one of the most satisfying mechanics in gaming - jumping! We're switching from top-down to side-scrolling view, where your hero can run left and right with arrow keys and launch into the air with the spacebar. Let's create that perfect jump feel that makes players want to bounce around your world!

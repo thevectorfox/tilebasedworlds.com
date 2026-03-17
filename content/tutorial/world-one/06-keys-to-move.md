@@ -4,8 +4,8 @@ date = 2026-03-09T02:00:00+11:00
 weight = 6
 draft = false
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/07-hit-the-wall/"
-prev = "/tutorial/05-the-hero/"
+next = "/tutorial/world-one/07-hit-the-wall/"
+prev = "/tutorial/world-one/05-the-hero/"
 +++
 
 
@@ -377,4 +377,4 @@ You've just built a complete movement system that rivals professional games! You
 - ✅ Smooth animation techniques
 - ✅ The foundation for ALL game interactions!
 
-Ready for the next challenge? Let's add collision detection so your hero can't walk through walls! [Next: Hit the Wall](/tutorial/07-hit-the-wall/)
+Ready for the next challenge? Let's add collision detection so your hero can't walk through walls! [Next: Hit the Wall](/tutorial/world-one/07-hit-the-wall/)

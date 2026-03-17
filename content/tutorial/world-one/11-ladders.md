@@ -4,8 +4,8 @@ date = 2026-03-09T07:00:00+11:00
 weight = 11
 draft = false
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/12-stupid-enemy/"
-prev = "/tutorial/10-clouds/"
+next = "/tutorial/world-one/12-stupid-enemy/"
+prev = "/tutorial/world-one/10-clouds/"
 +++
 
 Ready to add vertical exploration to your game world? 🪜 Ladders are one of the most iconic platformer mechanics - think Donkey Kong's construction sites, Mega Man's industrial levels, or any classic 2D adventure! You're about to give your players the freedom to climb up and down through your levels, opening up incredible possibilities for level design!
@@ -512,4 +512,4 @@ function updatePlayerVisuals(player) {
 
 **🏆 Congratulations!** You've just implemented professional-grade ladder mechanics! Your players can now explore vertically through your levels with smooth, responsive climbing. This opens up amazing possibilities for level design - multi-story buildings, underground caverns, sky-high towers!
 
-**Next up**: Time to add some challenge with enemies! [Next: Stupid Enemy](/tutorial/12-stupid-enemy/)
+**Next up**: Time to add some challenge with enemies! [Next: Stupid Enemy](/tutorial/world-one/12-stupid-enemy/)
