@@ -9,7 +9,6 @@ A comprehensive guide to building tile-based games using JavaScript and PixiJS T
 
 ## Getting Started
 
-- [Crash Course in JavaScript](/tutorial/00-crash-course-js/) - Programming fundamentals
 - [Why Tiles?](/tutorial/01-why-tiles/) - Introduction to tile-based games
 - [Map Format](/tutorial/02-map-format/) - How to store tile maps
 

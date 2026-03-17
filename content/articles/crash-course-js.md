@@ -4,8 +4,6 @@ date = 2026-03-08T20:00:00+11:00
 weight = 0
 draft = false
 tags = ["beginner", "javascript", "programming"]
-next = "/tutorial/01-why-tiles/"
-prev = ""
 +++
 
 Beginner

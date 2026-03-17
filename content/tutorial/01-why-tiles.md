@@ -5,7 +5,7 @@ weight = 1
 draft = false
 tags = ["beginner", "tiles", "tutorial"]
 next = "/tutorial/02-map-format/"
-prev = "/tutorial/00-crash-course-js/"
+prev = ""
 +++
 
 Ever wondered how games like Super Mario Bros, The Legend of Zelda, or even modern hits like Stardew Valley create their massive worlds? The secret sauce is TILES! You're about to discover one of game development's most powerful techniques - and by the time we're done, you'll be building your own game worlds faster than you can say "1-Up!"
