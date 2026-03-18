@@ -10,26 +10,16 @@ prev = "/tutorial/world-one/12-stupid-enemy/"
 
 Time to make your enemies SMART! 🧠 While basic wall-bouncing enemies are useful, platform-aware enemies that don't fall off edges create much more interesting and unpredictable gameplay. Think of the Goombas in Mario that patrol platforms, or the security robots in Mega Man that never fall into pits - these enemies feel more alive and create better spatial challenges!
 
-<div id="platformDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="platformCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys to move, Spacebar to jump<br>
-        <strong>Watch:</strong> Purple enemies stay on platforms, turquoise ones patrol more randomly!
-    </div>
-</div>
-
-<script type="module">
-import { Application, Sprite, Container, Graphics, Ticker } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('platformCanvas');
-const app = new Application();
+{{< pixidemo title="Enemy on Platform" >}}
+const app = new PIXI.Application();
 
 await app.init({
-    canvas: canvas,
     width: 300,
     height: 240,
     backgroundColor: 0x87CEEB
 });
+
+document.body.appendChild(app.canvas);
 
 // Game constants
 const TILE_SIZE = 30;
@@ -72,13 +62,13 @@ const enemySpawns = [
 ];
 
 // Create map display
-const mapContainer = new Container();
+const mapContainer = new PIXI.Container();
 app.stage.addChild(mapContainer);
 
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const tile = new Graphics()
+            const tile = new PIXI.Graphics()
                 .rect(0, 0, TILE_SIZE, TILE_SIZE)
                 .fill(0x8B4513);
             tile.x = col * TILE_SIZE;
@@ -89,7 +79,7 @@ for (let row = 0; row < map.length; row++) {
 }
 
 // Create hero
-const hero = new Graphics()
+const hero = new PIXI.Graphics()
     .rect(0, 0, 12, 12)
     .fill(0xff4444);
 hero.x = 60;
@@ -148,7 +138,7 @@ function hasGroundBelow(x, y, width, height) {
 function createEnemies() {
     enemySpawns.forEach((spawn, index) => {
         const type = enemyTypes[spawn.type];
-        const enemySprite = new Graphics()
+        const enemySprite = new PIXI.Graphics()
             .rect(0, 0, 10, 10)
             .fill(type.color)
             .stroke({width: 1, color: 0x000000});
@@ -338,28 +328,17 @@ function gameLoop() {
 // Initialize
 createEnemies();
 app.ticker.add(gameLoop);
-</script>
+{{< /pixidemo >}}
 
 
 ## Smart Direction Changes: Adding Unpredictability 🎲
 
 Basic edge detection is great, but predictable enemies get boring fast! Let's add intelligent direction changes that make enemies feel more alive:
 
-<div id="smartEnemyDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="smartCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Watch:</strong> These enemies change direction even without hitting walls!<br>
-        Different colors = different AI personalities.
-    </div>
-</div>
-
-<script type="module">
-// Simplified demo for smart direction changes
-const canvas2 = document.getElementById('smartCanvas');
+{{< pixidemo title="Smart Direction Changes" >}}
 const app2 = new Application();
 
 await app2.init({
-    canvas: canvas2,
     width: 300,
     height: 240,
     backgroundColor: 0x87CEEB
@@ -381,7 +360,7 @@ const map2 = [
 for (let row = 0; row < map2.length; row++) {
     for (let col = 0; col < map2[row].length; col++) {
         if (map2[row][col] === 1) {
-            const tile = new Graphics().
+            const tile = new PIXI.Graphics().
                 rect(0, 0, 30, 30).
                 fill(0x8B4513);
             tile.x = col * 30;
@@ -394,17 +373,17 @@ for (let row = 0; row < map2.length; row++) {
 // Smart enemies with different personalities
 const smartEnemies = [
     {
-        sprite: new Graphics().rect(0, 0, 10, 10).fill(0x9370DB),
+        sprite: new PIXI.Graphics().rect(0, 0, 10, 10).fill(0x9370DB),
         x: 60, y: 60, moveX: 1, moveY: 0,
         turnChance: 3, personality: 'cautious'
     },
     {
-        sprite: new Graphics().rect(0, 0, 10, 10).fill(0xFF6347),
+        sprite: new PIXI.Graphics().rect(0, 0, 10, 10).fill(0xFF6347),
         x: 120, y: 120, moveX: 0, moveY: 1,
         turnChance: 12, personality: 'erratic'
     },
     {
-        sprite: new Graphics().rect(0, 0, 10, 10).fill(0x32CD32),
+        sprite: new PIXI.Graphics().rect(0, 0, 10, 10).fill(0x32CD32),
         x: 180, y: 60, moveX: -1, moveY: 0,
         turnChance: 7, personality: 'explorer'
     }
@@ -454,7 +433,9 @@ function updateSmartEnemies() {
 }
 
 app2.ticker.add(updateSmartEnemies);
-</script>
+});
+document.body.appendChild(app2.canvas);
+{{< /pixidemo >}}
 
 ### Random Direction Algorithm
 
@@ -530,7 +511,6 @@ Your enemies now feel **intentional and alive** rather than mindlessly bouncing 
 - Edge detection only for horizontal movement saves processing power
 
 **Next up**: Time to give players a way to fight back against these smart enemies! [Next: Shoot Him](/tutorial/world-one/14-shoot-him/)
-</script>
 
 ### Random Direction Algorithm
 

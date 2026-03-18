@@ -10,20 +10,10 @@ prev = "/tutorial/world-one/18-more-scrolling/"
 
 Walk below a pillar and you're in front of it. Walk above and the pillar covers you. That's depth - a 2D trick that makes your top-down world feel solid and three-dimensional. Try it:
 
-<div id="depthDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="depthCanvas" width="300" height="240" style="border: 2px solid #333; background: #5a8a3a;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys or WASD<br>
-        <strong>Notice:</strong> Walk above a pillar - it covers you. Walk below - you cover it!
-    </div>
-</div>
-
-<script type="module">
-import { Application, Graphics, Container } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('depthCanvas');
-const app = new Application();
-await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x5a8a3a });
+{{< pixidemo title="Depth" >}}
+const app = new PIXI.Application();
+await app.init({ width: 300, height: 240, backgroundColor: 0x5a8a3a });
+document.body.appendChild(app.canvas);
 
 const TILE_SIZE = 30;
 
@@ -40,7 +30,7 @@ const map = [
 ];
 
 // sortableChildren tells PixiJS to re-sort by zIndex every frame
-const world = new Container();
+const world = new PIXI.Container();
 world.sortableChildren = true;
 app.stage.addChild(world);
 
@@ -48,14 +38,14 @@ for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
             // Border walls - flat tile, sorted by foot point
-            const wall = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            const wall = new PIXI.Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
             wall.x = col * TILE_SIZE;
             wall.y = row * TILE_SIZE;
             wall.zIndex = (row + 1) * TILE_SIZE;
             world.addChild(wall);
         } else if (map[row][col] === 2) {
             // Pillar: 20px wide, 50px tall, extending 20px above its tile row
-            const pillar = new Graphics()
+            const pillar = new PIXI.Graphics()
                 .rect(5, -20, 20, 50)   // y=-20 puts top 20px above the tile row
                 .fill(0x8B4513);
             pillar.x = col * TILE_SIZE;
@@ -67,7 +57,7 @@ for (let row = 0; row < map.length; row++) {
     }
 }
 
-const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+const heroSprite = new PIXI.Graphics().rect(0, 0, 12, 12).fill(0xff4444);
 world.addChild(heroSprite);
 
 const player = {
@@ -119,7 +109,7 @@ function gameLoop() {
 }
 
 app.ticker.add(gameLoop);
-</script>
+{{< /pixidemo >}}
 
 ## THE ILLUSION 🎭
 
@@ -147,7 +137,7 @@ Two PixiJS features solve this:
 - **`sortableChildren`** - a flag on containers. When `true`, PixiJS re-sorts children by `zIndex` every frame before drawing.
 
 ```js
-const world = new Container();
+const world = new PIXI.Container();
 world.sortableChildren = true; // enable Z-sorting for all children
 
 // Now zIndex controls who's in front
@@ -177,7 +167,7 @@ Tiles get their `zIndex` set once when the map is built. The player's `zIndex` u
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const tile = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            const tile = new PIXI.Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
             tile.x = col * TILE_SIZE;
             tile.y = row * TILE_SIZE;
             tile.zIndex = (row + 1) * TILE_SIZE; // foot of this tile row
@@ -201,7 +191,7 @@ Draw the tall portion above the tile's grid position using a negative y offset i
 
 ```js
 // A pillar: grid position is row × TILE_SIZE, but it extends 20px above that
-const pillar = new Graphics()
+const pillar = new PIXI.Graphics()
     .rect(5, -20, 20, 50)   // x=5 (centered), y=-20 (above cell), 20px wide × 50px tall
     .fill(0x8B4513);
 

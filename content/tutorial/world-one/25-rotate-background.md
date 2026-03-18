@@ -25,26 +25,15 @@ This technique creates those mind-bending effects you see in space games like *A
 
 Time to make your players feel like they control the very fabric of space and time!
 
-<div id="rotateBgDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="rotateBgCanvas" width="300" height="240" style="border: 2px solid #333; background: #0a0a0a; display: block; margin: 0 auto;"></canvas>
-    <div style="margin-top: 10px; font-family: monospace;">
-        <strong>Controls:</strong> ← → Rotate World, ↑ ↓ Move Forward/Back
-    </div>
-    <div id="rotateBgStatus" style="margin-top: 5px; font-size: 12px; color: #666; min-height: 16px;"></div>
-</div>
-
-<script type="module">
-import { Application, Container, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('rotateBgCanvas');
-const app = new Application();
+{{< pixidemo title="Rotate Background" >}}
+const app = new PIXI.Application();
 
 await app.init({
-    canvas: canvas,
     width: 300,
     height: 240,
     backgroundColor: 0x0a0a0a
 });
+document.body.appendChild(app.canvas);
 
 // Game constants
 const TILE_SIZE = 30;
@@ -69,7 +58,7 @@ for (let row = 0; row < WORLD_SIZE; row++) {
 }
 
 // Create world container that will rotate
-const worldContainer = new Container();
+const worldContainer = new PIXI.Container();
 app.stage.addChild(worldContainer);
 
 // Position the world container at screen center
@@ -80,15 +69,13 @@ worldContainer.y = 120; // Center of 240px canvas
 for (let row = 0; row < WORLD_SIZE; row++) {
     for (let col = 0; col < WORLD_SIZE; col++) {
         if (worldMap[row][col] > 0) {
-            const tile = new Graphics();
-            
-            // Different colors for different tile types
             let color;
             if (worldMap[row][col] === 1) color = 0x34495e; // Walls
             else if (worldMap[row][col] === 2) color = 0x2980b9; // Pattern
             else color = 0xe74c3c; // Corners
-            
-            tile.rect(0, 0, TILE_SIZE, TILE_SIZE).fill(color);
+
+            const tile = new PIXI.Graphics()
+                .rect(0, 0, TILE_SIZE, TILE_SIZE).fill(color);
             tile.x = col * TILE_SIZE;
             tile.y = row * TILE_SIZE;
             worldContainer.addChild(tile);
@@ -97,12 +84,9 @@ for (let row = 0; row < WORLD_SIZE; row++) {
 }
 
 // Create fixed hero at screen center
-const hero = new Graphics();
-hero.beginFill(0xffff00);
-// Draw a cross/plus shape to show orientation
-hero.drawRect(-1, -6, 2, 12);
-hero.drawRect(-6, -1, 12, 2);
-hero.endFill();
+const hero = new PIXI.Graphics()
+    .rect(-1, -6, 2, 12).fill(0xffff00)
+    .rect(-6, -1, 12, 2).fill(0xffff00);
 hero.x = 150; // Fixed at screen center
 hero.y = 120;
 app.stage.addChild(hero);
@@ -122,11 +106,10 @@ window.addEventListener('keydown', (e) => { keys[e.code] = true; });
 window.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
 // Status display
-const statusElement = document.getElementById('rotateBgStatus');
 function updateStatus() {
     const degrees = (camera.rotation * 180 / Math.PI).toFixed(0);
     const normalizedDegrees = ((degrees % 360) + 360) % 360;
-    statusElement.textContent = `World Rotation: ${normalizedDegrees}° | Camera: (${camera.x.toFixed(0)}, ${camera.y.toFixed(0)})`;
+    window.parent.postMessage({ type: 'status', text: `World Rotation: ${normalizedDegrees}° | Camera: (${camera.x.toFixed(0)}, ${camera.y.toFixed(0)})` }, '*');
 }
 
 // Update function
@@ -167,7 +150,7 @@ function updateCamera() {
 
 // Game loop
 app.ticker.add(updateCamera);
-</script>
+{{< /pixidemo >}}
 
 ## The Magic Behind Rotating Worlds
 

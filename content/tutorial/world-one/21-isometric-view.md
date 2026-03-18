@@ -10,20 +10,10 @@ prev = "/tutorial/world-one/20-mouse-to-move/"
 
 Tilt your world 45 degrees and you get the iconic look behind Pokémon, Age of Empires, and Diablo. Isometric view makes a flat tile grid feel like a real 3D space. Best of all, it's just two lines of math on top of everything you've already built:
 
-<div id="isoDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="isoCanvas" width="300" height="240" style="border: 2px solid #333; background: #1a1a2e;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys or WASD<br>
-        <strong>Notice:</strong> Walk around the pillar - it covers you when you're north, you cover it when you're south
-    </div>
-</div>
-
-<script type="module">
-import { Application, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('isoCanvas');
-const app = new Application();
-await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x1a1a2e });
+{{< pixidemo title="Isometric View" >}}
+const app = new PIXI.Application();
+await app.init({ width: 300, height: 240, backgroundColor: 0x1a1a2e });
+document.body.appendChild(app.canvas);
 
 const TILE_SIZE = 30;
 const OFFSET_X = 150; // center of 300px canvas
@@ -47,14 +37,14 @@ function isoToScreen(worldX, worldY) {
 }
 
 function makeGroundTile() {
-    return new Graphics()
+    return new PIXI.Graphics()
         .poly([30, 0, 60, 15, 30, 30, 0, 15])
         .fill(0x3d6b47);
 }
 
 function makeWallTile() {
     const WH = 20;
-    const g = new Graphics();
+    const g = new PIXI.Graphics();
     g.poly([30, -WH, 60, 15-WH, 30, 30-WH, 0, 15-WH]).fill(0xA07840);
     g.poly([0, 15-WH, 30, 30-WH, 30, 30, 0, 15]).fill(0x5C4020);
     g.poly([30, 30-WH, 60, 15-WH, 60, 15, 30, 30]).fill(0x7A5528);
@@ -75,7 +65,7 @@ for (let row = 0; row < map.length; row++) {
     }
 }
 
-const heroSprite = new Graphics()
+const heroSprite = new PIXI.Graphics()
     .poly([8, 0, 16, 4, 8, 8, 0, 4])
     .fill(0xff4444);
 app.stage.addChild(heroSprite);
@@ -128,7 +118,7 @@ function gameLoop() {
 }
 
 app.ticker.add(gameLoop);
-</script>
+{{< /pixidemo >}}
 
 Walk north of the pillar - it covers you. Walk south - you cover it. All game logic (movement, collision) runs in the flat world grid. Only the final render step converts to the diamond view.
 
@@ -204,7 +194,7 @@ Your `isSolid()` function doesn't change at all - it still divides by `TILE_SIZE
 ```js
 // TILE_SIZE = 30: diamond is 60px wide (2 × TILE_SIZE) and 30px tall
 function makeGroundTile(color) {
-    return new Graphics()
+    return new PIXI.Graphics()
         .poly([30, 0,   // top vertex
                60, 15,  // right vertex
                30, 30,  // bottom vertex
@@ -222,7 +212,7 @@ For wall tiles that look like 3D boxes, draw three faces with different shades:
 ```js
 function makeWallTile() {
     const WH = 20; // visual height of the wall in pixels
-    const g = new Graphics();
+    const g = new PIXI.Graphics();
 
     // Top face: diamond shifted up by WH pixels
     g.poly([30, -WH,    60, 15-WH, 30, 30-WH, 0, 15-WH]).fill(0xA07840);

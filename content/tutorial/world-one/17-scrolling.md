@@ -10,20 +10,10 @@ prev = "/tutorial/world-one/16-moving-tiles/"
 
 Your world is bigger than one screen. Scrolling is how you show it - it's the technique behind every side-scroller ever made, from the original Super Mario Bros to Hollow Knight. The camera follows the hero, and the whole world slides past. Let's build it!
 
-<div id="scrollDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="scrollCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys + Space to jump<br>
-        <strong>Explore:</strong> The world is twice as wide as the screen! →
-    </div>
-</div>
-
-<script type="module">
-import { Application, Graphics, Container } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('scrollCanvas');
-const app = new Application();
-await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x87CEEB });
+{{< pixidemo title="Scrolling" >}}
+const app = new PIXI.Application();
+await app.init({ width: 300, height: 240, backgroundColor: 0x87CEEB });
+document.body.appendChild(app.canvas);
 
 const TILE_SIZE = 30;
 const SCREEN_W = 300;
@@ -43,13 +33,13 @@ const map = [
 ];
 
 // All game objects live inside the world container
-const world = new Container();
+const world = new PIXI.Container();
 app.stage.addChild(world);
 
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const tile = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            const tile = new PIXI.Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
             tile.x = col * TILE_SIZE;
             tile.y = row * TILE_SIZE;
             world.addChild(tile);
@@ -57,7 +47,7 @@ for (let row = 0; row < map.length; row++) {
     }
 }
 
-const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+const heroSprite = new PIXI.Graphics().rect(0, 0, 12, 12).fill(0xff4444);
 world.addChild(heroSprite);
 
 const player = {
@@ -134,7 +124,7 @@ function gameLoop() {
 }
 
 app.ticker.add(gameLoop);
-</script>
+{{< /pixidemo >}}
 
 Notice that the hero stays near the center of the screen while the world slides around them. That's the illusion of scrolling - the hero isn't really moving on screen, the world is.
 
@@ -157,7 +147,7 @@ The only structural change from earlier tutorials: instead of adding tiles direc
 ```js
 import { Application, Graphics, Container } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
 
-const world = new Container();
+const world = new PIXI.Container();
 app.stage.addChild(world);
 
 // All game objects go into world, NOT app.stage
@@ -165,7 +155,7 @@ function buildMap() {
     for (let row = 0; row < map.length; row++) {
         for (let col = 0; col < map[row].length; col++) {
             if (map[row][col] === 1) {
-                const tile = new Graphics()
+                const tile = new PIXI.Graphics()
                     .rect(0, 0, game.tileSize, game.tileSize)
                     .fill(0x8B4513);
                 tile.x = col * game.tileSize;

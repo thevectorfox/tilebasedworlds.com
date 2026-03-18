@@ -10,26 +10,16 @@ prev = "/tutorial/world-one/08-open-the-door/"
 
 Time to add one of the most satisfying mechanics in gaming - jumping! We're switching from top-down to side-scrolling view, where your hero can run left and right with arrow keys and launch into the air with the spacebar. Let's create that perfect jump feel that makes players want to bounce around your world!
 
-<div id="jumpingDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="jumpCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB; display: block; margin: 0 auto;"></canvas>
-    <div style="margin-top: 10px; font-family: monospace;">
-        <strong>Controls:</strong> ← → Arrow Keys to move, Spacebar to jump
-    </div>
-    <div id="jumpStatus" style="margin-top: 5px; font-size: 12px; color: #666; min-height: 16px;"></div>
-</div>
-
-<script type="module">
-import { Application, Sprite, Container, Graphics, Ticker } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('jumpCanvas');
-const app = new Application();
+{{< pixidemo title="Jumping" >}}
+const app = new PIXI.Application();
 
 await app.init({
-    canvas: canvas,
     width: 300,
     height: 240,
     backgroundColor: 0x87CEEB
 });
+
+document.body.appendChild(app.canvas);
 
 // Game constants
 const TILE_SIZE = 30;
@@ -49,13 +39,13 @@ const map = [
 ];
 
 // Create map display
-const mapContainer = new Container();
+const mapContainer = new PIXI.Container();
 app.stage.addChild(mapContainer);
 
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const tile = new Graphics()
+            const tile = new PIXI.Graphics()
                 .rect(0, 0, TILE_SIZE, TILE_SIZE)
                 .fill(0x8B4513);
             tile.x = col * TILE_SIZE;
@@ -66,7 +56,7 @@ for (let row = 0; row < map.length; row++) {
 }
 
 // Create hero
-const hero = new Graphics()
+const hero = new PIXI.Graphics()
     .rect(0, 0, 12, 12)
     .fill(0xff4444);
 hero.x = 60;
@@ -89,13 +79,12 @@ const player = {
 };
 
 // Status display for educational purposes
-const statusElement = document.getElementById('jumpStatus');
 function updateStatus() {
     const vY = player.velocityY.toFixed(1);
     const status = `Velocity Y: ${vY} | Ground: ${player.onGround ? 'Yes' : 'No'} | State: ${
         player.onGround ? 'Standing' : player.velocityY < 0 ? 'Rising' : 'Falling'
     }`;
-    statusElement.textContent = status;
+    window.parent.postMessage({ type: 'pixidemo-status', text: status }, '*');
 }
 
 // Input handling with browser scroll prevention
@@ -188,7 +177,7 @@ function updatePlayer() {
 
 // Game loop
 app.ticker.add(updatePlayer);
-</script>
+{{< /pixidemo >}}
 
 
 ## Jump Physics: Making It Feel Right

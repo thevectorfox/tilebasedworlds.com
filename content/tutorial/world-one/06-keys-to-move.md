@@ -11,10 +11,7 @@ prev = "/tutorial/world-one/05-the-hero/"
 
 Time to bring your hero to LIFE! 🎮 This is the moment where your game transforms from a static picture into an interactive experience. Player control is what separates games from movies - and you're about to master it! By the end of this chapter, your hero will respond to your every command, moving smoothly through your tile-based world.
 
-<div id="movement-demo" style="border: 2px solid #00ff41; border-radius: 8px; margin: 20px 0; background: #000;"></div>
-
-<script>
-window.addEventListener('load', async function() {
+{{< pixidemo title="Keys to Move" >}}
     // Create PixiJS application for movement demo
     const app = new PIXI.Application();
     await app.init({
@@ -24,7 +21,7 @@ window.addEventListener('load', async function() {
         antialias: true
     });
     
-    document.getElementById('movement-demo').appendChild(app.canvas);
+    document.body.appendChild(app.canvas);
     
     // Our game map
     const gameMap = [
@@ -148,8 +145,7 @@ window.addEventListener('load', async function() {
     
     // Game loop
     app.ticker.add(updateMovement);
-});
-</script>
+{{< /pixidemo >}}
 
 **Try it!** Use your arrow keys to move the red square around! ⬅️➡️⬆️⬇️
 

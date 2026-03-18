@@ -10,20 +10,9 @@ prev = "/tutorial/world-one/14-shoot-him/"
 
 Time to get rewarded! 🌟 Collectibles are the heartbeat of so many classic games - coins in Mario, rupees in Zelda, rings in Sonic. That satisfying *ding* when your score ticks up? Pure dopamine. Let's build that item pickup system!
 
-<div id="itemsDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="itemsCanvas" width="300" height="240" style="border: 2px solid #333; background: #1a1a2e;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys to move<br>
-        <strong>Mission:</strong> Collect all the coins and gems! 🪙💎
-    </div>
-</div>
-
-<script type="module">
-import { Application, Graphics, Text, TextStyle } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('itemsCanvas');
-const app = new Application();
-await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x1a1a2e });
+{{< pixidemo title="Getting Items" >}}
+const app = new PIXI.Application();
+await app.init({ width: 300, height: 240, backgroundColor: 0x1a1a2e });
 
 const TILE_SIZE = 30;
 
@@ -41,7 +30,7 @@ const map = [
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const tile = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x4a3728);
+            const tile = new PIXI.Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x4a3728);
             tile.x = col * TILE_SIZE;
             tile.y = row * TILE_SIZE;
             app.stage.addChild(tile);
@@ -63,8 +52,8 @@ const myItems = [
 
 const activeItems = new Map();
 
-const pointsStyle = new TextStyle({ fill: 0xFFFFFF, fontSize: 12, fontFamily: 'monospace' });
-const pointsDisplay = new Text({ text: 'Points: 0', style: pointsStyle });
+const pointsStyle = new PIXI.TextStyle({ fill: 0xFFFFFF, fontSize: 12, fontFamily: 'monospace' });
+const pointsDisplay = new PIXI.Text({ text: 'Points: 0', style: pointsStyle });
 pointsDisplay.x = 8;
 pointsDisplay.y = 8;
 
@@ -74,7 +63,7 @@ function buildItems() {
 
     for (const [type, tileX, tileY] of myItems[game.currentRoom]) {
         const itemType = ITEM_TYPES[type];
-        const sprite = new Graphics().circle(0, 0, itemType.size).fill(itemType.color);
+        const sprite = new PIXI.Graphics().circle(0, 0, itemType.size).fill(itemType.color);
         sprite.x = tileX * TILE_SIZE + TILE_SIZE / 2;
         sprite.y = tileY * TILE_SIZE + TILE_SIZE / 2;
         app.stage.addChild(sprite);
@@ -84,7 +73,7 @@ function buildItems() {
     app.stage.addChild(pointsDisplay);
 }
 
-const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+const heroSprite = new PIXI.Graphics().rect(0, 0, 12, 12).fill(0xff4444);
 const player = { sprite: heroSprite, x: 60, y: 180, width: 12, height: 12, speed: 2 };
 app.stage.addChild(heroSprite);
 
@@ -141,7 +130,9 @@ function gameLoop() {
 
 buildItems();
 app.ticker.add(gameLoop);
-</script>
+
+document.body.appendChild(app.canvas);
+{{< /pixidemo >}}
 
 Items are different in what they do - coins add a little to your score, gems are worth ten times more. That's the same trick games use to reward you for exploring off the beaten path. In this tutorial all items just give points, but the same pattern works for health potions, ammo pickups, power-ups, or anything else you want to create!
 
@@ -302,20 +293,10 @@ This rebuilds `myItems[currentRoom]` from whatever's still in `activeItems`. Any
 
 The same system works perfectly in a side-scrolling platformer. Here's the complete picture - jumping, enemies, shooting, and now items all together:
 
-<div id="platformDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="platformCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys + Space to jump, Shift to shoot<br>
-        <strong>Score:</strong> Grab gold coins (+1) and blue gems (+10)! 🪙💎
-    </div>
-</div>
-
-<script type="module">
-import { Application, Graphics, Text, TextStyle } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('platformCanvas');
-const app = new Application();
-await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x87CEEB });
+{{< pixidemo title="Platform Items" >}}
+const app = new PIXI.Application();
+await app.init({ width: 300, height: 240, backgroundColor: 0x87CEEB });
+document.body.appendChild(app.canvas);
 
 const TILE_SIZE = 30;
 const GRAVITY = 0.6;
@@ -334,7 +315,7 @@ const map = [
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const tile = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            const tile = new PIXI.Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
             tile.x = col * TILE_SIZE;
             tile.y = row * TILE_SIZE;
             app.stage.addChild(tile);
@@ -356,15 +337,15 @@ const myItems = [
 
 const activeItems = new Map();
 
-const pointsStyle = new TextStyle({ fill: 0x000000, fontSize: 11, fontFamily: 'monospace' });
-const pointsDisplay = new Text({ text: 'Points: 0', style: pointsStyle });
+const pointsStyle = new PIXI.TextStyle({ fill: 0x000000, fontSize: 11, fontFamily: 'monospace' });
+const pointsDisplay = new PIXI.Text({ text: 'Points: 0', style: pointsStyle });
 pointsDisplay.x = 8;
 pointsDisplay.y = 8;
 
 function buildItems() {
     for (const [type, tileX, tileY] of myItems[game.currentRoom]) {
         const itemType = ITEM_TYPES[type];
-        const sprite = new Graphics().circle(0, 0, itemType.size).fill(itemType.color);
+        const sprite = new PIXI.Graphics().circle(0, 0, itemType.size).fill(itemType.color);
         sprite.x = tileX * TILE_SIZE + TILE_SIZE / 2;
         sprite.y = tileY * TILE_SIZE + TILE_SIZE / 2;
         app.stage.addChild(sprite);
@@ -373,7 +354,7 @@ function buildItems() {
     app.stage.addChild(pointsDisplay);
 }
 
-const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+const heroSprite = new PIXI.Graphics().rect(0, 0, 12, 12).fill(0xff4444);
 app.stage.addChild(heroSprite);
 
 const player = {
@@ -392,7 +373,7 @@ const enemies = [];
 
 // Spawn some enemies
 for (let i = 0; i < 3; i++) {
-    const s = new Graphics().rect(0, 0, 10, 10).fill(0x8A2BE2);
+    const s = new PIXI.Graphics().rect(0, 0, 10, 10).fill(0x8A2BE2);
     app.stage.addChild(s);
     enemies.push({ sprite: s, x: 120 + i * 60, y: 60 + i * 30, width: 10, height: 10, active: true });
 }
@@ -433,7 +414,7 @@ function gameLoop() {
     }
 
     if ((keys['ShiftLeft'] || keys['ShiftRight']) && Date.now() - player.lastShot > player.shootCooldown) {
-        const bSprite = new Graphics().rect(0, 0, 4, 4).fill(0xFFFF00);
+        const bSprite = new PIXI.Graphics().rect(0, 0, 4, 4).fill(0xFFFF00);
         bSprite.x = player.x + player.width / 2;
         bSprite.y = player.y + player.height / 2;
         app.stage.addChild(bSprite);
@@ -494,7 +475,7 @@ function gameLoop() {
 
 buildItems();
 app.ticker.add(gameLoop);
-</script>
+{{< /pixidemo >}}
 
 **🎉 Congratulations!** Your game world now has collectibles! Everything in this tutorial is the same pattern whether it's a top-down RPG or a side-scrolling platformer - the key idea is always: store items in a data array, render sprites for the current room, check tile position on every frame, and remove collected items from all three places.
 

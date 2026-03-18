@@ -24,7 +24,6 @@ Each 1 becomes a solid wall, each 0 becomes walkable space!
 The result should look like this:
 
 {{< pixidemo title="Rendering a Map" >}}
-(async function() {
     const app = new PIXI.Application();
     await app.init({
         width: 240,
@@ -68,7 +67,6 @@ The result should look like this:
             app.stage.addChild(tile);
         }
     }
-})();
 {{< /pixidemo >}}
 
 First, let's set up our map data and tile definitions using modern JavaScript:

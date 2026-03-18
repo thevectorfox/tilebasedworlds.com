@@ -25,27 +25,15 @@ Welcome to the world of **pathfinding** - the AI magic behind every smart enemy 
 
 Get ready to watch your dumb hero transform into a navigation genius!
 
-<div id="pathfindingDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="pathfindingCanvas" width="300" height="240" style="border: 2px solid #333; background: #f8f9fa; display: block; margin: 0 auto;"></canvas>
-    <div style="margin-top: 10px; font-family: monospace;">
-        <strong>Click anywhere to see pathfinding magic!</strong><br>
-        🔍 Watch the search expand • 🛣️ See the shortest path
-    </div>
-    <div id="pathfindingStatus" style="margin-top: 5px; font-size: 12px; color: #666; min-height: 16px;"></div>
-</div>
-
-<script type="module">
-import { Application, Container, Graphics, Text } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('pathfindingCanvas');
-const app = new Application();
+{{< pixidemo title="Pathfinding Breadth-First" >}}
+const app = new PIXI.Application();
 
 await app.init({
-    canvas: canvas,
     width: 300,
     height: 240,
     backgroundColor: 0xf8f9fa
 });
+document.body.appendChild(app.canvas);
 
 // Game constants
 const TILE_SIZE = 20;
@@ -73,7 +61,7 @@ const tiles = [];
 for (let row = 0; row < ROWS; row++) {
     tiles[row] = [];
     for (let col = 0; col < COLS; col++) {
-        const tile = new Graphics();
+        const tile = new PIXI.Graphics();
         
         if (map[row][col] === 1) {
             // Wall tile
@@ -93,7 +81,7 @@ for (let row = 0; row < ROWS; row++) {
 }
 
 // Hero (starting position)
-const hero = new Graphics();
+const hero = new PIXI.Graphics();
 hero.circle(TILE_SIZE/2, TILE_SIZE/2, 6).fill(0xff4444);
 let heroPos = { x: 1, y: 1 };
 hero.x = heroPos.x * TILE_SIZE;
@@ -105,9 +93,8 @@ let searchTiles = [];
 let pathTiles = [];
 
 // Status display
-const statusElement = document.getElementById('pathfindingStatus');
 function updateStatus(message) {
-    statusElement.textContent = message;
+    window.parent.postMessage({ type: 'status', text: message }, '*');
 }
 
 // Breadth-First Search implementation
@@ -283,7 +270,7 @@ app.stage.on('pointerdown', (event) => {
 
 // Initialize
 updateStatus('🖱️ Click on any empty tile to see pathfinding in action!');
-</script>
+{{< /pixidemo >}}
 
 ## What Just Happened? Algorithm Magic Explained!
 

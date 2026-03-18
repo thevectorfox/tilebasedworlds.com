@@ -10,26 +10,16 @@ prev = "/tutorial/world-one/10-clouds/"
 
 Ready to add vertical exploration to your game world? 🪜 Ladders are one of the most iconic platformer mechanics - think Donkey Kong's construction sites, Mega Man's industrial levels, or any classic 2D adventure! You're about to give your players the freedom to climb up and down through your levels, opening up incredible possibilities for level design!
 
-<div id="ladderDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="ladderCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys to move, Up/Down to climb ladders<br>
-        <strong>Try this:</strong> Use the brown ladders to climb between platforms!
-    </div>
-</div>
-
-<script type="module">
-import { Application, Sprite, Container, Graphics, Ticker } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('ladderCanvas');
-const app = new Application();
+{{< pixidemo title="Ladders" >}}
+const app = new PIXI.Application();
 
 await app.init({
-    canvas: canvas,
     width: 300,
     height: 240,
     backgroundColor: 0x87CEEB
 });
+
+document.body.appendChild(app.canvas);
 
 // Game constants
 const TILE_SIZE = 30;
@@ -54,15 +44,15 @@ const map = [
 ];
 
 // Create map display
-const mapContainer = new Container();
+const mapContainer = new PIXI.Container();
 app.stage.addChild(mapContainer);
 
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         const tileType = map[row][col];
-        
+
         if (tileType === SOLID) {
-            const tile = new Graphics()
+            const tile = new PIXI.Graphics()
                 .rect(0, 0, TILE_SIZE, TILE_SIZE)
                 .fill(0x8B4513);
             tile.x = col * TILE_SIZE;
@@ -70,15 +60,15 @@ for (let row = 0; row < map.length; row++) {
             mapContainer.addChild(tile);
         } else if (tileType === LADDER) {
             // Draw ladder background (slightly darker)
-            const bg = new Graphics()
+            const bg = new PIXI.Graphics()
                 .rect(0, 0, TILE_SIZE, TILE_SIZE)
                 .fill(0x654321);
             bg.x = col * TILE_SIZE;
             bg.y = row * TILE_SIZE;
             mapContainer.addChild(bg);
-            
+
             // Draw ladder rungs
-            const ladder = new Graphics();
+            const ladder = new PIXI.Graphics();
             for (let i = 0; i < 4; i++) {
                 ladder.rect(5, 2 + i * 7, 20, 2).fill(0xD2B48C);
             }
@@ -93,7 +83,7 @@ for (let row = 0; row < map.length; row++) {
 }
 
 // Create hero
-const hero = new Graphics()
+const hero = new PIXI.Graphics()
     .rect(0, 0, 12, 12)
     .fill(0xff4444);
 hero.x = 60;
@@ -258,7 +248,7 @@ function updatePlayer() {
 
 // Game loop
 app.ticker.add(updatePlayer);
-</script>
+{{< /pixidemo >}}
 
 ## Understanding Ladder Types: Design Choices Matter!
 

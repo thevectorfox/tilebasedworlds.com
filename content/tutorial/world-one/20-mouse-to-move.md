@@ -10,20 +10,10 @@ prev = "/tutorial/world-one/19-depth/"
 
 Put down the keyboard and click anywhere on the map. The hero walks there. Click-to-move is the movement style behind countless RPGs, strategy games, and point-and-click adventures. Let's build it!
 
-<div id="mouseDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="mouseCanvas" width="300" height="240" style="border: 2px solid #333; background: #5a8a3a; cursor: crosshair;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Click anywhere on the green area<br>
-        <strong>Notice:</strong> The hero walks to the tile you clicked, one step at a time
-    </div>
-</div>
-
-<script type="module">
-import { Application, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('mouseCanvas');
-const app = new Application();
-await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x5a8a3a });
+{{< pixidemo title="Mouse to Move" >}}
+const app = new PIXI.Application();
+await app.init({ width: 300, height: 240, backgroundColor: 0x5a8a3a });
+document.body.appendChild(app.canvas);
 
 const TILE_SIZE = 30;
 const CENTER = (TILE_SIZE - 12) / 2; // 9px offset to center a 12px hero in a 30px tile
@@ -43,7 +33,7 @@ const map = [
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const wall = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            const wall = new PIXI.Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
             wall.x = col * TILE_SIZE;
             wall.y = row * TILE_SIZE;
             app.stage.addChild(wall);
@@ -51,7 +41,7 @@ for (let row = 0; row < map.length; row++) {
     }
 }
 
-const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+const heroSprite = new PIXI.Graphics().rect(0, 0, 12, 12).fill(0xff4444);
 app.stage.addChild(heroSprite);
 
 const player = {
@@ -69,14 +59,14 @@ heroSprite.x = player.x;
 heroSprite.y = player.y;
 
 // Tile hover cursor - yellow highlight
-const cursor = new Graphics()
+const cursor = new PIXI.Graphics()
     .rect(1, 1, TILE_SIZE - 2, TILE_SIZE - 2)
     .fill({ color: 0xffff00, alpha: 0.35 });
 cursor.visible = false;
 app.stage.addChild(cursor);
 
 // Target marker - small crosshair at destination
-const targetMarker = new Graphics();
+const targetMarker = new PIXI.Graphics();
 targetMarker.visible = false;
 app.stage.addChild(targetMarker);
 
@@ -88,8 +78,8 @@ function isWalkable(col, row) {
 let mouseCol = -1;
 let mouseRow = -1;
 
-canvas.addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect();
+app.canvas.addEventListener('mousemove', (e) => {
+    const rect = app.canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
     mouseCol = Math.floor(mx / TILE_SIZE);
@@ -104,13 +94,13 @@ canvas.addEventListener('mousemove', (e) => {
     }
 });
 
-canvas.addEventListener('mouseleave', () => {
+app.canvas.addEventListener('mouseleave', () => {
     cursor.visible = false;
     mouseCol = -1;
     mouseRow = -1;
 });
 
-canvas.addEventListener('click', () => {
+app.canvas.addEventListener('click', () => {
     if (!isWalkable(mouseCol, mouseRow)) return;
 
     player.targetTileX = mouseCol;
@@ -174,7 +164,7 @@ function gameLoop() {
 }
 
 app.ticker.add(gameLoop);
-</script>
+{{< /pixidemo >}}
 
 Notice the hero steps from tile center to tile center - no stopping halfway. That's the key characteristic of tile-based movement: the hero is always perfectly aligned to the grid.
 
@@ -212,7 +202,7 @@ canvas.addEventListener('mousemove', (e) => {
 Add a highlight rectangle to show which tile is hovered. Put it on `app.stage` last so it renders on top of everything:
 
 ```js
-const cursor = new Graphics()
+const cursor = new PIXI.Graphics()
     .rect(1, 1, TILE_SIZE - 2, TILE_SIZE - 2)
     .fill({ color: 0xffff00, alpha: 0.35 });
 app.stage.addChild(cursor); // added last = renders on top

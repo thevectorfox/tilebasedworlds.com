@@ -10,26 +10,16 @@ prev = "/tutorial/world-one/11-ladders/"
 
 Time to add some DANGER to your world! 👾 A game without enemies is like a movie without conflict - technically possible, but nowhere near as exciting! You're about to breathe life into your levels with patrolling enemies that turn peaceful exploration into heart-pounding challenge. Even "stupid" enemies can create incredible tension and satisfaction!
 
-<div id="enemyDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="enemyCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys to move, avoid the purple and turquoise enemies!<br>
-        <strong>Try this:</strong> Watch how enemies patrol back and forth - simple but effective!
-    </div>
-</div>
-
-<script type="module">
-import { Application, Sprite, Container, Graphics, Ticker } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('enemyCanvas');
-const app = new Application();
+{{< pixidemo title="Stupid Enemy" >}}
+const app = new PIXI.Application();
 
 await app.init({
-    canvas: canvas,
     width: 300,
     height: 240,
     backgroundColor: 0x87CEEB
 });
+
+document.body.appendChild(app.canvas);
 
 // Game constants
 const TILE_SIZE = 30;
@@ -70,13 +60,13 @@ const enemySpawns = [
 ];
 
 // Create map display
-const mapContainer = new Container();
+const mapContainer = new PIXI.Container();
 app.stage.addChild(mapContainer);
 
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const tile = new Graphics()
+            const tile = new PIXI.Graphics()
                 .rect(0, 0, TILE_SIZE, TILE_SIZE)
                 .fill(0x8B4513);
             tile.x = col * TILE_SIZE;
@@ -87,7 +77,7 @@ for (let row = 0; row < map.length; row++) {
 }
 
 // Create hero
-const hero = new Graphics()
+const hero = new PIXI.Graphics()
     .rect(0, 0, 12, 12)
     .fill(0xff4444);
 hero.x = 60;
@@ -112,7 +102,7 @@ const enemies = [];
 function createEnemies() {
     enemySpawns.forEach((spawn, index) => {
         const type = enemyTypes[spawn.type];
-        const enemySprite = new Graphics()
+        const enemySprite = new PIXI.Graphics()
             .rect(0, 0, 10, 10)
             .fill(type.color);
         
@@ -246,7 +236,7 @@ function gameLoop() {
 // Initialize and start
 createEnemies();
 app.ticker.add(gameLoop);
-</script>
+{{< /pixidemo >}}
 
 ## Why "Stupid" Enemies Are Actually Genius! 🧠
 

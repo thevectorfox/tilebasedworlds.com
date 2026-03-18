@@ -10,22 +10,10 @@ prev = "/tutorial/world-one/09-jumping/"
 
 Time to add one of the most satisfying platform mechanics in gaming - **cloud platforms**! These one-way surfaces let you jump up through them and move through them from the sides, but when you're falling down, you land on top. Think Mario's cloud platforms or Mega Man's jump-through floors - they make platforming feel incredibly smooth and natural!
 
-<div id="cloudDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="cloudCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys to move, Spacebar to jump<br>
-        <strong>Try this:</strong> Jump up through the blue cloud platforms, then fall back down onto them!
-    </div>
-</div>
-
-<script type="module">
-import { Application, Sprite, Container, Graphics, Ticker } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('cloudCanvas');
-const app = new Application();
+{{< pixidemo title="Clouds" >}}
+const app = new PIXI.Application();
 
 await app.init({
-    canvas: canvas,
     width: 300,
     height: 240,
     backgroundColor: 0x87CEEB
@@ -53,21 +41,23 @@ const map = [
     [1,1,1,1,1,1,1,1,1,1]
 ];
 
+document.body.appendChild(app.canvas);
+
 // Create map display
-const mapContainer = new Container();
+const mapContainer = new PIXI.Container();
 app.stage.addChild(mapContainer);
 
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === SOLID) {
-            const tile = new Graphics()
+            const tile = new PIXI.Graphics()
                 .rect(0, 0, TILE_SIZE, TILE_SIZE)
                 .fill(0x8B4513);
             tile.x = col * TILE_SIZE;
             tile.y = row * TILE_SIZE;
             mapContainer.addChild(tile);
         } else if (map[row][col] === CLOUD) {
-            const cloud = new Graphics()
+            const cloud = new PIXI.Graphics()
                 .rect(0, 0, TILE_SIZE, TILE_SIZE)
                 .fill(0x87CEEB)
                 .stroke({width: 2, color: 0x4169E1});
@@ -79,7 +69,7 @@ for (let row = 0; row < map.length; row++) {
 }
 
 // Create hero
-const hero = new Graphics()
+const hero = new PIXI.Graphics()
     .rect(0, 0, 12, 12)
     .fill(0xff4444);
 hero.x = 60;
@@ -214,7 +204,8 @@ function updatePlayer() {
 
 // Game loop
 app.ticker.add(updatePlayer);
-</script>
+
+{{< /pixidemo >}}
 
 ## Understanding Cloud Platforms: The Magic of One-Way Surfaces
 

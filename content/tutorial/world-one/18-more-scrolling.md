@@ -10,20 +10,10 @@ prev = "/tutorial/world-one/17-scrolling/"
 
 The camera from the previous tutorial has one flaw: walk to the edge of the map and the camera keeps going, revealing the empty void beyond. Every great platformer stops scrolling at the map boundary so the world feels solid and complete. Let's fix it!
 
-<div id="clampDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="clampCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys + Space to jump<br>
-        <strong>Notice:</strong> Camera stops at the world's edges! 🗺️
-    </div>
-</div>
-
-<script type="module">
-import { Application, Graphics, Container } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('clampCanvas');
-const app = new Application();
-await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x87CEEB });
+{{< pixidemo title="More Scrolling" >}}
+const app = new PIXI.Application();
+await app.init({ width: 300, height: 240, backgroundColor: 0x87CEEB });
+document.body.appendChild(app.canvas);
 
 const TILE_SIZE = 30;
 const SCREEN_W = 300;
@@ -53,13 +43,13 @@ const MAP_ROWS = map.length;
 const MAP_W = MAP_COLS * TILE_SIZE; // 600px
 const MAP_H = MAP_ROWS * TILE_SIZE; // 420px
 
-const world = new Container();
+const world = new PIXI.Container();
 app.stage.addChild(world);
 
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const tile = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            const tile = new PIXI.Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
             tile.x = col * TILE_SIZE;
             tile.y = row * TILE_SIZE;
             world.addChild(tile);
@@ -67,7 +57,7 @@ for (let row = 0; row < map.length; row++) {
     }
 }
 
-const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+const heroSprite = new PIXI.Graphics().rect(0, 0, 12, 12).fill(0xff4444);
 world.addChild(heroSprite);
 
 const player = {
@@ -157,7 +147,7 @@ camX = 0;
 camY = Math.max(0, Math.min(player.y + player.height / 2 - SCREEN_H / 2, MAP_H - SCREEN_H));
 
 app.ticker.add(gameLoop);
-</script>
+{{< /pixidemo >}}
 
 Walk to a corner of the map - the camera stops cleanly at the edge and the hero keeps moving. That's the `clamp`. Two lines added to `updateCamera()` and the void disappears.
 

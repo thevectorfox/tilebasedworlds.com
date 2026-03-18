@@ -10,20 +10,10 @@ prev = "/tutorial/world-one/22-isometric-mouse/"
 
 A 5×5 isometric map is a proof of concept. A real game needs room to breathe. Combine the World Container from the scrolling tutorials with the isometric transform and you get a large diamond world that follows the player:
 
-<div id="isoScrollDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="isoScrollCanvas" width="300" height="240" style="border: 2px solid #333; background: #1a1a2e;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys or WASD<br>
-        <strong>Notice:</strong> The camera follows the player — explore the full 8×8 world
-    </div>
-</div>
-
-<script type="module">
-import { Application, Graphics, Container } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('isoScrollCanvas');
-const app = new Application();
-await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x1a1a2e });
+{{< pixidemo title="Isometric Scroll" >}}
+const app = new PIXI.Application();
+await app.init({ width: 300, height: 240, backgroundColor: 0x1a1a2e });
+document.body.appendChild(app.canvas);
 
 const TILE_SIZE = 30;
 const SCREEN_W = 300;
@@ -43,7 +33,7 @@ const map = [
 ];
 
 // World Container - no static OFFSET, the container position handles centering
-const world = new Container();
+const world = new PIXI.Container();
 world.sortableChildren = true;
 app.stage.addChild(world);
 
@@ -56,14 +46,14 @@ function isoToScreen(worldX, worldY) {
 }
 
 function makeGroundTile() {
-    return new Graphics()
+    return new PIXI.Graphics()
         .poly([30, 0, 60, 15, 30, 30, 0, 15])
         .fill(0x3d6b47);
 }
 
 function makeWallTile() {
     const WH = 20;
-    const g = new Graphics();
+    const g = new PIXI.Graphics();
     g.poly([30, -WH, 60, 15 - WH, 30, 30 - WH, 0, 15 - WH]).fill(0xA07840);
     g.poly([0, 15 - WH, 30, 30 - WH, 30, 30, 0, 15]).fill(0x5C4020);
     g.poly([30, 30 - WH, 60, 15 - WH, 60, 15, 30, 30]).fill(0x7A5528);
@@ -83,7 +73,7 @@ for (let row = 0; row < map.length; row++) {
     }
 }
 
-const heroSprite = new Graphics()
+const heroSprite = new PIXI.Graphics()
     .poly([8, 0, 16, 4, 8, 8, 0, 4])
     .fill(0xff4444);
 world.addChild(heroSprite);
@@ -150,7 +140,7 @@ function gameLoop() {
 }
 
 app.ticker.add(gameLoop);
-</script>
+{{< /pixidemo >}}
 
 Notice the diamond shape visible against the dark background at the edges. That's the one catch with isometric scroll — the viewport is rectangular but the world is diamond-shaped.
 
@@ -179,7 +169,7 @@ function isoToScreen(worldX, worldY) {
 Build the whole isometric world inside a `Container`. Every tile and the player sprite use the offset-free `isoToScreen()`. The container shifts the entire scene each frame:
 
 ```js
-const world = new Container();
+const world = new PIXI.Container();
 world.sortableChildren = true;
 app.stage.addChild(world);
 ```
@@ -242,7 +232,7 @@ Three approaches, in order of complexity:
 **Option 3 — Clip with a PixiJS mask.** Create a rectangle Graphics object and assign it as `world.mask`. PixiJS only renders what's inside the mask — the diamond corners vanish cleanly:
 
 ```js
-const viewMask = new Graphics()
+const viewMask = new PIXI.Graphics()
     .rect(0, 0, SCREEN_W, SCREEN_H)
     .fill(0xffffff);
 app.stage.addChild(viewMask);
@@ -256,7 +246,7 @@ The mask moves with the canvas (not the world container), so it stays fixed at t
 `sortableChildren` belongs on the container, not the stage. All depth relationships between tiles and the player stay correct as the camera scrolls:
 
 ```js
-const world = new Container();
+const world = new PIXI.Container();
 world.sortableChildren = true;  // ← on the container
 
 // Tiles - set once when building the map

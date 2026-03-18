@@ -10,20 +10,10 @@ prev = "/tutorial/world-one/21-isometric-view/"
 
 You know how to move in isometric. You know how to click-to-move. Now combine them. The tricky part isn't the movement — it's figuring out which diamond tile the mouse is actually over:
 
-<div id="isoMouseDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="isoMouseCanvas" width="300" height="240" style="border: 2px solid #333; background: #1a1a2e; cursor: crosshair;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Click any green tile<br>
-        <strong>Notice:</strong> The diamond highlight follows the mouse exactly
-    </div>
-</div>
-
-<script type="module">
-import { Application, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('isoMouseCanvas');
-const app = new Application();
-await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x1a1a2e });
+{{< pixidemo title="Isometric Mouse" >}}
+const app = new PIXI.Application();
+await app.init({ width: 300, height: 240, backgroundColor: 0x1a1a2e });
+document.body.appendChild(app.canvas);
 
 const TILE_SIZE = 30;
 const OFFSET_X = 150;
@@ -57,14 +47,14 @@ function screenToWorld(mx, my) {
 }
 
 function makeGroundTile() {
-    return new Graphics()
+    return new PIXI.Graphics()
         .poly([30, 0, 60, 15, 30, 30, 0, 15])
         .fill(0x3d6b47);
 }
 
 function makeWallTile() {
     const WH = 20;
-    const g = new Graphics();
+    const g = new PIXI.Graphics();
     g.poly([30, -WH, 60, 15-WH, 30, 30-WH, 0, 15-WH]).fill(0xA07840);
     g.poly([0, 15-WH, 30, 30-WH, 30, 30, 0, 15]).fill(0x5C4020);
     g.poly([30, 30-WH, 60, 15-WH, 60, 15, 30, 30]).fill(0x7A5528);
@@ -85,7 +75,7 @@ for (let row = 0; row < map.length; row++) {
 }
 
 // Diamond-shaped cursor highlight
-const cursor = new Graphics()
+const cursor = new PIXI.Graphics()
     .poly([30, 0, 60, 15, 30, 30, 0, 15])
     .fill({ color: 0xffff00, alpha: 0.4 });
 cursor.visible = false;
@@ -93,12 +83,12 @@ cursor.zIndex = 9999;
 app.stage.addChild(cursor);
 
 // Target crosshair marker
-const targetMarker = new Graphics();
+const targetMarker = new PIXI.Graphics();
 targetMarker.visible = false;
 targetMarker.zIndex = 9999;
 app.stage.addChild(targetMarker);
 
-const heroSprite = new Graphics()
+const heroSprite = new PIXI.Graphics()
     .poly([8, 0, 16, 4, 8, 8, 0, 4])
     .fill(0xff4444);
 app.stage.addChild(heroSprite);
@@ -127,8 +117,8 @@ function isWalkable(col, row) {
 
 let mouseCol = -1, mouseRow = -1;
 
-canvas.addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect();
+app.canvas.addEventListener('mousemove', (e) => {
+    const rect = app.canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
 
@@ -147,13 +137,13 @@ canvas.addEventListener('mousemove', (e) => {
     }
 });
 
-canvas.addEventListener('mouseleave', () => {
+app.canvas.addEventListener('mouseleave', () => {
     cursor.visible = false;
     mouseCol = -1;
     mouseRow = -1;
 });
 
-canvas.addEventListener('click', () => {
+app.canvas.addEventListener('click', () => {
     if (!isWalkable(mouseCol, mouseRow)) return;
 
     player.targetTileX = mouseCol;
@@ -213,7 +203,7 @@ function movePlayer() {
 }
 
 app.ticker.add(movePlayer);
-</script>
+{{< /pixidemo >}}
 
 ## THE CHALLENGE 🤔
 
@@ -293,7 +283,7 @@ A rectangular highlight rectangle looks wrong on diamond tiles. Draw the cursor 
 
 ```js
 // Matches makeGroundTile() exactly - same polygon, just semi-transparent
-const cursor = new Graphics()
+const cursor = new PIXI.Graphics()
     .poly([30, 0, 60, 15, 30, 30, 0, 15])
     .fill({ color: 0xffff00, alpha: 0.4 });
 cursor.zIndex = 9999; // always on top

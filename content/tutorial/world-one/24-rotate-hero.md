@@ -23,26 +23,15 @@ In this tutorial, you'll learn how to rotate your hero and move in any direction
 
 Let's start by setting up our rotatable hero. For top-down rotation games, you only need one sprite frame - typically facing right (0 degrees rotation). This becomes your "default" direction, and we'll rotate from there.
 
-<div id="rotateDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="rotateCanvas" width="300" height="240" style="border: 2px solid #333; background: #2c3e50; display: block; margin: 0 auto;"></canvas>
-    <div style="margin-top: 10px; font-family: monospace;">
-        <strong>Controls:</strong> ← → Rotate, ↑ ↓ Move Forward/Back
-    </div>
-    <div id="rotateStatus" style="margin-top: 5px; font-size: 12px; color: #666; min-height: 16px;"></div>
-</div>
-
-<script type="module">
-import { Application, Container, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('rotateCanvas');
-const app = new Application();
+{{< pixidemo title="Rotate Hero" >}}
+const app = new PIXI.Application();
 
 await app.init({
-    canvas: canvas,
     width: 300,
     height: 240,
     backgroundColor: 0x2c3e50
 });
+document.body.appendChild(app.canvas);
 
 // Game constants
 const TILE_SIZE = 30;
@@ -61,13 +50,13 @@ const map = [
 ];
 
 // Create map display
-const mapContainer = new Container();
+const mapContainer = new PIXI.Container();
 app.stage.addChild(mapContainer);
 
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const tile = new Graphics()
+            const tile = new PIXI.Graphics()
                 .rect(0, 0, TILE_SIZE, TILE_SIZE)
                 .fill(0x34495e);
             tile.x = col * TILE_SIZE;
@@ -78,18 +67,9 @@ for (let row = 0; row < map.length; row++) {
 }
 
 // Create hero - arrow shape pointing right
-const hero = new Graphics();
-hero.beginFill(0xff4444);
-// Draw a simple arrow pointing right (starting direction)
-hero.moveTo(0, 4);
-hero.lineTo(8, 4);
-hero.lineTo(8, 0);
-hero.lineTo(12, 6);
-hero.lineTo(8, 12);
-hero.lineTo(8, 8);
-hero.lineTo(0, 8);
-hero.closePath();
-hero.endFill();
+const hero = new PIXI.Graphics()
+    .poly([0,4, 8,4, 8,0, 12,6, 8,12, 8,8, 0,8])
+    .fill(0xff4444);
 
 // Set pivot point to center for smooth rotation
 hero.pivot.set(6, 6);
@@ -143,15 +123,14 @@ function checkPlayerCollision(newX, newY) {
 }
 
 // Status display for educational purposes
-const statusElement = document.getElementById('rotateStatus');
 function updateStatus() {
     const degrees = (player.rotation * 180 / Math.PI).toFixed(0);
     const normalizedDegrees = ((degrees % 360) + 360) % 360;
     const vX = player.velocityX.toFixed(1);
     const vY = player.velocityY.toFixed(1);
     const speed = Math.sqrt(vX * vX + vY * vY).toFixed(1);
-    
-    statusElement.textContent = `Angle: ${normalizedDegrees}° | Velocity: (${vX}, ${vY}) | Speed: ${speed}`;
+
+    window.parent.postMessage({ type: 'status', text: `Angle: ${normalizedDegrees}° | Velocity: (${vX}, ${vY}) | Speed: ${speed}` }, '*');
 }
 
 function updatePlayer() {
@@ -208,7 +187,7 @@ function updatePlayer() {
 
 // Game loop
 app.ticker.add(updatePlayer);
-</script>
+{{< /pixidemo >}}
 
 ## The Magic of Vectors and Angles
 

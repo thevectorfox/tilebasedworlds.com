@@ -10,10 +10,9 @@ prev = "/tutorial/world-one/04-rendering-a-map/"
 
 Time to create your HERO! 🦸 Every legendary game needs a protagonist - someone the player connects with, controls, and cheers for. Whether it's Mario jumping through pipes, Link exploring Hyrule, or Celeste climbing mountains, the hero makes the game come alive. You're about to bring your first character into your tile-based world!
 
-<div id="hero-demo" style="border: 2px solid #00ff41; border-radius: 8px; margin: 20px 0; background: #000;"></div>
 
-<script>
-window.addEventListener('load', async function() {
+{{< pixidemo title="The Hero" >}}
+
     // Create PixiJS application for hero demo
     const app = new PIXI.Application();
     await app.init({
@@ -22,8 +21,8 @@ window.addEventListener('load', async function() {
         backgroundColor: 0x2c3e50,
         antialias: true
     });
-    
-    document.getElementById('hero-demo').appendChild(app.canvas);
+
+    document.body.appendChild(app.canvas);
     
     // Our trusty map
     const myMap = [
@@ -89,8 +88,7 @@ window.addEventListener('load', async function() {
             pulseDirection *= -1;
         }
     });
-});
-</script>
+{{< /pixidemo >}}
 
 Look at that! Your hero (the red square) is standing proudly in your game world! 🔥
 

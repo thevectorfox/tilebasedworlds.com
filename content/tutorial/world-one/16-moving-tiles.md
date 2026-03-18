@@ -10,20 +10,10 @@ prev = "/tutorial/world-one/15-getting-items/"
 
 Moving platforms! 🏃‍♂️ They're in every great platformer - the swinging platforms in Donkey Kong Country, the cloud lifts in Mario, the crumbling bridges in Crash Bandicoot. They transform a flat level into a dynamic puzzle that rewards timing and skill. Let's build them!
 
-<div id="movingTilesDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="movingCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys to move, Space to jump<br>
-        <strong>Challenge:</strong> Ride the platforms to reach every level! 🟩
-    </div>
-</div>
-
-<script type="module">
-import { Application, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('movingCanvas');
-const app = new Application();
-await app.init({ canvas, width: 300, height: 240, backgroundColor: 0x87CEEB });
+{{< pixidemo title="Moving Tiles" >}}
+const app = new PIXI.Application();
+await app.init({ width: 300, height: 240, backgroundColor: 0x87CEEB });
+document.body.appendChild(app.canvas);
 
 const TILE_SIZE = 30;
 const GRAVITY = 0.6;
@@ -42,7 +32,7 @@ const map = [
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const tile = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
+            const tile = new PIXI.Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0x8B4513);
             tile.x = col * TILE_SIZE;
             tile.y = row * TILE_SIZE;
             app.stage.addChild(tile);
@@ -68,7 +58,7 @@ const movingTiles = [];
 function buildMovingTiles() {
     for (const [type, startTileX, startTileY] of myMovingTiles[game.currentRoom]) {
         const def = MOVING_TILE_TYPES[type];
-        const sprite = new Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE / 2).fill(def.color);
+        const sprite = new PIXI.Graphics().rect(0, 0, TILE_SIZE, TILE_SIZE / 2).fill(def.color);
 
         const tile = {
             sprite,
@@ -92,7 +82,7 @@ function buildMovingTiles() {
     }
 }
 
-const heroSprite = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+const heroSprite = new PIXI.Graphics().rect(0, 0, 12, 12).fill(0xff4444);
 app.stage.addChild(heroSprite);
 
 const player = {
@@ -276,7 +266,7 @@ function gameLoop() {
 
 buildMovingTiles();
 app.ticker.add(gameLoop);
-</script>
+{{< /pixidemo >}}
 
 Before we start coding, let's agree on the rules. Moving platforms in this tutorial work like cloud tiles - the hero can only land on them from above. Here's what we need to handle:
 
@@ -336,7 +326,7 @@ function buildMovingTiles() {
     for (const [type, startTileX, startTileY] of myMovingTiles[game.currentRoom]) {
         const def = MOVING_TILE_TYPES[type];
 
-        const sprite = new Graphics()
+        const sprite = new PIXI.Graphics()
             .rect(0, 0, game.tileSize, game.tileSize / 2)
             .fill(def.color);
 

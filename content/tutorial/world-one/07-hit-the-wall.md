@@ -10,10 +10,7 @@ prev = "/tutorial/world-one/06-keys-to-move/"
 
 Time to make your game world SOLID! 💥 Collision detection is what separates real games from slideshows - it's the magic that makes walls feel solid, platforms feel sturdy, and your hero feel like they truly exist in the world. You're about to master one of the most crucial skills in game development!
 
-<div id="collision-demo" style="border: 2px solid #00ff41; border-radius: 8px; margin: 20px 0; background: #000;"></div>
-
-<script>
-window.addEventListener('load', async function() {
+{{< pixidemo title="Hit the Wall" >}}
     // Create PixiJS application for collision demo
     const app = new PIXI.Application();
     await app.init({
@@ -23,7 +20,7 @@ window.addEventListener('load', async function() {
         antialias: true
     });
     
-    document.getElementById('collision-demo').appendChild(app.canvas);
+    document.body.appendChild(app.canvas);
     
     // Game world with walls
     const gameMap = [
@@ -149,8 +146,7 @@ window.addEventListener('load', async function() {
     }
     
     app.ticker.add(updateMovement);
-});
-</script>
+{{< /pixidemo >}}
 
 **Try it!** Use arrow keys to move around. Notice how the hero can't pass through walls and turns slightly red when hitting them! 🚧
 

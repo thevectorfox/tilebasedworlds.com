@@ -25,27 +25,15 @@ Enter **Best-First Search** - the algorithm that adds intuition to pathfinding! 
 
 Time to give your pathfinding algorithm a brain upgrade that'll make it 5-10x faster! ⚡
 
-<div id="bestFirstDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="bestFirstCanvas" width="600" height="240" style="border: 2px solid #333; background: #f8f9fa; display: block; margin: 0 auto;"></canvas>
-    <div style="margin-top: 10px; font-family: monospace;">
-        <strong>🆚 Algorithm Showdown!</strong> Click to compare Breadth-First vs Best-First<br>
-        🔵 Breadth-First (Thorough) • 🔴 Best-First (Smart & Fast)
-    </div>
-    <div id="bestFirstStatus" style="margin-top: 5px; font-size: 12px; color: #666; min-height: 16px;"></div>
-</div>
-
-<script type="module">
-import { Application, Container, Graphics, Text } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('bestFirstCanvas');
-const app = new Application();
+{{< pixidemo title="Pathfinding Best-First" >}}
+const app = new PIXI.Application();
 
 await app.init({
-    canvas: canvas,
     width: 600,
     height: 240,
     backgroundColor: 0xf8f9fa
 });
+document.body.appendChild(app.canvas);
 
 // Game constants
 const TILE_SIZE = 16;
@@ -77,12 +65,12 @@ const leftDemo = createDemoArea(0, "Breadth-First");
 const rightDemo = createDemoArea(DEMO_WIDTH, "Best-First");
 
 function createDemoArea(offsetX, title) {
-    const container = new Container();
+    const container = new PIXI.Container();
     container.x = offsetX;
     app.stage.addChild(container);
     
     // Title
-    const titleText = new Text({
+    const titleText = new PIXI.Text({
         text: title,
         style: {
             fontSize: 14,
@@ -99,7 +87,7 @@ function createDemoArea(offsetX, title) {
     for (let row = 0; row < ROWS; row++) {
         tiles[row] = [];
         for (let col = 0; col < COLS; col++) {
-            const tile = new Graphics();
+            const tile = new PIXI.Graphics();
             
             if (map[row][col] === 1) {
                 // Wall tile
@@ -167,9 +155,8 @@ function getNeighbors(node, targetX, targetY, isBestFirst = false) {
 let animationRunning = false;
 
 // Status display
-const statusElement = document.getElementById('bestFirstStatus');
 function updateStatus(message) {
-    statusElement.textContent = message;
+    window.parent.postMessage({ type: 'status', text: message }, '*');
 }
 
 // Breadth-First Search (from previous tutorial)
@@ -356,7 +343,7 @@ app.stage.on('pointerdown', (event) => {
 
 // Initialize
 updateStatus('🎯 Click anywhere on the maze to start the pathfinding race!');
-</script>
+{{< /pixidemo >}}
 
 
 ## The Speed Revolution: Why Best-First Wins

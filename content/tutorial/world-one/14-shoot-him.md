@@ -10,26 +10,16 @@ prev = "/tutorial/world-one/13-enemy-on-platform/"
 
 Time to fight back! 🔫 There's nothing quite like the satisfaction of blasting enemies that have been chasing you around! Whether you're firing arrows like Link, blasting with a mega buster like Mega Man, or launching fireballs like Mario - giving players offensive weapons transforms passive avoidance into active, strategic combat!
 
-<div id="shootingDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="shootingCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys to move, Shift to shoot<br>
-        <strong>Mission:</strong> Destroy all the enemies! Watch them explode! 💥
-    </div>
-</div>
-
-<script type="module">
-import { Application, Sprite, Container, Graphics, Ticker } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas = document.getElementById('shootingCanvas');
-const app = new Application();
+{{< pixidemo title="Shoot Him" >}}
+const app = new PIXI.Application();
 
 await app.init({
-    canvas: canvas,
     width: 300,
     height: 240,
     backgroundColor: 0x87CEEB
 });
+
+document.body.appendChild(app.canvas);
 
 // Game constants
 const TILE_SIZE = 30;
@@ -47,13 +37,13 @@ const map = [
 ];
 
 // Create map display
-const mapContainer = new Container();
+const mapContainer = new PIXI.Container();
 app.stage.addChild(mapContainer);
 
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const tile = new Graphics()
+            const tile = new PIXI.Graphics()
                 .rect(0, 0, TILE_SIZE, TILE_SIZE)
                 .fill(0x8B4513);
             tile.x = col * TILE_SIZE;
@@ -64,7 +54,7 @@ for (let row = 0; row < map.length; row++) {
 }
 
 // Create hero
-const hero = new Graphics()
+const hero = new PIXI.Graphics()
     .rect(0, 0, 12, 12)
     .fill(0xff4444);
 hero.x = 60;
@@ -97,7 +87,7 @@ function createBullet(x, y, dirX, dirY) {
         bullet.active = true;
     } else {
         bullet = {
-            sprite: new Graphics().rect(0, 0, 4, 4).fill(0xFFFF00),
+            sprite: new PIXI.Graphics().rect(0, 0, 4, 4).fill(0xFFFF00),
             active: true,
             width: 4,
             height: 4
@@ -139,7 +129,7 @@ function spawnEnemies() {
     ];
     
     spawns.forEach((spawn, index) => {
-        const enemySprite = new Graphics()
+        const enemySprite = new PIXI.Graphics()
             .rect(0, 0, 10, 10)
             .fill(0x8A2BE2)
             .stroke({width: 1, color: 0x000000});
@@ -192,7 +182,7 @@ function distance(obj1, obj2) {
 // Particle effects for explosions
 function createExplosion(x, y) {
     for (let i = 0; i < 6; i++) {
-        const particle = new Graphics()
+        const particle = new PIXI.Graphics()
             .rect(0, 0, 3, 3)
             .fill(0xFF4500);
         
@@ -353,7 +343,7 @@ function gameLoop() {
 // Initialize
 spawnEnemies();
 app.ticker.add(gameLoop);
-</script>
+{{< /pixidemo >}}
 
 
 ## Bullet System Architecture: Modern Projectile Design 🚀
@@ -778,23 +768,10 @@ function tryShoot() {
 
 ## Side-Scrolling Shooting: Complete Platform Combat! 🏃‍♂️
 
-<div id="platformShootingDemo" style="text-align: center; margin: 20px 0;">
-    <canvas id="platformCanvas" width="300" height="240" style="border: 2px solid #333; background: #87CEEB;"></canvas>
-    <div style="margin-top: 10px;">
-        <strong>Controls:</strong> Arrow Keys + Spacebar to jump, Shift to shoot<br>
-        <strong>Try:</strong> Jump and shoot in mid-air! Full platform combat!
-    </div>
-</div>
-
-<script type="module">
-// Platform shooter demo
-import { Application, Graphics } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
-const canvas2 = document.getElementById('platformCanvas');
-const app2 = new Application();
+{{< pixidemo title="Platform Shooting" >}}
+const app2 = new PIXI.Application();
 
 await app2.init({
-    canvas: canvas2,
     width: 300,
     height: 240,
     backgroundColor: 0x87CEEB
@@ -816,7 +793,7 @@ const platformMap = [
 for (let row = 0; row < platformMap.length; row++) {
     for (let col = 0; col < platformMap[row].length; col++) {
         if (platformMap[row][col] === 1) {
-            const tile = new Graphics()
+            const tile = new PIXI.Graphics()
                 .rect(0, 0, 30, 30)
                 .fill(0x8B4513);
             tile.x = col * 30;
@@ -827,7 +804,7 @@ for (let row = 0; row < platformMap.length; row++) {
 }
 
 // Platform hero with jumping and shooting
-const platformHero = new Graphics().rect(0, 0, 12, 12).fill(0xff4444);
+const platformHero = new PIXI.Graphics().rect(0, 0, 12, 12).fill(0xff4444);
 platformHero.x = 60;
 platformHero.y = 180;
 app2.stage.addChild(platformHero);
@@ -848,7 +825,7 @@ const platformEnemies = [];
 
 // Spawn platform enemies
 for (let i = 0; i < 3; i++) {
-    const enemy = new Graphics().rect(0, 0, 10, 10).fill(0x8A2BE2);
+    const enemy = new PIXI.Graphics().rect(0, 0, 10, 10).fill(0x8A2BE2);
     enemy.x = 150 + i * 60;
     enemy.y = 60 + i * 40;
     app2.stage.addChild(enemy);
@@ -893,7 +870,7 @@ function updatePlatformGame() {
     
     // Shooting
     if (platformKeys['ShiftLeft'] && Date.now() - platformPlayer.lastShot > platformPlayer.shootCooldown) {
-        const bullet = new Graphics().rect(0, 0, 4, 4).fill(0xFFFF00);
+        const bullet = new PIXI.Graphics().rect(0, 0, 4, 4).fill(0xFFFF00);
         bullet.x = platformPlayer.x + platformPlayer.width/2;
         bullet.y = platformPlayer.y + platformPlayer.height/2;
         app2.stage.addChild(bullet);
@@ -967,7 +944,8 @@ function updatePlatformGame() {
 }
 
 app2.ticker.add(updatePlatformGame);
-</script>
+document.body.appendChild(app2.canvas);
+{{< /pixidemo >}}
 
 **🎉 Congratulations!** You've just implemented a complete combat system! Your game now has:
 - ✅ **Responsive shooting** with visual feedback

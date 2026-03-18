@@ -11,7 +11,6 @@ prev = "/tutorial/world-one/07-hit-the-wall/"
 Ready to build your first WORLD? 🗺️ One room was just the beginning - now you're about to create interconnected spaces like the dungeons in Zelda, the sprawling stations in Metroid, or the mysterious houses in classic RPGs. You're about to become a world builder! ✨
 
 {{< pixidemo title="Multi-Room World Explorer" >}}
-(async function() {
     // Create PixiJS application for room transition demo
     const app = new PIXI.Application();
     await app.init({
@@ -213,7 +212,6 @@ Ready to build your first WORLD? 🗺️ One room was just the beginning - now y
     
     // Start in room 1
     buildRoom(1);
-})();
 {{< /pixidemo >}}
 
 **Try it!** Move around with arrow keys and walk into the yellow doors to explore different rooms! 🚪✨
