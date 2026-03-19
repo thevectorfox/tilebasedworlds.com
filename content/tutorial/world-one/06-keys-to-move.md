@@ -3,9 +3,10 @@ title = "Keys to Move"
 date = 2026-03-09T02:00:00+11:00
 weight = 6
 draft = false
+slug = "keys-to-move"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/world-one/07-hit-the-wall/"
-prev = "/tutorial/world-one/05-the-hero/"
+next = "/tutorial/world-one/hit-the-wall/"
+prev = "/tutorial/world-one/the-hero/"
 +++
 
 

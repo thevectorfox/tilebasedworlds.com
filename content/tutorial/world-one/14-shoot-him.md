@@ -3,9 +3,10 @@ title = "Shoot Him"
 date = 2026-03-09T10:00:00+11:00
 weight = 14
 draft = false
+slug = "shoot-him"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/world-one/15-getting-items/"
-prev = "/tutorial/world-one/13-enemy-on-platform/"
+next = "/tutorial/world-one/getting-items/"
+prev = "/tutorial/world-one/enemy-on-platform/"
 +++
 
 Time to fight back! 🔫 There's nothing quite like the satisfaction of blasting enemies that have been chasing you around! Whether you're firing arrows like Link, blasting with a mega buster like Mega Man, or launching fireballs like Mario - giving players offensive weapons transforms passive avoidance into active, strategic combat!

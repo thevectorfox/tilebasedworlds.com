@@ -3,9 +3,10 @@ title = "Isometric Scroll"
 date = 2026-03-09T19:00:00+11:00
 weight = 23
 draft = false
+slug = "isometric-scroll"
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/world-one/24-rotate-hero/"
-prev = "/tutorial/world-one/22-isometric-mouse/"
+next = "/tutorial/world-one/rotate-hero/"
+prev = "/tutorial/world-one/isometric-mouse/"
 +++
 
 A 5×5 isometric map is a proof of concept. A real game needs room to breathe. Combine the World Container from the scrolling tutorials with the isometric transform and you get a large diamond world that follows the player:

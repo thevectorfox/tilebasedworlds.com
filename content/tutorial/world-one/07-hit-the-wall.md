@@ -3,9 +3,10 @@ title = "Hit the Wall"
 date = 2026-03-09T03:00:00+11:00
 weight = 7
 draft = false
+slug = "hit-the-wall"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/world-one/08-open-the-door/"
-prev = "/tutorial/world-one/06-keys-to-move/"
+next = "/tutorial/world-one/open-the-door/"
+prev = "/tutorial/world-one/keys-to-move/"
 +++
 
 Time to make your game world SOLID! 💥 Collision detection is what separates real games from slideshows - it's the magic that makes walls feel solid, platforms feel sturdy, and your hero feel like they truly exist in the world. You're about to master one of the most crucial skills in game development!

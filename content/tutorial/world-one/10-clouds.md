@@ -3,9 +3,10 @@ title = "Clouds"
 date = 2026-03-09T06:00:00+11:00
 weight = 10
 draft = false
+slug = "clouds"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/world-one/11-ladders/"
-prev = "/tutorial/world-one/09-jumping/"
+next = "/tutorial/world-one/ladders/"
+prev = "/tutorial/world-one/jumping/"
 +++
 
 Time to add one of the most satisfying platform mechanics in gaming - **cloud platforms**! These one-way surfaces let you jump up through them and move through them from the sides, but when you're falling down, you land on top. Think Mario's cloud platforms or Mega Man's jump-through floors - they make platforming feel incredibly smooth and natural!

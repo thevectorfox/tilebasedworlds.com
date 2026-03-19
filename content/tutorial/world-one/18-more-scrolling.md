@@ -3,9 +3,10 @@ title = "More Scrolling"
 date = 2026-03-09T14:00:00+11:00
 weight = 18
 draft = false
+slug = "more-scrolling"
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/world-one/19-depth/"
-prev = "/tutorial/world-one/17-scrolling/"
+next = "/tutorial/world-one/depth/"
+prev = "/tutorial/world-one/scrolling/"
 +++
 
 The camera from the previous tutorial has one flaw: walk to the edge of the map and the camera keeps going, revealing the empty void beyond. Every great platformer stops scrolling at the map boundary so the world feels solid and complete. Let's fix it!

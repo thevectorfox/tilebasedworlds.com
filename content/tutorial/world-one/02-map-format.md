@@ -3,9 +3,10 @@ title = "Map Format"
 date = 2026-03-08T22:00:00+11:00
 weight = 2
 draft = false
+slug = "map-format"
 tags = ["beginner", "tiles", "tutorial"]
-next = "/tutorial/world-one/03-more-maps/"
-prev = "/tutorial/world-one/01-why-tiles/"
+next = "/tutorial/world-one/more-maps/"
+prev = "/tutorial/world-one/why-tiles/"
 +++
 
 Let's build our first game world! Maps in tile-based games are stored as **2D arrays** - think of them as blueprints that tell your game exactly where to place walls, floors, enemies, and treasure. You're about to learn how to store entire game levels in just a few lines of code!

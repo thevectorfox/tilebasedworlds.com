@@ -3,9 +3,10 @@ title = "More Maps"
 date = 2026-03-08T23:00:00+11:00
 weight = 3
 draft = false
+slug = "more-maps"
 tags = ["beginner", "tiles", "tutorial"]
-next = "/tutorial/world-one/04-rendering-a-map/"
-prev = "/tutorial/world-one/02-map-format/"
+next = "/tutorial/world-one/rendering-a-map/"
+prev = "/tutorial/world-one/map-format/"
 +++
 
 Now that you know how 2D arrays work, let's explore your options! Different games need different map strategies - choosing the right one can save you hundreds of hours of development time and make your game run like butter. By the end of this chapter, you'll know exactly which approach fits your dream game!

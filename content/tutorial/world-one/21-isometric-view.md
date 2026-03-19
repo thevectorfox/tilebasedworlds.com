@@ -3,9 +3,10 @@ title = "Isometric View"
 date = 2026-03-09T17:00:00+11:00
 weight = 21
 draft = false
+slug = "isometric-view"
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/world-one/22-isometric-mouse/"
-prev = "/tutorial/world-one/20-mouse-to-move/"
+next = "/tutorial/world-one/isometric-mouse/"
+prev = "/tutorial/world-one/mouse-to-move/"
 +++
 
 Tilt your world 45 degrees and you get the iconic look behind Pokémon, Age of Empires, and Diablo. Isometric view makes a flat tile grid feel like a real 3D space. Best of all, it's just two lines of math on top of everything you've already built:

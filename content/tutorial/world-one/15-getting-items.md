@@ -3,9 +3,10 @@ title = "Getting Items"
 date = 2026-03-09T11:00:00+11:00
 weight = 15
 draft = false
+slug = "getting-items"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/world-one/16-moving-tiles/"
-prev = "/tutorial/world-one/14-shoot-him/"
+next = "/tutorial/world-one/moving-tiles/"
+prev = "/tutorial/world-one/shoot-him/"
 +++
 
 Time to get rewarded! 🌟 Collectibles are the heartbeat of so many classic games - coins in Mario, rupees in Zelda, rings in Sonic. That satisfying *ding* when your score ticks up? Pure dopamine. Let's build that item pickup system!

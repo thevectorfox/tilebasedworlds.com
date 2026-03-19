@@ -3,9 +3,10 @@ title = "Pathfinding Best-First"
 date = 2026-03-09T23:00:00+11:00
 weight = 27
 draft = false
+slug = "pathfinding-best-first"
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/world-one/28-slopes/"
-prev = "/tutorial/world-one/26-pathfinding-breadth-first/"
+next = "/tutorial/world-one/slopes/"
+prev = "/tutorial/world-one/pathfinding-breadth-first/"
 +++
 
 Ready to supercharge your AI? 🚀 While breadth-first search guarantees the shortest path, it can be painfully slow on large maps - exploring EVERYWHERE before finding the target. What if your AI could be smarter and **guess** which direction to search first?

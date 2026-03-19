@@ -3,9 +3,10 @@ title = "Open the Door"
 date = 2026-03-09T04:00:00+11:00
 weight = 8
 draft = false
+slug = "open-the-door"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/world-one/09-jumping/"
-prev = "/tutorial/world-one/07-hit-the-wall/"
+next = "/tutorial/world-one/jumping/"
+prev = "/tutorial/world-one/hit-the-wall/"
 +++
 
 Ready to build your first WORLD? 🗺️ One room was just the beginning - now you're about to create interconnected spaces like the dungeons in Zelda, the sprawling stations in Metroid, or the mysterious houses in classic RPGs. You're about to become a world builder! ✨

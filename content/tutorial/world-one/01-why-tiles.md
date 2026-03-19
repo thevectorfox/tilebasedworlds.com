@@ -3,8 +3,9 @@ title = "Why Tiles?"
 date = 2026-03-08T21:00:00+11:00
 weight = 1
 draft = false
+slug = "why-tiles"
 tags = ["beginner", "tiles", "tutorial"]
-next = "/tutorial/world-one/02-map-format/"
+next = "/tutorial/world-one/map-format/"
 prev = ""
 +++
 

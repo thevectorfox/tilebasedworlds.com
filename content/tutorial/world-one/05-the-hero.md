@@ -3,9 +3,10 @@ title = "The Hero"
 date = 2026-03-09T01:00:00+11:00
 weight = 5
 draft = false
+slug = "the-hero"
 tags = ["beginner", "tiles", "tutorial"]
-next = "/tutorial/world-one/06-keys-to-move/"
-prev = "/tutorial/world-one/04-rendering-a-map/"
+next = "/tutorial/world-one/keys-to-move/"
+prev = "/tutorial/world-one/rendering-a-map/"
 +++
 
 Time to create your HERO! 🦸 Every legendary game needs a protagonist - someone the player connects with, controls, and cheers for. Whether it's Mario jumping through pipes, Link exploring Hyrule, or Celeste climbing mountains, the hero makes the game come alive. You're about to bring your first character into your tile-based world!

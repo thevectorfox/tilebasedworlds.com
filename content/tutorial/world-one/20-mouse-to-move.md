@@ -3,9 +3,10 @@ title = "Mouse to Move"
 date = 2026-03-09T16:00:00+11:00
 weight = 20
 draft = false
+slug = "mouse-to-move"
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/world-one/21-isometric-view/"
-prev = "/tutorial/world-one/19-depth/"
+next = "/tutorial/world-one/isometric-view/"
+prev = "/tutorial/world-one/depth/"
 +++
 
 Put down the keyboard and click anywhere on the map. The hero walks there. Click-to-move is the movement style behind countless RPGs, strategy games, and point-and-click adventures. Let's build it!

@@ -3,9 +3,10 @@ title = "Ladders"
 date = 2026-03-09T07:00:00+11:00
 weight = 11
 draft = false
+slug = "ladders"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/world-one/12-stupid-enemy/"
-prev = "/tutorial/world-one/10-clouds/"
+next = "/tutorial/world-one/stupid-enemy/"
+prev = "/tutorial/world-one/clouds/"
 +++
 
 Ready to add vertical exploration to your game world? 🪜 Ladders are one of the most iconic platformer mechanics - think Donkey Kong's construction sites, Mega Man's industrial levels, or any classic 2D adventure! You're about to give your players the freedom to climb up and down through your levels, opening up incredible possibilities for level design!
