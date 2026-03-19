@@ -5,7 +5,7 @@ weight = 8
 draft = false
 slug = "open-the-door"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/world-one/jumping/"
+next = "/tutorial/world-one/getting-items/"
 prev = "/tutorial/world-one/hit-the-wall/"
 +++
 

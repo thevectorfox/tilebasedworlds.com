@@ -1,12 +1,12 @@
 +++
 title = "Pathfinding Breadth-First"
 date = 2026-03-09T22:00:00+11:00
-weight = 26
+weight = 14
 draft = false
 slug = "pathfinding-breadth-first"
 tags = ["advanced", "optimization", "tutorial"]
 next = "/tutorial/world-one/pathfinding-best-first/"
-prev = "/tutorial/world-one/rotate-background/"
+prev = "/tutorial/world-one/stupid-enemy/"
 +++
 
 Time to give your characters some serious brains! 🧠 So far, your hero has been pretty... let's say "directionally challenged." Tell them to go left, they go left - even straight into a wall! But what if they could think for themselves and find clever paths around obstacles?

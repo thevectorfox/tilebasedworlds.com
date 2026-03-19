@@ -1,12 +1,12 @@
 +++
 title = "Enemy on Platform"
 date = 2026-03-09T09:00:00+11:00
-weight = 13
+weight = 4
 draft = false
 slug = "enemy-on-platform"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/world-one/shoot-him/"
-prev = "/tutorial/world-one/stupid-enemy/"
+next = "/tutorial/the-keep/shoot-him/"
+prev = "/tutorial/the-keep/ladders/"
 +++
 
 Time to make your enemies SMART! 🧠 While basic wall-bouncing enemies are useful, platform-aware enemies that don't fall off edges create much more interesting and unpredictable gameplay. Think of the Goombas in Mario that patrol platforms, or the security robots in Mega Man that never fall into pits - these enemies feel more alive and create better spatial challenges!

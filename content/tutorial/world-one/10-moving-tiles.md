@@ -1,7 +1,7 @@
 +++
 title = "Moving Tiles"
 date = 2026-03-09T12:00:00+11:00
-weight = 16
+weight = 10
 draft = false
 slug = "moving-tiles"
 tags = ["advanced", "optimization", "tutorial"]

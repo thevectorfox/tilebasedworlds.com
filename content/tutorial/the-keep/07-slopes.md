@@ -1,12 +1,12 @@
 +++
 title = "Slopes"
 date = 2026-03-10T00:00:00+11:00
-weight = 28
+weight = 7
 draft = false
 slug = "slopes"
 tags = ["advanced", "optimization", "tutorial"]
 next = ""
-prev = "/tutorial/world-one/pathfinding-best-first/"
+prev = "/tutorial/the-keep/depth/"
 +++
 
 🎉 **Welcome to the GRAND FINALE!** 🎉

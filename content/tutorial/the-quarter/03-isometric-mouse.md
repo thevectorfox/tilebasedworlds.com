@@ -1,12 +1,12 @@
 +++
 title = "Isometric Mouse"
 date = 2026-03-09T18:00:00+11:00
-weight = 22
+weight = 3
 draft = false
 slug = "isometric-mouse"
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/world-one/isometric-scroll/"
-prev = "/tutorial/world-one/isometric-view/"
+next = "/tutorial/the-quarter/isometric-scroll/"
+prev = "/tutorial/the-quarter/isometric-view/"
 +++
 
 You know how to move in isometric. You know how to click-to-move. Now combine them. The tricky part isn't the movement — it's figuring out which diamond tile the mouse is actually over:

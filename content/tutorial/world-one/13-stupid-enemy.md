@@ -1,12 +1,12 @@
 +++
 title = "Stupid Enemy"
 date = 2026-03-09T08:00:00+11:00
-weight = 12
+weight = 13
 draft = false
 slug = "stupid-enemy"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/world-one/enemy-on-platform/"
-prev = "/tutorial/world-one/ladders/"
+next = "/tutorial/world-one/pathfinding-breadth-first/"
+prev = "/tutorial/world-one/more-scrolling/"
 +++
 
 Time to add some DANGER to your world! 👾 A game without enemies is like a movie without conflict - technically possible, but nowhere near as exciting! You're about to breathe life into your levels with patrolling enemies that turn peaceful exploration into heart-pounding challenge. Even "stupid" enemies can create incredible tension and satisfaction!
