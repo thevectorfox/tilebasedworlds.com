@@ -1,12 +1,12 @@
 +++
 title = "Moving Tiles"
 date = 2026-03-09T12:00:00+11:00
-weight = 10
+weight = 4
 draft = false
 slug = "moving-tiles"
-tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/world-one/scrolling/"
-prev = "/tutorial/world-one/getting-items/"
+tags = ["intermediate", "gameplay", "tutorial"]
+next = "/tutorial/the-keep/enemy-on-platform/"
+prev = "/tutorial/the-keep/ladders/"
 +++
 
 Moving platforms! 🏃‍♂️ They're in every great platformer - the swinging platforms in Donkey Kong Country, the cloud lifts in Mario, the crumbling bridges in Crash Bandicoot. They transform a flat level into a dynamic puzzle that rewards timing and skill. Let's build them!

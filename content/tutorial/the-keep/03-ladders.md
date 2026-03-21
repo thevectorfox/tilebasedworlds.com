@@ -5,7 +5,7 @@ weight = 3
 draft = false
 slug = "ladders"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/the-keep/enemy-on-platform/"
+next = "/tutorial/the-keep/moving-tiles/"
 prev = "/tutorial/the-keep/clouds/"
 +++
 

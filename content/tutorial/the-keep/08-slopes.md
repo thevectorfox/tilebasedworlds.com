@@ -1,7 +1,7 @@
 +++
 title = "Slopes"
 date = 2026-03-10T00:00:00+11:00
-weight = 7
+weight = 8
 draft = false
 slug = "slopes"
 tags = ["advanced", "optimization", "tutorial"]

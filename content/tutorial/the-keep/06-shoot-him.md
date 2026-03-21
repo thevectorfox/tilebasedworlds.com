@@ -1,7 +1,7 @@
 +++
 title = "Shoot Him"
 date = 2026-03-09T10:00:00+11:00
-weight = 5
+weight = 6
 draft = false
 slug = "shoot-him"
 tags = ["intermediate", "gameplay", "tutorial"]

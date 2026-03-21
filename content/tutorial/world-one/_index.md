@@ -23,7 +23,7 @@ No prior game development experience needed — just some familiarity with JavaS
 ## Environment & Interaction
 
 - [Getting Items](/tutorial/world-one/getting-items/) - Collectibles
-- [Moving Tiles](/tutorial/world-one/moving-tiles/) - Dynamic environments
+- [Pushing Tiles](/tutorial/world-one/pushing-tiles/) - Tile puzzles
 - [Scrolling](/tutorial/world-one/scrolling/) - Camera movement
 - [More Scrolling](/tutorial/world-one/more-scrolling/) - Advanced camera
 
