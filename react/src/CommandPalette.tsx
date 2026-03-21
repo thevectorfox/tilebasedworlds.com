@@ -20,13 +20,14 @@ function Results() {
       items={results}
       onRender={({ item, active }) =>
         typeof item === 'string' ? (
-          <div style={{ padding: '8px 16px', fontSize: 12, opacity: 0.5 }}>
+          <div style={{ padding: '8px 16px', fontSize: 12, opacity: 0.5, color: 'var(--muted)' }}>
             {item}
           </div>
         ) : (
           <div style={{
             padding: '12px 16px',
-            background: active ? '#1a1a2e' : 'transparent',
+            background: active ? 'var(--surface-2)' : 'transparent',
+            color: 'var(--text)',
             cursor: 'pointer',
           }}>
             {item.name}
@@ -85,15 +86,17 @@ export function CommandPalette() {
         <KBarPositioner style={{ zIndex: 9999, background: 'rgba(0,0,0,0.6)' }}>
           <KBarAnimator style={{
             width: 600,
-            background: '#0d0d1a',
+            background: 'var(--bg)',
+            border: '1px solid var(--border)',
             borderRadius: 8,
             overflow: 'hidden',
-            boxShadow: '0 16px 60px rgba(0,0,0,0.5)',
+            boxShadow: 'var(--shadow-content)',
           }}>
             <KBarSearch style={{
               width: '100%', padding: '16px 20px',
               fontSize: 16, background: 'transparent',
-              border: 'none', outline: 'none', color: '#fff',
+              borderBottom: '1px solid var(--border)',
+              outline: 'none', color: 'var(--text)',
             }} />
             <Results />
           </KBarAnimator>
