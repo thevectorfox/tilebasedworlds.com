@@ -95,8 +95,12 @@ export function CommandPalette() {
             <KBarSearch style={{
               width: '100%', padding: '16px 20px',
               fontSize: 16, background: 'transparent',
+              border: 'none',
               borderBottom: '1px solid var(--border)',
               outline: 'none', color: 'var(--text)',
+              boxShadow: 'none',
+              WebkitAppearance: 'none',
+              appearance: 'none',
             }} />
             <Results />
           </KBarAnimator>
