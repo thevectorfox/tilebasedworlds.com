@@ -75,7 +75,7 @@ function buildItems() {
 }
 
 const heroSprite = new PIXI.Graphics().rect(0, 0, 12, 12).fill(0xff4444);
-const player = { sprite: heroSprite, x: 60, y: 180, width: 12, height: 12, speed: 2 };
+const player = { sprite: heroSprite, x: 30, y: 30, width: 12, height: 12, speed: 2 };
 app.stage.addChild(heroSprite);
 
 function isSolid(x, y) {

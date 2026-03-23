@@ -53,7 +53,7 @@ world.addChild(heroSprite);
 
 const player = {
     sprite: heroSprite,
-    x: 60, y: 150,
+    x: 60, y: 198,
     width: 12, height: 12,
     velocityX: 0, velocityY: 0,
     speed: 2, jumpPower: -10,
@@ -102,7 +102,7 @@ function gameLoop() {
     if (player.velocityY > 0) {
         if (isSolid(player.x + 2, player.y + player.height + player.velocityY) ||
             isSolid(player.x + player.width - 2, player.y + player.height + player.velocityY)) {
-            player.y = Math.floor((player.y + player.height) / TILE_SIZE) * TILE_SIZE - player.height;
+            player.y = Math.floor((player.y + player.height + player.velocityY) / TILE_SIZE) * TILE_SIZE - player.height;
             player.velocityY = 0;
             player.onGround = true;
         } else {
