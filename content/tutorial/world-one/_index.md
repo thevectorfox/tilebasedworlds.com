@@ -5,11 +5,11 @@ weight = 1
 draft = false
 +++
 
-The foundational series. Build a top-down tile world from scratch — grid, movement, collision, interaction, enemies, and pathfinding.
+The foundational series. Build a top-down tile world from scratch — grid, movement, collision, interaction, and enemies.
 
 No prior game development experience needed — just some familiarity with JavaScript.
 
-## Getting Started
+## The Foundation
 
 - [Why Tiles?](/tutorial/world-one/why-tiles/) - Introduction to tile-based games
 - [Map Format](/tutorial/world-one/map-format/) - How to store tile maps
@@ -18,20 +18,15 @@ No prior game development experience needed — just some familiarity with JavaS
 - [The Hero](/tutorial/world-one/the-hero/) - Adding a player character
 - [Keys to Move](/tutorial/world-one/keys-to-move/) - Player movement
 - [Hit the Wall](/tutorial/world-one/hit-the-wall/) - Collision detection
-- [Open the Door](/tutorial/world-one/open-the-door/) - Interactive objects
 
-## Environment & Interaction
+## Making a Game
 
-- [Getting Items](/tutorial/world-one/getting-items/) - Collectibles
+- [Getting Items](/tutorial/world-one/getting-items/) - Collectibles and pickups
+- [Open the Door](/tutorial/world-one/open-the-door/) - Multi-room worlds
+- [Locked Doors](/tutorial/world-one/locked-doors/) - Keys and locked doors
 - [Pushing Tiles](/tutorial/world-one/pushing-tiles/) - Tile puzzles
-- [Scrolling](/tutorial/world-one/scrolling/) - Camera movement
-- [More Scrolling](/tutorial/world-one/more-scrolling/) - Advanced camera
-
-## Enemies & AI
-
 - [Stupid Enemy](/tutorial/world-one/stupid-enemy/) - Basic AI
-- [Pathfinding Breadth-First](/tutorial/world-one/pathfinding-breadth-first/) - BFS algorithm
-- [Pathfinding Best-First](/tutorial/world-one/pathfinding-best-first/) - Best-first search
+- [A Living World](/tutorial/world-one/bringing-it-together/) - Series showcase
 
 ---
 

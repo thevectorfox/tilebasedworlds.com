@@ -2,7 +2,7 @@
 title = "Enemy on Platform"
 date = 2026-03-09T09:00:00+11:00
 weight = 5
-draft = false
+draft = true
 slug = "enemy-on-platform"
 tags = ["intermediate", "gameplay", "tutorial"]
 next = "/tutorial/the-keep/shoot-him/"

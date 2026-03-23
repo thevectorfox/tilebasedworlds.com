@@ -1,12 +1,12 @@
 +++
 title = "Pushing Tiles"
 date = 2026-03-20T00:00:00+11:00
-weight = 10
+weight = 11
 draft = false
 slug = "pushing-tiles"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/world-one/scrolling/"
-prev = "/tutorial/world-one/getting-items/"
+next = "/tutorial/world-one/stupid-enemy/"
+prev = "/tutorial/world-one/locked-doors/"
 +++
 
 {{< pixidemo title="Pushing Tiles" >}}

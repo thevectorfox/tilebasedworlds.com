@@ -2,7 +2,7 @@
 title = "Clouds"
 date = 2026-03-09T06:00:00+11:00
 weight = 2
-draft = false
+draft = true
 slug = "clouds"
 tags = ["intermediate", "gameplay", "tutorial"]
 next = "/tutorial/the-keep/ladders/"

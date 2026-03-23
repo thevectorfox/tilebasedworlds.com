@@ -2,7 +2,7 @@
 title = "Shoot Him"
 date = 2026-03-09T10:00:00+11:00
 weight = 6
-draft = false
+draft = true
 slug = "shoot-him"
 tags = ["intermediate", "gameplay", "tutorial"]
 next = "/tutorial/the-keep/depth/"

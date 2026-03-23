@@ -2,7 +2,7 @@
 title = "More Scrolling"
 date = 2026-03-09T14:00:00+11:00
 weight = 12
-draft = false
+draft = true
 slug = "more-scrolling"
 tags = ["advanced", "optimization", "tutorial"]
 next = "/tutorial/world-one/stupid-enemy/"

@@ -2,7 +2,7 @@
 title = "Scrolling"
 date = 2026-03-09T13:00:00+11:00
 weight = 11
-draft = false
+draft = true
 slug = "scrolling"
 tags = ["advanced", "optimization", "tutorial"]
 next = "/tutorial/world-one/more-scrolling/"

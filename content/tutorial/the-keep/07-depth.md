@@ -2,7 +2,7 @@
 title = "Depth"
 date = 2026-03-09T15:00:00+11:00
 weight = 7
-draft = false
+draft = true
 slug = "depth"
 tags = ["advanced", "optimization", "tutorial"]
 next = "/tutorial/the-keep/slopes/"

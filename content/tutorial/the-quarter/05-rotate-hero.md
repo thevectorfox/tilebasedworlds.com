@@ -2,7 +2,7 @@
 title = "Rotate Hero"
 date = 2026-03-09T20:00:00+11:00
 weight = 5
-draft = false
+draft = true
 slug = "rotate-hero"
 tags = ["advanced", "optimization", "tutorial"]
 next = "/tutorial/the-quarter/rotate-background/"

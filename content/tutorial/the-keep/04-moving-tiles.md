@@ -2,7 +2,7 @@
 title = "Moving Tiles"
 date = 2026-03-09T12:00:00+11:00
 weight = 4
-draft = false
+draft = true
 slug = "moving-tiles"
 tags = ["intermediate", "gameplay", "tutorial"]
 next = "/tutorial/the-keep/enemy-on-platform/"

@@ -2,7 +2,7 @@
 title = "Pathfinding Best-First"
 date = 2026-03-09T23:00:00+11:00
 weight = 15
-draft = false
+draft = true
 slug = "pathfinding-best-first"
 tags = ["advanced", "optimization", "tutorial"]
 next = ""

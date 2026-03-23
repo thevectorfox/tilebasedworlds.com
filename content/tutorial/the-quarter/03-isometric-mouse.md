@@ -2,7 +2,7 @@
 title = "Isometric Mouse"
 date = 2026-03-09T18:00:00+11:00
 weight = 3
-draft = false
+draft = true
 slug = "isometric-mouse"
 tags = ["advanced", "optimization", "tutorial"]
 next = "/tutorial/the-quarter/isometric-scroll/"

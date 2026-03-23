@@ -2,7 +2,7 @@
 title = "Isometric Scroll"
 date = 2026-03-09T19:00:00+11:00
 weight = 4
-draft = false
+draft = true
 slug = "isometric-scroll"
 tags = ["advanced", "optimization", "tutorial"]
 next = "/tutorial/the-quarter/rotate-hero/"

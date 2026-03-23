@@ -2,7 +2,7 @@
 title = "Pathfinding Breadth-First"
 date = 2026-03-09T22:00:00+11:00
 weight = 14
-draft = false
+draft = true
 slug = "pathfinding-breadth-first"
 tags = ["advanced", "optimization", "tutorial"]
 next = "/tutorial/world-one/pathfinding-best-first/"
