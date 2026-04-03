@@ -5,7 +5,7 @@ weight = 13
 draft = false
 slug = "bringing-it-together"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = ""
+next = "/tutorial/world-one/going-further/"
 prev = "/tutorial/world-one/stupid-enemy/"
 +++
 
