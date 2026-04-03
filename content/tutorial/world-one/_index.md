@@ -26,7 +26,8 @@ No prior game development experience needed — just some familiarity with JavaS
 - [Locked Doors](/tutorial/world-one/locked-doors/) - Keys and locked doors
 - [Pushing Tiles](/tutorial/world-one/pushing-tiles/) - Tile puzzles
 - [Stupid Enemy](/tutorial/world-one/stupid-enemy/) - Basic AI
-- [A Living World](/tutorial/world-one/bringing-it-together/) - Series showcase
+- [Bringing it together](/tutorial/world-one/bringing-it-together/) - Series showcase
+- [Going further](/tutorial/world-one/going-further/) - Optional extras
 
 ---
 
