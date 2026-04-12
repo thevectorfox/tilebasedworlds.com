@@ -31,6 +31,11 @@ function Results() {
             cursor: 'pointer',
           }}>
             {item.name}
+            {item.shortcut && (
+              <>
+                &nbsp; <span className='kbd'>{item.shortcut}</span>
+              </>
+            )}
           </div>
         )
       }
