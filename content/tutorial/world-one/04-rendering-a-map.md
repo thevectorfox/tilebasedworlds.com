@@ -16,7 +16,7 @@ Look at our map array again, but this time imagine it as your game world:
 ```
 Array:           Visual Result:
 [1, 1, 1, 1] →  🧱🧱🧱🧱
-[1, 0, 0, 1] →  🧱  🌟  🌟🧱  
+[1, 0, 0, 1] →  🧱🌟🌟🧱  
 [1, 1, 1, 1] →  🧱🧱🧱🧱
 
 Each 1 becomes a solid wall, each 0 becomes walkable space!
