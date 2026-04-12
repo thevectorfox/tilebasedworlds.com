@@ -1,0 +1,10 @@
+{{- $name   := .Get "name" -}}
+{{- $weight := .Get "weight" | default "regular" -}}
+{{- $size   := .Get "size"   | default "1em" -}}
+{{- $color  := .Get "color"  | default "currentColor" -}}
+{{- /* Regular uses class "ph", all others use "ph-{weight}" */ -}}
+{{- $wclass := "ph" -}}
+{{- if ne $weight "regular" -}}{{- $wclass = printf "ph-%s" $weight -}}{{- end -}}
+<i class="{{ $wclass }} ph-{{ $name }}"
+   style="font-size: {{ $size }}; color: {{ $color }}; vertical-align: middle;"
+   aria-hidden="true"></i>
