@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   KBarProvider, KBarPortal, KBarPositioner,
   KBarAnimator, KBarSearch, KBarResults, useMatches, useRegisterActions,
-  type Action,
+  useKBar, type Action,
 } from 'kbar'
 
 interface NavItem {
@@ -41,6 +41,16 @@ function Results() {
       }
     />
   )
+}
+
+// Exposes query.toggle() on window so native JS can open/close kbar
+function KBarBridge() {
+  const { query } = useKBar()
+  useEffect(() => {
+    (window as any).__kbarToggle = () => query.toggle()
+    return () => { delete (window as any).__kbarToggle }
+  }, [query])
+  return null
 }
 
 function DynamicActions() {
@@ -167,6 +177,7 @@ export function CommandPalette() {
         </KBarPositioner>
       </KBarPortal>
       <DynamicActions />
+      <KBarBridge />
     </KBarProvider>
   )
 }

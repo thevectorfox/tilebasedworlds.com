@@ -30,10 +30,10 @@
     <div id="kbar-root"></div>
 
     <nav>
-        <a href="{{ "/" | relURL }}" class="home-link">◢ {{ site.Title }} ◣</a>
+        <a href="{{ "/" | relURL }}" class="home-link"><i class="ph ph-puzzle-piece"></i></a>
         <a href="{{ "/tutorial" | relURL }}">Tutorials</a>
         <a href="{{ "/articles" | relURL }}">Articles</a>
-        <button class="kbd">Cmd+k</button>
+        <button class="kbd"> <i class="ph-bold ph-command"></i> Cmd+k</button>
         <div class="theme-switcher" role="group" aria-label="Theme">
             <button class="theme-btn" data-theme="light" onclick="setTheme('light')" aria-label="Light mode"><i class="ph-bold ph-sun-dim"></i></button>
             <button class="theme-btn" data-theme="dark"  onclick="setTheme('dark')"  aria-label="Dark mode"><i class="ph-bold ph-moon"></i></button>
@@ -53,5 +53,14 @@
 
     <!-- React islands bundle — deferred, non-blocking -->
     <script type="module" src="/js/islands.js" defer></script>
+
+    <!-- Wire Cmd+K button to kbar once React has mounted the bridge -->
+    <script>
+      document.querySelector('button.kbd').addEventListener('click', () => {
+        if (typeof window.__kbarToggle === 'function') {
+          window.__kbarToggle()
+        }
+      })
+    </script>
 </body>
 </html>
