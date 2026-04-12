@@ -164,7 +164,6 @@ body {
   background-color: var(--bg);
   max-width: 900px;
   margin: 0 auto;
-  padding: 20px;
 }
 
 /* ── Type scale (major third: ×1.25) ──────────────────────── */
@@ -337,10 +336,7 @@ nav {
   display: flex;
   align-items: center;
   margin-bottom: 30px;
-  background: var(--surface);
   padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: var(--shadow-nav);
 }
 nav a {
   margin-right: 20px;
@@ -475,11 +471,7 @@ nav a:hover {
 /* ── Tutorial navigation ───────────────────────────────────── */
 .tutorial-nav {
   margin-top: 3em;
-  padding: 2em;
-  background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  box-shadow: var(--shadow-card);
+  padding: 0;
 }
 .nav-links {
   display: flex;
@@ -525,6 +517,13 @@ nav a:hover {
   padding-top: 1em;
   border-top: 1px solid var(--border);
   font-size: 0.9em;
-  color: var(--muted);
   text-align: center;
+  background: var(--accent-alt);
+  color: var(--bg);
+  height: 150px;
+}
+
+.tech-footer a {
+  color: var(--bg);
+  text-decoration: underline;
 }
