@@ -148,3 +148,4 @@ Concrete suggestions with before/after examples where helpful.
 - PRIORITIZE game development context over generic programming
 - MAINTAIN encouraging, enthusiastic tone in feedback
 - SUGGEST specific improvements rather than general critiques
+- NEVER suggest or use UTF-8 emoji icons (🚀 🎯 🔥 etc.) in content edits or examples — use Phosphor icon shortcodes instead: `{{</* icon name="rocket-launch" */>}}`, `{{</* icon name="target" */>}}`, `{{</* icon name="lightning" */>}}` etc. Emoji used as literal tile art in tilemap diagrams (🧱 🌟) are the only exception.

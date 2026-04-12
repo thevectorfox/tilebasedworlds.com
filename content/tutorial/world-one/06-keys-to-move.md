@@ -10,7 +10,7 @@ prev = "/tutorial/world-one/the-hero/"
 +++
 
 
-Time to bring your hero to LIFE! 🎮 This is the moment where your game transforms from a static picture into an interactive experience. Player control is what separates games from movies - and you're about to master it! By the end of this chapter, your hero will respond to your every command, moving smoothly through your tile-based world.
+Time to bring your hero to LIFE! {{< icon name="game-controller" >}} This is the moment where your game transforms from a static picture into an interactive experience. Player control is what separates games from movies - and you're about to master it! By the end of this chapter, your hero will respond to your every command, moving smoothly through your tile-based world.
 
 {{< pixidemo title="Keys to Move" >}}
     // Create PixiJS application for movement demo
@@ -148,11 +148,11 @@ Time to bring your hero to LIFE! 🎮 This is the moment where your game transfo
     app.ticker.add(updateMovement);
 {{< /pixidemo >}}
 
-**Try it!** Use your arrow keys to move the red square around! ⬅️➡️⬆️⬇️
+**Try it!** Use your arrow keys to move the red square around! {{< icon name="arrow-left" >}}{{< icon name="arrow-right" >}}{{< icon name="arrow-up" >}}{{< icon name="arrow-down" >}}
 
 *Notice how the hero changes color when moving and stays within the boundaries!*
 
-## MODERN CHARACTER SETUP 🎨
+## MODERN CHARACTER SETUP {{< icon name="paint-brush" >}}
 
 Forget complex movie clips and keyframes! Modern game development uses much simpler, more powerful approaches. Let's build a character system that's both easier to understand and more flexible than the old Flash methods.
 
@@ -188,7 +188,7 @@ const hero = {
 - ✅ **Performant**: No movie clip overhead
 - ✅ **Debuggable**: Easy to inspect and modify
 
-## KEYBOARD INPUT: THE MODERN WAY 🎯
+## KEYBOARD INPUT: THE MODERN WAY {{< icon name="target" >}}
 
 **Step 1: Set Up Input Tracking**
 
@@ -224,12 +224,12 @@ window.addEventListener('keyup', (event) => {
 ```
 
 **Why this rocks:**
-- 🎮 **Multiple keys**: Handle multiple simultaneous key presses
-- 🚀 **Responsive**: Immediate reaction to input
-- 🔧 **Flexible**: Easy to add new controls
-- 🌐 **Standard**: Works across all modern browsers
+- {{< icon name="game-controller" >}} **Multiple keys**: Handle multiple simultaneous key presses
+- {{< icon name="rocket-launch" >}} **Responsive**: Immediate reaction to input
+- {{< icon name="wrench" >}} **Flexible**: Easy to add new controls
+- {{< icon name="globe" >}} **Standard**: Works across all modern browsers
 
-## MOVEMENT LOGIC: CLEAN & POWERFUL 🚀
+## MOVEMENT LOGIC: CLEAN & POWERFUL {{< icon name="rocket-launch" >}}
 
 **Step 2: Create the Movement System**
 
@@ -300,12 +300,12 @@ app.ticker.add(updateMovement);
 ```
 
 **What makes this awesome:**
-- 🎯 **Clear logic**: Easy to understand what each part does
-- 🔄 **Reusable**: Same pattern works for any moving object
-- 📈 **Scalable**: Easy to add features like acceleration, animation
-- 🛡️ **Reliable**: Consistent 60fps updates with PixiJS ticker
+- {{< icon name="target" >}} **Clear logic**: Easy to understand what each part does
+- {{< icon name="arrows-clockwise" >}} **Reusable**: Same pattern works for any moving object
+- {{< icon name="chart-line-up" >}} **Scalable**: Easy to add features like acceleration, animation
+- {{< icon name="shield" >}} **Reliable**: Consistent 60fps updates with PixiJS ticker
 
-## ADDING VISUAL DIRECTION 🎨
+## ADDING VISUAL DIRECTION {{< icon name="paint-brush" >}}
 
 **Make Your Hero Face the Right Way:**
 
@@ -344,7 +344,7 @@ function updateHeroAppearance() {
 }
 ```
 
-## ADVANCED: SMOOTH MOVEMENT 🚀
+## ADVANCED: SMOOTH MOVEMENT {{< icon name="rocket-launch" >}}
 
 **Want buttery-smooth movement instead of tile-by-tile jumping?**
 
@@ -363,7 +363,7 @@ function updateSmoothMovement() {
 }
 ```
 
-🏆 **MOVEMENT MASTERY ACHIEVED!**
+{{< icon name="trophy" >}} **MOVEMENT MASTERY ACHIEVED!**
 
 You've just built a complete movement system that rivals professional games! Your hero responds instantly to input, faces the right direction, and moves smoothly through your world.
 

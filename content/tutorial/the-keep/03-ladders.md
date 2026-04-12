@@ -265,7 +265,7 @@ Ladders might seem simple, but there are important design decisions to make! Let
 - When walking off, hero falls naturally
 - Great for open level design like Mega Man
 
-**⬆️ Type C - Top-only Ladders**: No ladder below, only above
+**{{< icon name="arrow-up" >}} Type C - Top-only Ladders**: No ladder below, only above
 - Hero can climb up but not down
 - Perfect for one-way ascent areas
 - Creates interesting level flow patterns
@@ -356,10 +356,10 @@ function isSolid(x, y) {
 ```
 
 **Why this approach rocks:**
-- 🎯 **Clear tile definitions** with explicit properties
-- 🔧 **Easy to extend** - just add new tile types
-- 🚀 **Readable code** - functions that explain themselves
-- 🛡️ **Type safety** - consistent property checking
+- {{< icon name="target" >}} **Clear tile definitions** with explicit properties
+- {{< icon name="wrench" >}} **Easy to extend** - just add new tile types
+- {{< icon name="rocket-launch" >}} **Readable code** - functions that explain themselves
+- {{< icon name="shield" >}} **Type safety** - consistent property checking
 
 ## Input Handling: Climbing Controls
 
@@ -418,10 +418,10 @@ function tryExitLadder(player, direction) {
 ```
 
 **Key features:**
-- 🎯 **Auto-centering** on ladders for clean movement
-- 🚪 **Smart exit detection** prevents wall clipping
-- 🎮 **Separated input modes** climbing vs normal movement
-- ✨ **Smooth transitions** between movement states
+- {{< icon name="target" >}} **Auto-centering** on ladders for clean movement
+- {{< icon name="door-open" >}} **Smart exit detection** prevents wall clipping
+- {{< icon name="game-controller" >}} **Separated input modes** climbing vs normal movement
+- {{< icon name="sparkle" >}} **Smooth transitions** between movement states
 
 
 ## Ladder Detection: Smart Climbing Logic
@@ -494,13 +494,13 @@ function updatePlayerVisuals(player) {
 ```
 
 **The magic happens when:**
-1. 🎯 **Player approaches ladder** → `canStartClimbing()` detects it
-2. ⬆️ **Up/Down pressed** → Enter climbing mode
+1. {{< icon name="target" >}} **Player approaches ladder** → `canStartClimbing()` detects it
+2. {{< icon name="arrow-up" >}} **Up/Down pressed** → Enter climbing mode
 3. 🧲 **Auto-center** → Player snaps to ladder center
 4. 🚫 **Gravity disabled** → No falling while climbing  
 5. 🚶 **Left/Right pressed** → Smart exit with collision checking
-6. ✨ **Visual feedback** → Player knows they're in climb mode
+6. {{< icon name="sparkle" >}} **Visual feedback** → Player knows they're in climb mode
 
-**🏆 Congratulations!** You've just implemented professional-grade ladder mechanics! Your players can now explore vertically through your levels with smooth, responsive climbing. This opens up amazing possibilities for level design - multi-story buildings, underground caverns, sky-high towers!
+**{{< icon name="trophy" >}} Congratulations!** You've just implemented professional-grade ladder mechanics! Your players can now explore vertically through your levels with smooth, responsive climbing. This opens up amazing possibilities for level design - multi-story buildings, underground caverns, sky-high towers!
 
 **Next up**: Time to add some challenge with enemies! [Next: Stupid Enemy](/tutorial/world-one/12-stupid-enemy/)

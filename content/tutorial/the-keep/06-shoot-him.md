@@ -347,13 +347,13 @@ app.ticker.add(gameLoop);
 {{< /pixidemo >}}
 
 
-## Bullet System Architecture: Modern Projectile Design 🚀
+## Bullet System Architecture: Modern Projectile Design {{< icon name="rocket-launch" >}}
 
 **When I say "bullet", I mean any projectile** - arrows, fireballs, energy blasts, magic missiles, or even flying penguins! The core mechanics remain the same.
 
 ### Key Design Decisions
 
-**🎯 Bullet Behavior Rules:**
+**{{< icon name="target" >}} Bullet Behavior Rules:**
 1. **SHIFT key** triggers shooting in the direction hero last moved
 2. **Bullets move faster** than the hero (4 pixels/frame vs 2 pixels/frame)
 3. **Wall collision** destroys bullets instantly
@@ -425,13 +425,13 @@ class Bullet {
 ```
 
 **Why this design rocks:**
-- 🎯 **Clear separation**: Each bullet manages its own behavior
-- ⚡ **Performance optimized**: Object pooling prevents garbage collection lag
-- 🔧 **Configurable**: Easy to tweak speeds, damage, cooldowns
-- 🎨 **Visual feedback**: Bullets are bright and easy to track
+- {{< icon name="target" >}} **Clear separation**: Each bullet manages its own behavior
+- {{< icon name="lightning" >}} **Performance optimized**: Object pooling prevents garbage collection lag
+- {{< icon name="wrench" >}} **Configurable**: Easy to tweak speeds, damage, cooldowns
+- {{< icon name="paint-brush" >}} **Visual feedback**: Bullets are bright and easy to track
 
 
-## Shooting Controls: Responsive Combat Input 🎮
+## Shooting Controls: Responsive Combat Input {{< icon name="game-controller" >}}
 
 Let's implement smooth, responsive shooting that feels great:
 
@@ -525,14 +525,14 @@ function showShootingEffect() {
 ```
 
 **Smart features:**
-- 🎯 **Direction memory**: Bullets fire in the direction you last moved
+- {{< icon name="target" >}} **Direction memory**: Bullets fire in the direction you last moved
 - ⏱️ **Rate limiting**: Prevents button mashing bullet spam
 - 🔢 **Bullet limit**: Maximum 5 active bullets at once
-- ✨ **Visual feedback**: Player flashes when shooting
+- {{< icon name="sparkle" >}} **Visual feedback**: Player flashes when shooting
 - 📍 **Smart positioning**: Bullets spawn slightly in front of player
 
 
-## Collision Detection & Destruction: Satisfying Combat! 💥
+## Collision Detection & Destruction: Satisfying Combat! {{< icon name="explosion" >}}
 
 Time for the most satisfying part - making things explode when bullets hit them!
 
@@ -664,17 +664,17 @@ function destroyEnemy(index) {
 ```
 
 **Destruction system features:**
-- 💥 **Epic explosions**: Multi-particle effects with physics
-- 🎯 **Precise collision**: Circle-based detection for fairness
+- {{< icon name="explosion" >}} **Epic explosions**: Multi-particle effects with physics
+- {{< icon name="target" >}} **Precise collision**: Circle-based detection for fairness
 - ♻️ **Memory efficient**: Object pooling prevents garbage collection lag
-- 🎊 **Visual satisfaction**: Particles, rotation, and fade effects
-- 🏆 **Victory detection**: Checks when all enemies are eliminated
+- {{< icon name="confetti" >}} **Visual satisfaction**: Particles, rotation, and fade effects
+- {{< icon name="trophy" >}} **Victory detection**: Checks when all enemies are eliminated
 
-## Advanced Shooting Features: Level Up Your Combat! 🎮
+## Advanced Shooting Features: Level Up Your Combat! {{< icon name="game-controller" >}}
 
 **Ready for more awesome shooting mechanics?** Here are pro-level features to make your combat even more engaging:
 
-### 🔥 Enhanced Weapon Systems
+### {{< icon name="fire" >}} Enhanced Weapon Systems
 
 ```javascript
 // Multiple weapon types
@@ -711,7 +711,7 @@ function switchWeapon(weaponType) {
 }
 ```
 
-### 🎯 Smart Combat Features
+### {{< icon name="target" >}} Smart Combat Features
 
 **Ammo limitation system:**
 ```javascript
@@ -755,7 +755,7 @@ function tryShoot() {
 }
 ```
 
-### 📈 Performance Optimizations
+### {{< icon name="chart-line-up" >}} Performance Optimizations
 
 **Object pooling** (already implemented in our demo!):
 - Reuse bullet objects instead of creating/destroying
@@ -948,7 +948,7 @@ app2.ticker.add(updatePlatformGame);
 document.body.appendChild(app2.canvas);
 {{< /pixidemo >}}
 
-**🎉 Congratulations!** You've just implemented a complete combat system! Your game now has:
+**{{< icon name="confetti" >}} Congratulations!** You've just implemented a complete combat system! Your game now has:
 - ✅ **Responsive shooting** with visual feedback
 - ✅ **Smart collision detection** for bullets and enemies
 - ✅ **Epic explosion effects** for satisfying enemy destruction  

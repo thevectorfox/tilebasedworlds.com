@@ -9,7 +9,7 @@ next = "/tutorial/world-one/locked-doors/"
 prev = "/tutorial/world-one/getting-items/"
 +++
 
-Ready to build your first WORLD? 🗺️ One room was just the beginning - now you're about to create interconnected spaces like the dungeons in Zelda, the sprawling stations in Metroid, or the mysterious houses in classic RPGs. You're about to become a world builder! ✨
+Ready to build your first WORLD? {{< icon name="map-trifold" >}} One room was just the beginning - now you're about to create interconnected spaces like the dungeons in Zelda, the sprawling stations in Metroid, or the mysterious houses in classic RPGs. You're about to become a world builder! {{< icon name="sparkle" >}}
 
 {{< pixidemo title="Multi-Room World Explorer" >}}
     // Create PixiJS application for room transition demo
@@ -215,9 +215,9 @@ Ready to build your first WORLD? 🗺️ One room was just the beginning - now y
     buildRoom(1);
 {{< /pixidemo >}}
 
-**Try it!** Move around with arrow keys and walk into the yellow doors to explore different rooms! 🚪✨
+**Try it!** Move around with arrow keys and walk into the yellow doors to explore different rooms! {{< icon name="door-open" >}}{{< icon name="sparkle" >}}
 
-## CREATING MULTIPLE ROOMS 🏰
+## CREATING MULTIPLE ROOMS {{< icon name="castle" >}}
 
 **Modern Room System:**
 
@@ -280,12 +280,12 @@ const gameState = {
 ```
 
 **Why this approach rocks:**
-- 📦 **Organized**: All room data in one place
-- 🚀 **Scalable**: Easy to add new rooms and properties  
-- 🔧 **Flexible**: Each room can have unique settings
-- 🧠 **Clear**: Simple object structure anyone can understand
+- {{< icon name="package" >}} **Organized**: All room data in one place
+- {{< icon name="rocket-launch" >}} **Scalable**: Easy to add new rooms and properties  
+- {{< icon name="wrench" >}} **Flexible**: Each room can have unique settings
+- {{< icon name="brain" >}} **Clear**: Simple object structure anyone can understand
 
-## ROOM TRANSITIONS: SMOOTH & PROFESSIONAL 🚀
+## ROOM TRANSITIONS: SMOOTH & PROFESSIONAL {{< icon name="rocket-launch" >}}
 
 **Step 1: Door Detection**
 
@@ -359,7 +359,7 @@ function updateMovement(hero, keys, gameState, app) {
 }
 ```
 
-## ADVANCED FEATURES 🎆
+## ADVANCED FEATURES {{< icon name="shooting-star" >}}
 
 **Enhanced Room System:**
 
@@ -443,7 +443,7 @@ function tryUseDoor(tileType, hero) {
 }
 ```
 
-🏆 **WORLD BUILDER ACHIEVED!**
+{{< icon name="trophy" >}} **WORLD BUILDER ACHIEVED!**
 
 You've just mastered the art of creating interconnected game worlds! This is the same system used in classic RPGs, adventure games, and modern indies. Your players can now explore rich, connected environments that feel alive and purposeful.
 

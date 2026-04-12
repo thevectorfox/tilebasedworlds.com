@@ -9,7 +9,7 @@ next = "/tutorial/world-one/bringing-it-together/"
 prev = "/tutorial/world-one/pushing-tiles/"
 +++
 
-Time to add some DANGER to your world! 👾 A game without enemies is like a movie without conflict - technically possible, but nowhere near as exciting! You're about to breathe life into your levels with patrolling enemies that turn peaceful exploration into heart-pounding challenge. Even "stupid" enemies can create incredible tension and satisfaction!
+Time to add some DANGER to your world! {{< icon name="alien" >}} A game without enemies is like a movie without conflict - technically possible, but nowhere near as exciting! You're about to breathe life into your levels with patrolling enemies that turn peaceful exploration into heart-pounding challenge. Even "stupid" enemies can create incredible tension and satisfaction!
 
 {{< pixidemo title="Stupid Enemy" >}}
 const app = new PIXI.Application();
@@ -239,20 +239,20 @@ createEnemies();
 app.ticker.add(gameLoop);
 {{< /pixidemo >}}
 
-## Why "Stupid" Enemies Are Actually Genius! 🧠
+## Why "Stupid" Enemies Are Actually Genius! {{< icon name="brain" >}}
 
 Before you think your game needs super-intelligent AI, let's talk strategy! Many legendary games use beautifully simple enemy patterns:
 
-**🔴 Pac-Man ghosts**: Simple chase/scatter patterns that create complex emergent gameplay
-**🦔 Sonic badniks**: Basic back-and-forth patrolling that's predictable yet challenging  
-**🍄 Mario Goombas**: Walk in straight lines, but placement makes them deadly
-**👾 Space Invaders**: Move in formation - simple rules, intense gameplay
+**- Pac-Man ghosts**: Simple chase/scatter patterns that create complex emergent gameplay
+**- Sonic badniks**: Basic back-and-forth patrolling that's predictable yet challenging  
+**- Mario Goombas**: Walk in straight lines, but placement makes them deadly
+**{{< icon name="alien" >}} Space Invaders**: Move in formation - simple rules, intense gameplay
 
 **Why simple enemies work:**
-- 🎯 **Predictable = Fair**: Players can learn patterns and improve
-- ⚡ **Performance friendly**: Hundreds of simple enemies > few complex ones
-- 🎭 **Personality through movement**: Each pattern creates different feelings
-- 🧩 **Placement matters more than AI**: Smart level design beats smart AI
+- {{< icon name="target" >}} **Predictable = Fair**: Players can learn patterns and improve
+- {{< icon name="lightning" >}} **Performance friendly**: Hundreds of simple enemies > few complex ones
+- {{< icon name="mask-happy" >}} **Personality through movement**: Each pattern creates different feelings
+- {{< icon name="puzzle-piece" >}} **Placement matters more than AI**: Smart level design beats smart AI
 
 **The wisdom**: Players don't need enemies to surprise them with complex decisions. They need enemies that create interesting spatial puzzles, timing challenges, and satisfying patterns to overcome!
 
@@ -260,7 +260,7 @@ Before you think your game needs super-intelligent AI, let's talk strategy! Many
 
 We'll create two fundamental enemy archetypes:
 
-**🔄 Horizontal Patroller**
+**{{< icon name="arrows-clockwise" >}} Horizontal Patroller**
 - Walks left ↔ right between walls
 - Creates timing-based challenges
 - Perfect for corridor and platform sections
@@ -321,10 +321,10 @@ const levelEnemies = {
 ```
 
 **Why this approach rocks:**
-- 📦 **Organized data**: All enemy properties in one place
-- 🚀 **Easy expansion**: Add new types without touching existing code
-- 🎯 **Level-specific**: Different enemy layouts per level
-- 🔧 **Tweakable**: Change speeds, colors, sizes instantly
+- {{< icon name="package" >}} **Organized data**: All enemy properties in one place
+- {{< icon name="rocket-launch" >}} **Easy expansion**: Add new types without touching existing code
+- {{< icon name="target" >}} **Level-specific**: Different enemy layouts per level
+- {{< icon name="wrench" >}} **Tweakable**: Change speeds, colors, sizes instantly
 
 
 ## Spawning Enemies: Bringing Danger to Life
@@ -398,13 +398,13 @@ function createEnemy(typeName, tileX, tileY) {
 ```
 
 **Smart spawning features:**
-- 🎯 **Tile-based positioning**: Place enemies precisely on grid
+- {{< icon name="target" >}} **Tile-based positioning**: Place enemies precisely on grid
 - 🆔 **Unique IDs**: Track individual enemies for special behaviors
-- 🧹 **Clean lifecycle**: Proper creation and cleanup
-- 🎨 **Visual variety**: Different colors and sizes per type
+- {{< icon name="broom" >}} **Clean lifecycle**: Proper creation and cleanup
+- {{< icon name="paint-brush" >}} **Visual variety**: Different colors and sizes per type
 
 
-## Enemy AI: Simple Brains, Effective Results! 🤖
+## Enemy AI: Simple Brains, Effective Results! {{< icon name="robot" >}}
 
 Time to give our enemies the intelligence to patrol and threaten the player:
 
@@ -496,18 +496,18 @@ function getDistance(obj1, obj2) {
 
 **What makes this "stupid" AI actually brilliant:**
 
-🔄 **Predictable patterns**: Players can learn and plan around enemy movements
+{{< icon name="arrows-clockwise" >}} **Predictable patterns**: Players can learn and plan around enemy movements
 
-⚡ **Instant feedback**: Enemies react immediately to walls with direction changes
+{{< icon name="lightning" >}} **Instant feedback**: Enemies react immediately to walls with direction changes
 
-🎯 **Consistent threat**: Always moving, always dangerous, never idle
+{{< icon name="target" >}} **Consistent threat**: Always moving, always dangerous, never idle
 
-🎨 **Visual personality**: Different colors and speeds create distinct "characters"
+{{< icon name="paint-brush" >}} **Visual personality**: Different colors and speeds create distinct "characters"
 
 **Performance benefits:**
-- 📊 **Efficient**: Simple math operations, no complex pathfinding
-- 🚀 **Scalable**: Can handle dozens of enemies without lag
-- 🧩 **Modular**: Easy to add new behaviors or modify existing ones
+- {{< icon name="chart-bar" >}} **Efficient**: Simple math operations, no complex pathfinding
+- {{< icon name="rocket-launch" >}} **Scalable**: Can handle dozens of enemies without lag
+- {{< icon name="puzzle-piece" >}} **Modular**: Easy to add new behaviors or modify existing ones
 
 **Design wisdom**: The best enemy AI doesn't try to outsmart the player - it creates interesting spatial and temporal puzzles for them to solve!
 
@@ -525,6 +525,6 @@ function gameLoop() {
 app.ticker.add(gameLoop);
 ```
 
-**🎊 Boom!** Your peaceful world is now alive with danger and challenge! These simple patrolling enemies transform static levels into dynamic puzzles. Players must now time their movements, find safe paths, and feel the thrill of narrowly avoiding threats!
+**{{< icon name="confetti" >}} Boom!** Your peaceful world is now alive with danger and challenge! These simple patrolling enemies transform static levels into dynamic puzzles. Players must now time their movements, find safe paths, and feel the thrill of narrowly avoiding threats!
 
 **Coming next**: We'll make these enemies even smarter by adding platform awareness and more sophisticated patrol behaviors! [Next: Enemy on Platform](/tutorial/world-one/13-enemy-on-platform/)

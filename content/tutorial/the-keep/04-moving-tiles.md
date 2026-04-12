@@ -303,7 +303,7 @@ const MOVING_TILE_TYPES = {
 
 `dirX`/`dirY` tell the tile which way to start moving. The range values are **relative to the starting tile position**, so you can place the same tile type anywhere in a map and its travel range will follow it. The tile bounces when it hits either boundary.
 
-## PLACING MOVING TILES 🗺️
+## PLACING MOVING TILES {{< icon name="map-trifold" >}}
 
 Like enemies and items, moving tiles are stored in a data array per room:
 
@@ -357,7 +357,7 @@ function buildMovingTiles() {
 
 Storing absolute boundaries avoids recalculating `start + range` on every frame. That may not sound like much, but at 60fps with many tiles it adds up!
 
-## LANDING ON A MOVING TILE 🎯
+## LANDING ON A MOVING TILE {{< icon name="target" >}}
 
 The landing check has one critical rule: **the hero must have been above the tile on the previous frame**. Without this, the hero would teleport to the top of any tile they happen to overlap with from the side.
 
@@ -413,7 +413,7 @@ if (player.velocityY > 0) {
 }
 ```
 
-## MOVING ALL THE TILES 🔄
+## MOVING ALL THE TILES {{< icon name="arrows-clockwise" >}}
 
 The `updateMovingTiles()` function runs once per frame **before** player input. It handles three jobs:
 

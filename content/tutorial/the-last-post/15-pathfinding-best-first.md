@@ -9,7 +9,7 @@ next = ""
 prev = "/tutorial/world-one/pathfinding-breadth-first/"
 +++
 
-Ready to supercharge your AI? 🚀 While breadth-first search guarantees the shortest path, it can be painfully slow on large maps - exploring EVERYWHERE before finding the target. What if your AI could be smarter and **guess** which direction to search first?
+Ready to supercharge your AI? {{< icon name="rocket-launch" >}} While breadth-first search guarantees the shortest path, it can be painfully slow on large maps - exploring EVERYWHERE before finding the target. What if your AI could be smarter and **guess** which direction to search first?
 
 Enter **Best-First Search** - the algorithm that adds intuition to pathfinding! Instead of blindly searching in all directions, your AI will make educated guesses about where the target might be, dramatically speeding up path discovery.
 
@@ -24,7 +24,7 @@ Enter **Best-First Search** - the algorithm that adds intuition to pathfinding! 
 - Completed the breadth-first pathfinding tutorial
 - Ready to see your AI get seriously smart!
 
-Time to give your pathfinding algorithm a brain upgrade that'll make it 5-10x faster! ⚡
+Time to give your pathfinding algorithm a brain upgrade that'll make it 5-10x faster! {{< icon name="lightning" >}}
 
 {{< pixidemo title="Pathfinding Best-First" >}}
 const app = new PIXI.Application();
@@ -337,13 +337,13 @@ app.stage.on('pointerdown', (event) => {
         leftDemo.tiles[startY][startX].clear().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0xffff00);
         rightDemo.tiles[startY][startX].clear().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0xffff00);
         
-        updateStatus('🚀 Starting algorithm race!');
+        updateStatus('{{< icon name="rocket-launch" >}} Starting algorithm race!');
         animateBreadthFirst(startX, startY, tileX, tileY);
     }
 });
 
 // Initialize
-updateStatus('🎯 Click anywhere on the maze to start the pathfinding race!');
+updateStatus('{{< icon name="target" >}} Click anywhere on the maze to start the pathfinding race!');
 {{< /pixidemo >}}
 
 
@@ -552,7 +552,7 @@ const gameWorld = {
 
 ## Advanced Optimizations: Enterprise-Level Performance
 
-**🚀 Pro-Level Techniques** for handling massive game worlds:
+**{{< icon name="rocket-launch" >}} Pro-Level Techniques** for handling massive game worlds:
 
 ### 1. Hierarchical Pathfinding
 For huge maps, don't search tile-by-tile - use waypoints!
@@ -659,15 +659,15 @@ class PathfindingCache {
 }
 ```
 
-**🎉 Incredible Achievement!** You've mastered intelligent pathfinding that's ready for professional game development! Your AI can now:
+**{{< icon name="confetti" >}} Incredible Achievement!** You've mastered intelligent pathfinding that's ready for professional game development! Your AI can now:
 
-- ⚡ **Find paths 5-10x faster** than basic breadth-first
-- 🧠 **Make smart decisions** using heuristics
+- {{< icon name="lightning" >}} **Find paths 5-10x faster** than basic breadth-first
+- {{< icon name="brain" >}} **Make smart decisions** using heuristics
 - 🏗️ **Scale to massive worlds** with hierarchical techniques  
 - ⏱️ **Never freeze the game** with async processing
-- 🎯 **Handle real-time scenarios** like RTS games
+- {{< icon name="target" >}} **Handle real-time scenarios** like RTS games
 
-**Next Level**: Ready to learn A* pathfinding? It combines the best of both worlds - the optimality of breadth-first with the speed of best-first. Your journey into advanced game AI is just beginning! 🚀
+**Next Level**: Ready to learn A* pathfinding? It combines the best of both worlds - the optimality of breadth-first with the speed of best-first. Your journey into advanced game AI is just beginning! {{< icon name="rocket-launch" >}}
         this.y = y;
         this.parent = parent;
         this.actualCost = actualCost;  // Steps taken to reach this tile
@@ -692,7 +692,7 @@ function findPathBestFirst(startX, startY, targetX, targetY, map) {
     const closedSet = new Set();      // Tiles already fully explored
     
     while (openList.length > 0) {
-        // 🔥 THE MAGIC: Sort by heuristic (best guess first!)
+        // {{< icon name="fire" >}} THE MAGIC: Sort by heuristic (best guess first!)
         openList.sort((a, b) => a.heuristic - b.heuristic);
         const current = openList.shift();
         

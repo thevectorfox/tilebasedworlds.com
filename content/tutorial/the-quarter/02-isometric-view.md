@@ -167,7 +167,7 @@ const worldY = row * TILE_SIZE;
 const screen = isoToScreen(worldX, worldY);
 ```
 
-## TWO COORDINATE SYSTEMS 🗺️
+## TWO COORDINATE SYSTEMS {{< icon name="map-trifold" >}}
 
 The most important architectural rule in isometric games: **keep all game logic in world space**.
 
@@ -188,7 +188,7 @@ function gameLoop() {
 
 Your `isSolid()` function doesn't change at all - it still divides by `TILE_SIZE` to find which grid cell the player is in. The diamond view is purely a visual layer on top.
 
-## DRAWING DIAMOND TILES 💎
+## DRAWING DIAMOND TILES {{< icon name="diamond" >}}
 
 `Graphics.poly()` draws any polygon from a flat array of `[x1, y1, x2, y2, ...]` vertices. A flat ground diamond:
 

@@ -137,7 +137,7 @@ document.body.appendChild(app.canvas);
 
 Items are different in what they do - coins add a little to your score, gems are worth ten times more. That's the same trick games use to reward you for exploring off the beaten path. In this tutorial all items just give points, but the same pattern works for health potions, ammo pickups, power-ups, or anything else you want to create!
 
-## TRACKING YOUR SCORE 💰
+## TRACKING YOUR SCORE {{< icon name="currency-dollar" >}}
 
 Add a `points` property to your `game` object:
 
@@ -164,7 +164,7 @@ app.stage.addChild(pointsDisplay);
 pointsDisplay.text = `Points: ${game.points}`;
 ```
 
-## SOMETHING TO PICK UP 🪙💎
+## SOMETHING TO PICK UP {{< icon name="coin" >}}{{< icon name="diamond" >}}
 
 Like enemies, items are stored in a data array - one sub-array per room. Each item is three numbers: `[type, tileX, tileY]`.
 
@@ -189,7 +189,7 @@ const ITEM_TYPES = {
 
 The type number in `myItems` is the key into `ITEM_TYPES`. So `[2,6,3]` means "a gem (type 2) at tile column 6, row 3". Type 1 gives 1 point, type 2 gives 10 - go hunt those gems!
 
-## PLACING ITEMS ON THE MAP 🗺️
+## PLACING ITEMS ON THE MAP {{< icon name="map-trifold" >}}
 
 When you call `buildMap()`, loop through the items for the current room and create a PixiJS graphic for each one. Store everything in a JavaScript `Map` object keyed by tile position so you can do instant lookups during pickup checks.
 
@@ -226,7 +226,7 @@ function buildItems() {
 
 The key is just `"tileX_tileY"` - for example a gem at column 6, row 3 gets the key `"6_3"`. When the hero steps on that tile you can check `activeItems.get("6_3")` instantly, no looping required.
 
-## COLLECTING ITEMS 🎯
+## COLLECTING ITEMS {{< icon name="target" >}}
 
 Add this check at the end of your movement function. After every step, look up the player's current tile in `activeItems`:
 

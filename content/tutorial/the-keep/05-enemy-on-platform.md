@@ -9,7 +9,7 @@ next = "/tutorial/the-keep/shoot-him/"
 prev = "/tutorial/the-keep/moving-tiles/"
 +++
 
-Time to make your enemies SMART! 🧠 While basic wall-bouncing enemies are useful, platform-aware enemies that don't fall off edges create much more interesting and unpredictable gameplay. Think of the Goombas in Mario that patrol platforms, or the security robots in Mega Man that never fall into pits - these enemies feel more alive and create better spatial challenges!
+Time to make your enemies SMART! {{< icon name="brain" >}} While basic wall-bouncing enemies are useful, platform-aware enemies that don't fall off edges create much more interesting and unpredictable gameplay. Think of the Goombas in Mario that patrol platforms, or the security robots in Mega Man that never fall into pits - these enemies feel more alive and create better spatial challenges!
 
 {{< pixidemo title="Enemy on Platform" >}}
 const app = new PIXI.Application();
@@ -489,24 +489,24 @@ function updateEnemyAI(enemy) {
 ```
 
 **Why this creates better gameplay:**
-- 🎯 **Unpredictable but fair**: Players can't memorize exact patterns
-- 🎭 **Personality variety**: Different enemies feel distinct
+- {{< icon name="target" >}} **Unpredictable but fair**: Players can't memorize exact patterns
+- {{< icon name="mask-happy" >}} **Personality variety**: Different enemies feel distinct
 - ⏳ **Spatial coverage**: Enemies explore more of the level
 - 🤔 **Adaptive challenge**: Players must stay alert and reactive
 
-## Complete Implementation Summary 🏆
+## Complete Implementation Summary {{< icon name="trophy" >}}
 
-**🔥 What you've built:**
+**{{< icon name="fire" >}} What you've built:**
 - ✅ **Platform-aware enemies** that don't fall off edges
 - ✅ **Smart direction changes** that create unpredictability
 - ✅ **Personality-based AI** through simple turn chance parameters
 - ✅ **Visual feedback** for direction changes and collisions
 - ✅ **Performance-optimized** collision detection
 
-**🎮 Gameplay impact:**
+**{{< icon name="game-controller" >}} Gameplay impact:**
 Your enemies now feel **intentional and alive** rather than mindlessly bouncing around. They patrol platforms like guards, explore areas like scouts, and create dynamic spatial challenges that keep players engaged.
 
-**🚀 Performance tips:**
+**{{< icon name="rocket-launch" >}} Performance tips:**
 - Limit smart enemies to 3-5 per level for smooth gameplay
 - Use different AI personalities to create variety without complexity
 - Edge detection only for horizontal movement saves processing power
@@ -564,8 +564,8 @@ function updateEnemyAI(enemy) {
 ```
 
 **Why this creates better gameplay:**
-- 🎯 **Unpredictable but fair**: Players can't memorize exact patterns
-- 🎭 **Personality variety**: Different enemies feel distinct
+- {{< icon name="target" >}} **Unpredictable but fair**: Players can't memorize exact patterns
+- {{< icon name="mask-happy" >}} **Personality variety**: Different enemies feel distinct
 - ⏳ **Spatial coverage**: Enemies explore more of the level
 - 🤔 **Adaptive challenge**: Players must stay alert and reactive
 

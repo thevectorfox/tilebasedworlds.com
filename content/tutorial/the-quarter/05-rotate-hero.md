@@ -414,7 +414,7 @@ function gameLoop() {
 gameLoop();
 ```
 
-**🎉 Congratulations!** You've just implemented 360-degree character movement! Your hero can now:
+**{{< icon name="confetti" >}} Congratulations!** You've just implemented 360-degree character movement! Your hero can now:
 - Rotate smoothly with the arrow keys  
 - Move forward and backward in any direction
 - Handle collisions with directional movement

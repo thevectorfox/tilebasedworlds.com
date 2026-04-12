@@ -9,7 +9,7 @@ next = "/tutorial/world-one/pathfinding-best-first/"
 prev = "/tutorial/world-one/stupid-enemy/"
 +++
 
-Time to give your characters some serious brains! 🧠 So far, your hero has been pretty... let's say "directionally challenged." Tell them to go left, they go left - even straight into a wall! But what if they could think for themselves and find clever paths around obstacles?
+Time to give your characters some serious brains! {{< icon name="brain" >}} So far, your hero has been pretty... let's say "directionally challenged." Tell them to go left, they go left - even straight into a wall! But what if they could think for themselves and find clever paths around obstacles?
 
 Welcome to the world of **pathfinding** - the AI magic behind every smart enemy in RTS games, every helpful companion in RPGs, and every tower defense unit that knows exactly how to reach their target. You're about to implement the same algorithms that power characters in *Starcraft*, *Age of Empires*, and countless other games!
 
@@ -138,7 +138,7 @@ function animateSearch(queue, visited, target, step = 0) {
     
     // Check if we reached the target
     if (current.x === target.x && current.y === target.y) {
-        updateStatus('🎉 Path found! Building route...');
+        updateStatus('{{< icon name="confetti" >}} Path found! Building route...');
         buildPath(current);
         return;
     }
@@ -239,7 +239,7 @@ function clearVisualization() {
 
 function findPath(startX, startY, targetX, targetY) {
     clearVisualization();
-    updateStatus('🎯 Starting pathfinding...');
+    updateStatus('{{< icon name="target" >}} Starting pathfinding...');
     
     const startNode = new PathfindingNode(startX, startY);
     const queue = [startNode];
@@ -278,10 +278,10 @@ updateStatus('🖱️ Click on any empty tile to see pathfinding in action!');
 **Mind = Blown! 🤯** You just watched the **Breadth-First Search** algorithm in action! Notice how the search expands outward like ripples in a pond? That's the "breadth-first" part - it explores all tiles at distance 1, then all tiles at distance 2, and so on.
 
 **Why This Matters:**
-- 🎯 **Guaranteed Shortest Path**: Breadth-first always finds the route with the fewest steps
+- {{< icon name="target" >}} **Guaranteed Shortest Path**: Breadth-first always finds the route with the fewest steps
 - 🔍 **Systematic Search**: No randomness - it methodically explores every possibility  
-- 🏰 **Perfect for Grid Games**: RTS units, tower defense enemies, puzzle games
-- 🧠 **Foundation Knowledge**: Understanding this unlocks more advanced AI algorithms
+- {{< icon name="castle" >}} **Perfect for Grid Games**: RTS units, tower defense enemies, puzzle games
+- {{< icon name="brain" >}} **Foundation Knowledge**: Understanding this unlocks more advanced AI algorithms
 
 **Real-World Usage:**
 - **RTS Games**: Units finding paths around buildings and terrain
@@ -413,7 +413,7 @@ function buildPathArray(endNode) {
 }
 ```
 
-**🎯 Algorithm Breakdown**:
+**{{< icon name="target" >}} Algorithm Breakdown**:
 1. **Queue**: Stores tiles we need to explore (breadth-first order)
 2. **Visited Set**: Prevents revisiting tiles (infinite loops = bad!)
 3. **Parent Tracking**: Each node remembers how we got there
@@ -496,7 +496,7 @@ function gameLoop() {
 }
 ```
 
-**🎮 User Experience Magic**: 
+**{{< icon name="game-controller" >}} User Experience Magic**: 
 - **Instant feedback**: Path calculation happens immediately on click
 - **Smooth movement**: Character smoothly follows the calculated route
 - **Flexible targeting**: Click anywhere reachable for navigation
@@ -504,7 +504,7 @@ function gameLoop() {
 
 ## Performance and Optimization
 
-**⚡ Real-World Considerations**: Pathfinding can be expensive! Here's how to keep your game smooth:
+**{{< icon name="lightning" >}} Real-World Considerations**: Pathfinding can be expensive! Here's how to keep your game smooth:
 
 ```javascript
 // Optimization 1: Limit search area
@@ -564,18 +564,18 @@ async function findPathAsync(startX, startY, targetX, targetY, map) {
 }
 ```
 
-**🚀 Performance Tips**:
+**{{< icon name="rocket-launch" >}} Performance Tips**:
 - **Limit search distance**: Don't search the entire world for every path
 - **Cache common paths**: Store frequently-used routes
 - **Use async for large maps**: Spread pathfinding across multiple frames
 - **Early exit**: Stop searching if distance gets too far
 
-**🎉 Amazing Work!** You've just implemented **professional-grade pathfinding**! Your characters can now:
+**{{< icon name="confetti" >}} Amazing Work!** You've just implemented **professional-grade pathfinding**! Your characters can now:
 
-- ✨ Navigate intelligently around obstacles
-- 🎯 Find the shortest route every time
-- 🧠 Make decisions like real game AI
-- 🎮 Provide smooth click-to-move gameplay
+- {{< icon name="sparkle" >}} Navigate intelligently around obstacles
+- {{< icon name="target" >}} Find the shortest route every time
+- {{< icon name="brain" >}} Make decisions like real game AI
+- {{< icon name="game-controller" >}} Provide smooth click-to-move gameplay
 
 **Try This**: Experiment with diagonal movement, weighted terrain costs, or multiple units pathfinding simultaneously. You've mastered the foundation - now the sky's the limit!
 

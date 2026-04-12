@@ -9,7 +9,7 @@ next = "/tutorial/world-one/the-hero/"
 prev = "/tutorial/world-one/more-maps/"
 +++
 
-Time to witness some MAGIC! 🎮 You're about to transform those boring arrays of numbers into a living, breathing game world. By the end of this chapter, you'll watch your map data come alive on screen - just like the pros do it! This is the moment where your game starts feeling real.
+Time to witness some MAGIC! {{< icon name="game-controller" >}} You're about to transform those boring arrays of numbers into a living, breathing game world. By the end of this chapter, you'll watch your map data come alive on screen - just like the pros do it! This is the moment where your game starts feeling real.
 
 Look at our map array again, but this time imagine it as your game world:
 
@@ -106,7 +106,7 @@ const TileTypes = {
 };
 ```
 
-Boom! Look what we've built - a complete tile system! 🔥 The `game` object holds all our configuration - keeping everything organized in one place makes our code much cleaner and easier to manage. You're already thinking like a game developer!
+Boom! Look what we've built - a complete tile system! {{< icon name="fire" >}} The `game` object holds all our configuration - keeping everything organized in one place makes our code much cleaner and easier to manage. You're already thinking like a game developer!
 
 Notice how we set `tileW: 30` and `tileH: 30` in our game object. This defines how big each tile will be in pixels. Here's something cool - tiles don't have to be squares! Want massive 64x64 tiles for that chunky retro feel? Thin 32x8 platform strips for precise platforming? Just change these numbers and watch the magic happen!
 
@@ -136,7 +136,7 @@ Time to make those tiles appear on screen! This is where the real magic happens.
 - **Step 2**: Loop through every tile position (we're building this systematically!)
 - **Step 3**: Create graphics for each tile (watch the magic happen!)
 - **Step 4**: Position everything perfectly
-- **Step 5**: Add it all to the stage (and celebrate! 🎉)
+- **Step 5**: Add it all to the stage (and celebrate! {{< icon name="confetti" >}})
 
 Here's our modern PixiJS powerhouse:
 
@@ -189,7 +189,7 @@ async function buildMap(map, containerId) {
 }
 ```
 
-### Try This Right Now! 🔥
+### Try This Right Now! {{< icon name="fire" >}}
 Want to see some instant magic? Try changing the colors in `TileTypes` and refresh the page:
 - Want red walls? Change `0x00ff41` to `0xff0000`
 - Want blue floors? Change `0x003311` to `0x0066cc`
@@ -225,7 +225,7 @@ for (let row = 0; row < mapHeight; row++) {      // Loop through rows (top to bo
 const mapApp = await buildMap(myMap, 'my-canvas-container');
 ```
 
-🏆 **VICTORY!** You just built a complete tile rendering system that would make professional game developers proud! This is the same technique used in countless indie hits and AAA games. Your arrays of numbers have transformed into a visual game world!
+{{< icon name="trophy" >}} **VICTORY!** You just built a complete tile rendering system that would make professional game developers proud! This is the same technique used in countless indie hits and AAA games. Your arrays of numbers have transformed into a visual game world!
 
 **What you've accomplished:**
 - ✅ Mastered the fundamentals of game rendering
@@ -233,6 +233,6 @@ const mapApp = await buildMap(myMap, 'my-canvas-container');
 - ✅ Created your first interactive game world
 - ✅ Learned the same techniques used by the pros
 
-Ready to add some life to this world? Next up: creating a hero character who can explore your newly created level! Time to make your world truly interactive! 🚀
+Ready to add some life to this world? Next up: creating a hero character who can explore your newly created level! Time to make your world truly interactive! {{< icon name="rocket-launch" >}}
 
 [Next: The Hero](/tutorial/world-one/05-the-hero/)

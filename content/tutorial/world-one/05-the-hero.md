@@ -9,7 +9,7 @@ next = "/tutorial/world-one/keys-to-move/"
 prev = "/tutorial/world-one/rendering-a-map/"
 +++
 
-Time to create your HERO! 🦸 Every legendary game needs a protagonist - someone the player connects with, controls, and cheers for. Whether it's Mario jumping through pipes, Link exploring Hyrule, or Celeste climbing mountains, the hero makes the game come alive. You're about to bring your first character into your tile-based world!
+Time to create your HERO! {{< icon name="person-simple-run" >}} Every legendary game needs a protagonist - someone the player connects with, controls, and cheers for. Whether it's Mario jumping through pipes, Link exploring Hyrule, or Celeste climbing mountains, the hero makes the game come alive. You're about to bring your first character into your tile-based world!
 
 
 {{< pixidemo title="The Hero" >}}
@@ -62,7 +62,7 @@ Time to create your HERO! 🦸 Every legendary game needs a protagonist - someon
         }
     }
     
-    // NOW FOR THE HERO! 🦸
+    // NOW FOR THE HERO! {{< icon name="person-simple-run" >}}
     const hero = new PIXI.Graphics();
     hero.beginFill(0xff4444);  // Bright red hero
     hero.drawRect(-10, -10, 20, 20);  // 20x20 square, centered
@@ -91,11 +91,11 @@ Time to create your HERO! 🦸 Every legendary game needs a protagonist - someon
     });
 {{< /pixidemo >}}
 
-Look at that! Your hero (the red square) is standing proudly in your game world! 🔥
+Look at that! Your hero (the red square) is standing proudly in your game world! {{< icon name="fire" >}}
 
 ## CREATING YOUR HERO OBJECT
 
-What doesn't look mighty? That red square is your HERO! 💪 Sure, they might not look like Link or Mario yet, but every legendary character started as simple shapes. The beauty of game development is that you can make this hero uniquely yours!
+What doesn't look mighty? That red square is your HERO! {{< icon name="hand-fist" >}} Sure, they might not look like Link or Mario yet, but every legendary character started as simple shapes. The beauty of game development is that you can make this hero uniquely yours!
 
 **Modern Hero Setup:**
 Let's create a hero object that holds all our character's data:
@@ -132,7 +132,7 @@ const hero = {
 
 Think of it like this: tile position is your "address" ("I'm at tile 2,1"), pixel position is your exact location ("I'm at pixel 75,45")!
 
-## BRINGING YOUR HERO TO LIFE! 🚀
+## BRINGING YOUR HERO TO LIFE! {{< icon name="rocket-launch" >}}
 
 Time to make your hero appear in the world! Add this amazing function to your game:
 
@@ -186,7 +186,7 @@ const heroSprite = createHero(hero, game.tileW);
 app.stage.addChild(heroSprite);
 ```
 
-## LEVEL UP YOUR HERO! 🎨
+## LEVEL UP YOUR HERO! {{< icon name="paint-brush" >}}
 
 Want to make your hero look more epic? Here are some ideas to try:
 
@@ -217,7 +217,7 @@ const heroSprite = new PIXI.Sprite(heroTexture);
 heroSprite.anchor.set(0.5);
 ```
 
-🏆 **ACHIEVEMENT UNLOCKED: First Hero Created!**
+{{< icon name="trophy" >}} **ACHIEVEMENT UNLOCKED: First Hero Created!**
 
 You've just accomplished something amazing - you created your first interactive game character! Your hero now exists in your tile-based world, perfectly positioned and ready for adventure.
 

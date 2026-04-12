@@ -416,7 +416,7 @@ function checkStillOnGround() {
 3. While falling → cloud platforms are checked for landing
 4. When landing on cloud → `player.onGround = true` → can jump again!
 
-**🎉 Congratulations!** You now have silky-smooth cloud platforms just like the pros use! Players can flow through your levels naturally, jumping up through platforms and landing on them from above.
+**{{< icon name="confetti" >}} Congratulations!** You now have silky-smooth cloud platforms just like the pros use! Players can flow through your levels naturally, jumping up through platforms and landing on them from above.
 
 **Try different feels**: Experiment with the `+5` inset values for feet detection, or add different cloud types with different behaviors. The foundation you've built makes these variations super easy to implement!
 

@@ -219,7 +219,7 @@ In isometric, tiles are placed at angles. The same screen pixel could be in comp
 
 The diamond tile that lives at logical position (2, 1) appears at a completely different screen location than the tile at (1, 2) — even though both might be at the same screen Y coordinate. You need to invert the `isoToScreen()` transform.
 
-## INVERTING THE FORMULA 🔄
+## INVERTING THE FORMULA {{< icon name="arrows-clockwise" >}}
 
 The forward transform is:
 

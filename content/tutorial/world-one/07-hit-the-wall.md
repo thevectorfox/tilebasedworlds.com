@@ -9,7 +9,7 @@ next = "/tutorial/world-one/open-the-door/"
 prev = "/tutorial/world-one/keys-to-move/"
 +++
 
-Time to make your game world SOLID! 💥 Collision detection is what separates real games from slideshows - it's the magic that makes walls feel solid, platforms feel sturdy, and your hero feel like they truly exist in the world. You're about to master one of the most crucial skills in game development!
+Time to make your game world SOLID! {{< icon name="explosion" >}} Collision detection is what separates real games from slideshows - it's the magic that makes walls feel solid, platforms feel sturdy, and your hero feel like they truly exist in the world. You're about to master one of the most crucial skills in game development!
 
 {{< pixidemo title="Hit the Wall" >}}
     // Create PixiJS application for collision demo
@@ -149,7 +149,7 @@ Time to make your game world SOLID! 💥 Collision detection is what separates r
     app.ticker.add(updateMovement);
 {{< /pixidemo >}}
 
-**Try it!** Use arrow keys to move around. Notice how the hero can't pass through walls and turns slightly red when hitting them! 🚧
+**Try it!** Use arrow keys to move around. Notice how the hero can't pass through walls and turns slightly red when hitting them! {{< icon name="warning-circle" >}}
 
 ## COLLISION DETECTION: THE FOUNDATION 🧱
 
@@ -187,13 +187,13 @@ function tryMoveTo(hero, newTileX, newTileY, gameMap) {
 ```
 
 **Why this approach rocks:**
-- 🚀 **Super fast**: Just one array lookup per movement
-- 🧠 **Easy to understand**: Clear logic anyone can follow
-- 🔧 **Easy to extend**: Simple to add different tile types
-- 🎮 **Perfect for tile games**: Works great for grid-based movement
+- {{< icon name="rocket-launch" >}} **Super fast**: Just one array lookup per movement
+- {{< icon name="brain" >}} **Easy to understand**: Clear logic anyone can follow
+- {{< icon name="wrench" >}} **Easy to extend**: Simple to add different tile types
+- {{< icon name="game-controller" >}} **Perfect for tile games**: Works great for grid-based movement
 
 
-## ADVANCED: BOUNDING BOX COLLISION 📦
+## ADVANCED: BOUNDING BOX COLLISION {{< icon name="package" >}}
 
 **For pixel-perfect movement and larger characters:**
 
@@ -257,7 +257,7 @@ function updateSmoothMovement(hero, keys, gameMap, tileSize) {
 This allows "wall sliding" - if you hit a wall while moving diagonally, you can still slide along it. Just like in Mario or Zelda!
 
 
-## COMPLETE COLLISION SYSTEM 🎮
+## COMPLETE COLLISION SYSTEM {{< icon name="game-controller" >}}
 
 **Put it all together:**
 
@@ -336,7 +336,7 @@ function updateMovement(hero, keys) {
 }
 ```
 
-## PRO TIPS & ENHANCEMENTS 🚀
+## PRO TIPS & ENHANCEMENTS {{< icon name="rocket-launch" >}}
 
 **Visual Feedback:**
 ```js
@@ -392,7 +392,7 @@ function getTileEffect(tileType) {
 }
 ```
 
-🏆 **COLLISION MASTERY ACHIEVED!**
+{{< icon name="trophy" >}} **COLLISION MASTERY ACHIEVED!**
 
 You've just mastered one of the most important systems in game development! Your games now have solid, responsive collision detection that makes the world feel real and interactive.
 

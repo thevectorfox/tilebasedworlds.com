@@ -9,7 +9,7 @@ next = ""
 prev = "/tutorial/the-keep/depth/"
 +++
 
-🎉 **Welcome to the GRAND FINALE!** 🎉
+{{< icon name="confetti" >}} **Welcome to the GRAND FINALE!** {{< icon name="confetti" >}}
 
 You've mastered tile collision, jumping physics, pathfinding AI, and camera rotation. Now it's time for the ultimate challenge: **slopes!** This isn't just another tutorial - this is where your tile-based world transforms from blocky Minecraft terrain into smooth, flowing landscapes like *Super Mario World* or *Sonic the Hedgehog*.
 
@@ -302,12 +302,12 @@ hero.y = player.y;
 
 ## The Science of Smooth Terrain
 
-**Did you see that magic?! ✨** Your character just walked up and down hills as naturally as walking on flat ground! No awkward jumping, no getting stuck on elevation changes - just pure, fluid movement that feels incredible.
+**Did you see that magic?! {{< icon name="sparkle" >}}** Your character just walked up and down hills as naturally as walking on flat ground! No awkward jumping, no getting stuck on elevation changes - just pure, fluid movement that feels incredible.
 
 **Why This Matters:**
 Slopes transform your game world from a blocky, artificial grid into **natural, flowing terrain**. Compare:
 
-- **Without slopes**: Jump, jump, jump up every platform like a robot 🤖
+- **Without slopes**: Jump, jump, jump up every platform like a robot {{< icon name="robot" >}}
 - **With slopes**: Glide smoothly up hills and down valleys like a real character 🏃‍♀️
 
 **The Mathematical Beauty:**
@@ -438,7 +438,7 @@ function calculateSlopeHeight(worldX, worldY, tileSize) {
 }
 ```
 
-**🧠 Math Breakdown**:
+**{{< icon name="brain" >}} Math Breakdown**:
 - **localX**: How far into the tile we are (0-30 for 30px tiles)
 - **SLOPE_UP**: As we move right, ground gets higher (height = 30 - localX)
 - **SLOPE_DOWN**: As we move right, ground gets lower (height = localX)
@@ -520,7 +520,7 @@ function checkVerticalMovement(x, newY, player, gameMap) {
 }
 ```
 
-**🎯 Key Features**:
+**{{< icon name="target" >}} Key Features**:
 - **Smooth Walking**: Character height adjusts pixel-perfectly to slope angle
 - **Natural Transitions**: Seamless movement between flat and sloped terrain
 - **Jump Integration**: Jumping works perfectly from any slope angle
@@ -907,22 +907,22 @@ Slope Height: ${slopeHeight ? slopeHeight.toFixed(1) : 'None'}`;
 })();
 </script>
 
-**🎯 Demo Features:**
+**{{< icon name="target" >}} Demo Features:**
 - **Smooth Slope Walking**: Character height adjusts perfectly to terrain
 - **Real-time Physics**: Watch velocity and position calculations live
 - **Seamless Transitions**: Move naturally between flat ground and slopes  
 - **Jump Integration**: Jumping works from any position on slopes
 - **Professional Feel**: Physics that match commercial games
 
-## �🎉 **CONGRATULATIONS - YOU'VE COMPLETED THE ENTIRE SERIES!** 🎉
+## �{{< icon name="confetti" >}} **CONGRATULATIONS - YOU'VE COMPLETED THE ENTIRE SERIES!** {{< icon name="confetti" >}}
 
 **What an incredible journey!** You started with basic tile collision and finished with **advanced slope physics** that rivals professional games. You've mastered:
 
-✨ **28 Advanced Tutorials** covering every aspect of tile-based games
-🎮 **Modern JavaScript/PixiJS** implementation ready for real projects  
-🧠 **Professional Algorithms** including pathfinding and physics systems
+{{< icon name="sparkle" >}} **28 Advanced Tutorials** covering every aspect of tile-based games
+{{< icon name="game-controller" >}} **Modern JavaScript/PixiJS** implementation ready for real projects  
+{{< icon name="brain" >}} **Professional Algorithms** including pathfinding and physics systems
 🏗️ **Scalable Architecture** patterns used in AAA game development
-🎯 **Interactive Learning** with hands-on demos for every concept
+{{< icon name="target" >}} **Interactive Learning** with hands-on demos for every concept
 
 **Your Game Development Superpowers:**
 - Tile-based collision detection and movement systems
@@ -939,6 +939,6 @@ Slope Height: ${slopeHeight ? slopeHeight.toFixed(1) : 'None'}`;
 - **RPGs** with tile-based movement and exploration
 - **Puzzle Games** with physics-based mechanics
 
-The game development world is your oyster! 🚀
+The game development world is your oyster! {{< icon name="rocket-launch" >}}
 
-**Keep Building, Keep Learning, Keep Creating Amazing Games!** 🎮✨
+**Keep Building, Keep Learning, Keep Creating Amazing Games!** {{< icon name="game-controller" >}}{{< icon name="sparkle" >}}

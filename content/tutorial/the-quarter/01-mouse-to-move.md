@@ -225,7 +225,7 @@ canvas.addEventListener('mouseleave', () => {
 });
 ```
 
-## CLICK TO SET TARGET 🎯
+## CLICK TO SET TARGET {{< icon name="target" >}}
 
 When the player clicks a walkable tile, store the destination and tell the hero to start moving:
 
@@ -313,7 +313,7 @@ function movePlayer() {
 
 The modulo check `player.x % TILE_SIZE === CENTER` is the trick. Since the hero starts at a tile center (x=39 for tile 1, where 39 % 30 = 9 = CENTER), and moves in 2px steps, it hits the next center (x=69, 69 % 30 = 9) after exactly 15 frames - and every tile center beyond that.
 
-## THE PATHFINDING TRADE-OFF 🗺️
+## THE PATHFINDING TRADE-OFF {{< icon name="map-trifold" >}}
 
 This approach is called **greedy pathfinding**: always try to close the gap directly. It works well on open maps, but gets stuck when walls are in the way:
 

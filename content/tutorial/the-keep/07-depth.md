@@ -112,7 +112,7 @@ function gameLoop() {
 app.ticker.add(gameLoop);
 {{< /pixidemo >}}
 
-## THE ILLUSION 🎭
+## THE ILLUSION {{< icon name="mask-happy" >}}
 
 Top-down games use a simple rule: **things lower on the screen are closer to the viewer**. Imagine looking down at a scene from above. A character further north (higher up on screen) is physically further away, so objects in the south overlap them.
 

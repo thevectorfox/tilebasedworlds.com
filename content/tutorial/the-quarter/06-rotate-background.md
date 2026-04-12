@@ -158,9 +158,9 @@ app.ticker.add(updateCamera);
 **Mind = Blown** 🤯 What you just experienced is the power of **coordinate space transformation**! Instead of moving the player around a static world, we're doing the opposite - keeping the player fixed and moving the entire world around them.
 
 This technique is used in tons of games:
-- 🚀 **Space games**: Your ship stays centered while asteroids swirl around you
+- {{< icon name="rocket-launch" >}} **Space games**: Your ship stays centered while asteroids swirl around you
 - 🏎️ **Racing games**: The track rotates beneath your car
-- 🧩 **Puzzle games**: Levels that physically rotate to solve challenges
+- {{< icon name="puzzle-piece" >}} **Puzzle games**: Levels that physically rotate to solve challenges
 - 🌌 **Exploration games**: Camera effects that follow terrain or create dramatic angles
 
 **Performance Tip**: Notice how smooth the demo runs even with a large world? That's because modern browsers and PixiJS are optimized for this kind of transformation. Still, be mindful with huge worlds - only render what's visible!
@@ -355,7 +355,7 @@ function gameLoop() {
 
 ## Performance and Visual Polish
 
-**🎨 Fixing Visual Glitches**: When rotating pixel art, you might notice thin lines appearing between tiles. Here's how to fix it:
+**{{< icon name="paint-brush" >}} Fixing Visual Glitches**: When rotating pixel art, you might notice thin lines appearing between tiles. Here's how to fix it:
 
 ```javascript
 // Option 1: Overlap tiles slightly
@@ -376,7 +376,7 @@ function setupCrispRendering() {
 }
 ```
 
-**⚡ Performance Optimization**:
+**{{< icon name="lightning" >}} Performance Optimization**:
 
 ```javascript
 // Cull off-screen tiles when rotating large worlds
@@ -392,12 +392,12 @@ function optimizeWorldRendering(worldContainer) {
 }
 ```
 
-**🎉 Congratulations!** You've just mastered one of the coolest camera effects in game development! Your players can now:
+**{{< icon name="confetti" >}} Congratulations!** You've just mastered one of the coolest camera effects in game development! Your players can now:
 
-- ✨ Experience smooth world rotation around their character
-- 🚀 Move through space with the universe spinning around them  
-- 🎮 Enjoy professional-quality camera effects
-- 🎯 Navigate with directional movement that follows world rotation
+- {{< icon name="sparkle" >}} Experience smooth world rotation around their character
+- {{< icon name="rocket-launch" >}} Move through space with the universe spinning around them  
+- {{< icon name="game-controller" >}} Enjoy professional-quality camera effects
+- {{< icon name="target" >}} Navigate with directional movement that follows world rotation
 
 **Try This**: Experiment with different rotation speeds, add smooth easing, or try rotating only when moving. Many games combine this with particle effects or screen shake for extra impact!
 
