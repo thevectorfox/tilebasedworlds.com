@@ -23,7 +23,7 @@ Platformer mechanics — jumping, gravity, ladders, moving platforms, enemies, c
 
 Isometric rendering, depth sorting, mouse-driven movement, and camera rotation.
 
-### A Thinking World *(coming soon)*
+### [A Thinking World](/tutorial/a-thinking-world)
 
 Pathfinding foundations — BFS, Dijkstra's, Greedy Best-First, and A*.
 

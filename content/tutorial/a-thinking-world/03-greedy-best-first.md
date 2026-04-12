@@ -2,7 +2,7 @@
 title = "Greedy Best-First"
 date = 2026-03-09T23:00:00+11:00
 weight = 3
-draft = true
+draft = false
 slug = "greedy-best-first"
 tags = ["advanced", "pathfinding", "tutorial"]
 prev = "/tutorial/a-thinking-world/dijkstras/"
