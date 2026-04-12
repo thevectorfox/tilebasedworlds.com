@@ -61,22 +61,77 @@ function DynamicActions() {
   return null
 }
 
+function applyTheme(t: string) {
+  document.documentElement.setAttribute('data-theme', t)
+  localStorage.setItem('theme', t)
+}
+
+function applyPrimary(p: string) {
+  document.documentElement.setAttribute('data-primary', p)
+  localStorage.setItem('primary', p)
+}
+
 const staticActions: Action[] = [
+  // ── Navigation ──────────────────────────────────────────────
   {
     id: 'home',
     name: 'Home',
-    shortcut: ['g', 'h'],
+    shortcut: ['h'],
     keywords: 'home start',
     perform: () => { window.location.href = '/' },
     section: 'Navigation',
   },
-  // {
-  //   id: 'theme-dark',
-  //   name: 'Dark Mode',
-  //   keywords: 'theme dark',
-  //   perform: () => document.documentElement.classList.add('dark'),
-  //   section: 'Preferences',
-  // },
+  {
+    id: 'tutorials',
+    name: 'Tutorials',
+    shortcut: ['t'],
+    keywords: 'tutorials guides',
+    perform: () => { window.location.href = '/tutorial' },
+    section: 'Navigation',
+  },
+
+  // ── Theme ────────────────────────────────────────────────────
+  {
+    id: 'theme-light',
+    name: 'Light Mode',
+    shortcut: ['l'],
+    keywords: 'theme light bright day',
+    perform: () => applyTheme('light'),
+    section: 'Theme',
+  },
+  {
+    id: 'theme-dark',
+    name: 'Dark Mode',
+    shortcut: ['d'],
+    keywords: 'theme dark night dim',
+    perform: () => applyTheme('dark'),
+    section: 'Theme',
+  },
+  {
+    id: 'theme-retro',
+    name: '🕹️ Unlock Arcade Mode',
+    keywords: 'theme retro arcade green neon terminal pixel',
+    perform: () => applyTheme('retro'),
+    section: 'Theme',
+  },
+
+  // ── Colour ───────────────────────────────────────────────────
+  {
+    id: 'primary-purple',
+    name: 'Purple',
+    shortcut: ['p'],
+    keywords: 'colour color purple violet indigo',
+    perform: () => applyPrimary('purple'),
+    section: 'Colour',
+  },
+  {
+    id: 'primary-orange',
+    name: 'Orange',
+    shortcut: ['o'],
+    keywords: 'colour color orange warm amber',
+    perform: () => applyPrimary('orange'),
+    section: 'Colour',
+  },
 ]
 
 export function CommandPalette() {
