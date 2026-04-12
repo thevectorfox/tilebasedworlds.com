@@ -11,7 +11,7 @@
         {{ with .GetTerms "tags" }}
             <span class="post-tags">
                 {{ range . }}
-                    <a class="tag" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+                    <a class="kbd" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
                 {{ end }}
             </span>
         {{ end }}

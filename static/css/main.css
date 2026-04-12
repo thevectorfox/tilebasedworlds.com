@@ -298,6 +298,7 @@ pre code {
   white-space: nowrap;
   vertical-align: middle;
   cursor: pointer;
+  text-decoration: none;
 }
 .kbd:hover {
   background: var(--surface-3);
