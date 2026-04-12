@@ -15,7 +15,7 @@
   --font-body: "puffin", sans-serif;
   --font-heading: "puffin-arcade-nerf", sans-serif;
   --font-ui: "puffin-display-soft", sans-serif;
-  --font-mono: "JetBrains Mono", "Monaco", "Consolas", monospace;
+  --font-mono: "space-mono", "Monaco", "Consolas", monospace;
   --glow-h1: none;
   --glow-h2: none;
   --glow-link: none;
@@ -42,7 +42,7 @@
   --font-body: "puffin", sans-serif;
   --font-heading: "puffin-arcade-nerf", sans-serif;
   --font-ui: "puffin-display-soft", sans-serif;
-  --font-mono: "JetBrains Mono", "Monaco", "Consolas", monospace;
+  --font-mono: "space-mono", "Monaco", "Consolas", monospace;
   --glow-h1: none;
   --glow-h2: none;
   --glow-link: none;
@@ -66,10 +66,10 @@
   --surface-2: rgba(0, 255, 65, 0.2);
   --surface-3: rgba(0, 255, 65, 0.3);
   --border: #00ff41;
-  --font-body: "JetBrains Mono", "Monaco", "Consolas", monospace;
-  --font-heading: "JetBrains Mono", "Monaco", "Consolas", monospace;
-  --font-ui: "JetBrains Mono", "Monaco", "Consolas", monospace;
-  --font-mono: "JetBrains Mono", "Monaco", "Consolas", monospace;
+  --font-body: "puffin", sans-serif;
+  --font-heading: "puffin-arcade-nerf", sans-serif;
+  --font-ui: "puffin-display-soft", sans-serif;
+  --font-mono: "space-mono", "Monaco", "Consolas", monospace;
   --glow-h1: 0 0 10px #00ff41;
   --glow-h2: 0 0 5px #00e635;
   --glow-link: 0 0 3px #00ff41;
@@ -149,7 +149,7 @@ h6 {
   text-shadow: var(--glow-h1);
   margin-bottom: 0.5em;
   text-transform: capitalize;
-  font-family: "JetBrains Mono", serif; /* */
+  font-family: "space-mono", serif; /* */
   color: var(--accent);
   position: relative; /* Needed for z-index */
   transform: skewX(-10deg); /* Skew the text for a dynamic feel */
