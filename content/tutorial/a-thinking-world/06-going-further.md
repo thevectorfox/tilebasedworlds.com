@@ -38,7 +38,7 @@ const map = [
     [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 ];
-const TARGET = { x: 14, y: 10 };
+let TARGET = { x: 14, y: 10 };
 
 function isWalkable(x, y) { return x>=0&&COLS>x&&y>=0&&ROWS>y&&map[y][x]!==0; }
 const DIRS = [{x:0,y:-1},{x:1,y:0},{x:0,y:1},{x:-1,y:0}];
@@ -50,7 +50,6 @@ function buildFlowField() {
     const flow = Array.from({length:ROWS}, () => new Array(COLS).fill(null));
     const q = [TARGET];
     dist[TARGET.y][TARGET.x] = 0;
-
     while (q.length > 0) {
         const cur = q.shift();
         for (let di = 0; DIRS.length > di; di++) {
@@ -58,7 +57,6 @@ function buildFlowField() {
             const nx = cur.x + d.x, ny = cur.y + d.y;
             if (!isWalkable(nx, ny) || dist[ny][nx] !== Infinity) continue;
             dist[ny][nx] = dist[cur.y][cur.x] + 1;
-            // Flow direction: point BACK toward lower cost (i.e., toward target)
             flow[ny][nx] = { dx: -d.x, dy: -d.y, arrow: ARROW[(di + 2) % 4] };
             q.push({ x: nx, y: ny });
         }
@@ -66,61 +64,101 @@ function buildFlowField() {
     return { dist, flow };
 }
 
-const { dist, flow } = buildFlowField();
-
-// Draw tiles and arrows
+// Store tile graphics so we can redraw when the target moves
+const tileGfx = Array.from({length:ROWS}, () => new Array(COLS).fill(null));
 for (let row = 0; ROWS > row; row++) {
     for (let col = 0; COLS > col; col++) {
         const g = new PIXI.Graphics();
-        const isWall = map[row][col] === 0;
-        g.rect(1,1,TILE-2,TILE-2).fill(isWall ? 0x2c3e50 : 0x2d333b);
         g.x = col*TILE; g.y = row*TILE;
         app.stage.addChild(g);
-
-        if (!isWall && flow[row][col]) {
-            const d = dist[row][col];
-            const maxD = Math.max(...dist.flat().filter(v => v !== Infinity));
-            const heat = 1 - d / maxD;
-            const r = Math.floor(heat * 80);
-            const b = Math.floor((1 - heat) * 120 + 40);
-            g.clear().rect(1,1,TILE-2,TILE-2).fill((r << 16) | b);
-
-            const lbl = new PIXI.Text({ text: flow[row][col].arrow, style: { fontSize: 9, fill: 0xffffff } });
-            lbl.x = col*TILE + 5; lbl.y = row*TILE + 4;
-            app.stage.addChild(lbl);
-        }
+        tileGfx[row][col] = g;
     }
 }
 
-// Target marker
-const tg = new PIXI.Graphics();
-tg.circle(TILE/2, TILE/2, 6).fill(0x56d364);
-tg.x = TARGET.x*TILE; tg.y = TARGET.y*TILE;
-app.stage.addChild(tg);
+// Arrow labels live in their own container so they can all be cleared at once
+const arrowLayer = new PIXI.Container();
+app.stage.addChild(arrowLayer);
 
-// Spawn agents and let them follow the field
+const tgMarker = new PIXI.Graphics();
+tgMarker.circle(TILE/2, TILE/2, 6).fill(0x56d364);
+app.stage.addChild(tgMarker);
+
+function redraw(dist, flow) {
+    arrowLayer.removeChildren();
+    const maxD = Math.max(...dist.flat().filter(v => v !== Infinity));
+    for (let row = 0; ROWS > row; row++) {
+        for (let col = 0; COLS > col; col++) {
+            const g = tileGfx[row][col];
+            g.clear();
+            const isWall = map[row][col] === 0;
+            if (isWall) { g.rect(1,1,TILE-2,TILE-2).fill(0x2c3e50); continue; }
+            const d = dist[row][col];
+            // Unreachable walkable tile (disconnected from target)
+            if (d === Infinity) { g.rect(1,1,TILE-2,TILE-2).fill(0x2d333b); continue; }
+            // All reachable tiles — including the target itself (d=0) — get heat colouring
+            const heat = 1 - d / maxD;
+            const r = Math.floor(heat * 80);
+            const b = Math.floor((1 - heat) * 120 + 40);
+            g.rect(1,1,TILE-2,TILE-2).fill((r << 16) | b);
+            if (flow[row][col]) {
+                const lbl = new PIXI.Text({ text: flow[row][col].arrow, style: { fontSize: 9, fill: 0xffffff } });
+                lbl.x = col*TILE + 5; lbl.y = row*TILE + 4;
+                arrowLayer.addChild(lbl);
+            }
+        }
+    }
+    tgMarker.x = TARGET.x*TILE;
+    tgMarker.y = TARGET.y*TILE;
+}
+
+let { dist, flow } = buildFlowField();
+redraw(dist, flow);
+
+// Spawn agents
 const agents = [];
 for (let i = 0; i < 12; i++) {
     let ax, ay;
     do { ax = Math.floor(Math.random()*COLS); ay = Math.floor(Math.random()*ROWS); }
     while (!isWalkable(ax, ay) || (ax===TARGET.x && ay===TARGET.y));
-
     const s = new PIXI.Graphics();
     s.circle(TILE/2, TILE/2, 4).fill(0x79c0ff);
     s.x = ax*TILE; s.y = ay*TILE;
     app.stage.addChild(s);
-    agents.push({ x: ax, y: ay, px: ax*TILE, py: ay*TILE, done: false, sprite: s });
+    // ticks: step timer — agents move one tile every 15 frames, not every frame
+    agents.push({ x: ax, y: ay, px: ax*TILE, py: ay*TILE, done: false, sprite: s, ticks: 0 });
 }
 
 let arrived = 0;
+
+// Click any walkable tile to reposition the target and rebuild the field
+app.stage.eventMode = 'static';
+app.stage.hitArea = app.screen;
+app.stage.on('pointerdown', (event) => {
+    const col = Math.floor(event.global.x / TILE);
+    const row = Math.floor(event.global.y / TILE);
+    if (!isWalkable(col, row)) return;
+    TARGET = { x: col, y: row };
+    ({ dist, flow } = buildFlowField());
+    redraw(dist, flow);
+    arrived = 0;
+    agents.forEach(a => { a.done = false; a.sprite.clear().circle(TILE/2,TILE/2,4).fill(0x79c0ff); });
+    window.parent.postMessage({type:'status',text:'Target moved — flow field rebuilt for all agents!'}, '*');
+});
+
 app.ticker.add(() => {
     agents.forEach(a => {
         if (a.done) return;
         if (a.x === TARGET.x && a.y === TARGET.y) { a.done = true; arrived++; a.sprite.clear().circle(TILE/2,TILE/2,4).fill(0x56d364); return; }
-        const dir = flow[a.y][a.x];
-        if (!dir) return;
-        const nx = a.x + dir.dx, ny = a.y + dir.dy;
-        if (isWalkable(nx, ny)) { a.x = nx; a.y = ny; }
+        // Advance tile position once every 15 frames; lerp the visual position every frame
+        a.ticks++;
+        if (a.ticks >= 15) {
+            a.ticks = 0;
+            const dir = flow[a.y][a.x];
+            if (dir) {
+                const nx = a.x + dir.dx, ny = a.y + dir.dy;
+                if (isWalkable(nx, ny)) { a.x = nx; a.y = ny; }
+            }
+        }
         a.px += (a.x*TILE - a.px) * 0.15;
         a.py += (a.y*TILE - a.py) * 0.15;
         a.sprite.x = a.px; a.sprite.y = a.py;
@@ -130,7 +168,7 @@ app.ticker.add(() => {
     }
 });
 
-window.parent.postMessage({type:'status',text:'Flow field: one BFS from target, infinite agents for free'}, '*');
+window.parent.postMessage({type:'status',text:'Flow field ready. Click any walkable tile to move the target!'}, '*');
 {{< /pixidemo >}}
 
 The colours show distance from the target (warmer = closer). Each blue agent follows the arrows without running a single A* search. When the target moves, you rebuild the field once and all 200 enemies automatically reroute.
