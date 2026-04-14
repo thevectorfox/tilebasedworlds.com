@@ -1,0 +1,5 @@
+{{- $title := .Get "title" -}}
+<div class="what-card">
+  <p class="what-title">{{ $title }}</p>
+  <p class="what-desc">{{ .Inner | markdownify }}</p>
+</div>

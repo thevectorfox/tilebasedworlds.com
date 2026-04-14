@@ -1,0 +1,7 @@
+{{- $label := .Get "label" | default "The worlds" -}}
+<div class="landing-section">
+  <p class="section-label">{{ $label }}</p>
+  <div class="worlds-grid">
+    {{ .Inner }}
+  </div>
+</div>

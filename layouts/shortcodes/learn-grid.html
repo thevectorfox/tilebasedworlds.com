@@ -1,0 +1,7 @@
+{{- $label := .Get "label" | default "What you'll learn" -}}
+<div class="landing-section">
+  <p class="section-label">{{ $label }}</p>
+  <div class="what-grid">
+    {{ .Inner }}
+  </div>
+</div>

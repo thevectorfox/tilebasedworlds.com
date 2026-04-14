@@ -4,54 +4,44 @@ date = 2026-03-08T19:54:58+11:00
 draft = false
 +++
 
-Ever dreamed of creating your own games? {{< icon name="game-controller" >}} You're about to discover the secret behind some of gaming's greatest hits - from Super Mario Bros to Stardew Valley, from classic Zelda to modern indies like Celeste. They all share one powerful technique: **TILE-BASED WORLDS!**
+{{< hero
+  eyebrow="Tile Based Worlds"
+  title="The systems behind tile worlds —"
+  title_em="explained by building them."
+  body="A structured tutorial series for developers who want to understand 2D game rendering properly — not just copy it. Each world builds on the last, taking you from a grid and a character through pathfinding, procedural generation, lighting, and physics. Live, editable demos throughout."
+  cta_primary="Start with World One"
+  cta_primary_url="/tutorial/world-one/"
+  cta_secondary="Browse all worlds"
+  cta_secondary_url="/tutorial/"
+>}}
 
-Transform from complete beginner to confident game developer with hands-on tutorials that'll have you building playable games from day one. No boring theory - just pure, creative game-making magic! {{< icon name="sparkle" >}}
+{{< lineage-block >}}
+Inspired by the Tonypa tile-based game tutorials — the most influential game dev writing on the early web — and rebuilt from scratch for modern JavaScript and PixiJS. The same depth, none of the Flash.
+{{< /lineage-block >}}
 
-## Start Your Epic Journey {{< icon name="rocket-launch" >}}
+{{< learn-grid label="What you'll actually learn" >}}
+  {{< learn-item title="Rendering fundamentals" >}}Grid systems, camera, layers, depth sorting, isometric projection.{{< /learn-item >}}
+  {{< learn-item title="Movement and physics" >}}Collision, gravity, slopes, platforms, and character controllers.{{< /learn-item >}}
+  {{< learn-item title="Pathfinding algorithms" >}}BFS, Dijkstra, A*, Flow Fields, JPS — with animated step-throughs.{{< /learn-item >}}
+  {{< learn-item title="Procedural generation" >}}BSP, cellular automata, noise functions, biome generation.{{< /learn-item >}}
+{{< /learn-grid >}}
 
-Ready to build the games you've always imagined? Jump into our interactive tutorial series:
+{{< worlds-grid label="The worlds" >}}
 
-**[{{< icon name="game-controller" >}} Start Tutorial Series](/tutorial/)** - From zero to game developer in one epic adventure!
+  {{< world-card num="World 01" name="A Top-Down World" status="available" tags="rendering|collision" url="/tutorial/world-one/" >}}Grid, movement, collision, interaction, and enemies. The foundation everything else builds on.{{< /world-card >}}
 
-### What You'll CREATE 🛠️
+  {{< world-card num="World 02" name="A Side-Scrolling World" status="available" tags="physics|platforms" url="/tutorial/a-side-scrolling-world/" >}}Gravity, jumping, ladders, moving platforms, slopes, and combat.{{< /world-card >}}
 
-**By the end of this series, you'll have built:**
+  {{< world-card num="World 03" name="A Tilted World" status="available" tags="isometric" url="/tutorial/a-tilted-world/" >}}Isometric rendering, depth sorting, mouse movement, and camera rotation.{{< /world-card >}}
 
-- **🕹️ Your First Interactive World** - Complete with a hero you control and solid walls that feel real
-- **🏃 Platform Game Mechanics** - Jumping, moving platforms, and smooth character movement  
-- **{{< icon name="robot" >}} Smart Enemies** - AI that hunts you down using professional pathfinding algorithms
-- **{{< icon name="explosion" >}} Combat System** - Shooting, item collection, and interactive game objects
-- **🌍 Epic Game Levels** - Scrolling worlds, multiple layers, and isometric 3D-style maps
-- **{{< icon name="target" >}} Complete Games** - From simple demos to full playable experiences you'll be proud to share!
+  {{< world-card num="World 04" name="A Thinking World" status="available" tags="algorithms" url="/tutorial/a-thinking-world/" >}}Pathfinding foundations — BFS, Dijkstra's, Greedy Best-First, and A* with visual step-throughs.{{< /world-card >}}
 
-**Plus you'll master:**
-- Modern JavaScript that powers the web 💻
-- PixiJS graphics that run smoothly everywhere {{< icon name="rocket-launch" >}}
-- Professional game development patterns {{< icon name="books" >}}
-- Problem-solving skills that transfer to any coding project {{< icon name="brain" >}}
+  {{< world-card num="World 05" name="A Smarter World" status="soon" tags="algorithms" >}}Advanced pathfinding — Flow Fields, JPS, Bidirectional A*, D* Lite, HPA*.{{< /world-card >}}
 
-### Why This Works {{< icon name="lightning" >}}
+  {{< world-card num="World 06" name="A Random World" status="soon" tags="procgen" >}}Procedural generation — room placement, BSP, cellular automata, noise, biomes.{{< /world-card >}}
 
-**Interactive Learning That Actually Sticks:**
-- {{< icon name="target" >}} **Hands-on from day one** - Build real games, not boring exercises
-- {{< icon name="fire" >}} **Modern web tech** - Learn JavaScript & PixiJS that powers today's games  
-- {{< icon name="rocket-launch" >}} **Beginner-friendly progression** - Start simple, build complexity naturally
-- 💡 **Professional techniques** - Same methods used in indie hits and AAA games
+  {{< world-card num="World 07" name="A Darker World" status="soon" tags="lighting" >}}Lighting — raycasting, FOV, shadow casting, fog of war, day/night cycles.{{< /world-card >}}
 
-*Inspired by the legendary Tonypa tutorials, completely modernized for today's web developers and game creators.*
+  {{< world-card num="World 08" name="A Living World" status="soon" tags="simulation" >}}Physics simulation — gravity, water flow, falling sand, destructible tiles.{{< /world-card >}}
 
-**Zero experience needed** - We start from absolute basics and build your confidence with every chapter! {{< icon name="hand-fist" >}}
-
----
-
-## Ready to Build Something AMAZING? {{< icon name="game-controller" >}}
-
-**Choose your adventure:**
-
-{{< icon name="rocket-launch" >}} **[Complete Beginner? Start Here!](/tutorial/00-crash-course-js/)** - JavaScript crash course designed for future game developers
-
-{{< icon name="target" >}} **[Know Some Code? Jump to Game Building!](/tutorial/01-why-tiles/)** - Dive straight into creating tile-based worlds
-
-**Your journey begins NOW! Pick a path and let's create something incredible together!** {{< icon name="sparkle" >}}
-
+{{< /worlds-grid >}}

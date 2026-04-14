@@ -1,28 +1,3 @@
 {{ define "main" }}
-<article>
-    <h1>{{ .Title }}</h1>
-    {{ .Content }}
-</article>
-
-<section>
-    <h2>Recent Tutorials</h2>
-    {{ $tutorials := where site.RegularPages "Section" "tutorial" | first 5 }}
-    {{ if $tutorials }}
-    <ul class="post-list">
-        {{ range $tutorials }}
-        <li>
-            <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-            <div class="post-meta">
-                <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
-            </div>
-            {{ if .Summary }}
-            <p>{{ .Summary }}</p>
-            {{ end }}
-        </li>
-        {{ end }}
-    </ul>
-    {{ else }}
-    <p>No tutorials yet. Check back for tile-based game development guides and techniques!</p>
-    {{ end }}
-</section>
+{{ .Content }}
 {{ end }}

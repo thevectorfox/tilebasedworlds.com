@@ -1,0 +1,33 @@
+{{- $num    := .Get "num" -}}
+{{- $name   := .Get "name" -}}
+{{- $status := .Get "status" | default "soon" -}}
+{{- $tags   := .Get "tags" -}}
+{{- $url    := .Get "url" | default "" -}}
+{{- $available := eq $status "available" -}}
+<div class="world-card{{ if $available }} available{{ else }} soon{{ end }}">
+  {{- if and $available $url }}
+  <a href="{{ $url }}" class="world-card-link" aria-label="Go to {{ $name }}"></a>
+  {{- end }}
+  <p class="world-num">{{ $num }}</p>
+  <p class="world-name">{{ $name }}</p>
+  <p class="world-desc">{{ .Inner | markdownify }}</p>
+  <div class="world-tags">
+    {{- if $available }}
+    <span class="wtag wtag-available">available</span>
+    {{- else }}
+    <span class="wtag wtag-soon">coming soon</span>
+    {{- end }}
+    {{- if $tags }}
+      {{- range (split $tags "|") }}
+        {{- $tag := . -}}
+        {{- if eq $tag "algorithms" }}
+    <span class="wtag wtag-purple">{{ $tag }}</span>
+        {{- else if or (eq $tag "isometric") (eq $tag "procgen") }}
+    <span class="wtag wtag-amber">{{ $tag }}</span>
+        {{- else }}
+    <span class="wtag wtag-topic">{{ $tag }}</span>
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  </div>
+</div>

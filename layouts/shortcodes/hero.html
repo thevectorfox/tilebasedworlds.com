@@ -1,0 +1,19 @@
+{{- $eyebrow       := .Get "eyebrow" -}}
+{{- $title         := .Get "title" -}}
+{{- $title_em      := .Get "title_em" -}}
+{{- $body          := .Get "body" -}}
+{{- $cta_primary   := .Get "cta_primary" -}}
+{{- $cta_primary_url  := .Get "cta_primary_url"  | default "#" -}}
+{{- $cta_secondary := .Get "cta_secondary" -}}
+{{- $cta_secondary_url := .Get "cta_secondary_url" | default "#" -}}
+<div class="hero">
+  {{ if $eyebrow }}<p class="hero-eyebrow">{{ $eyebrow }}</p>{{ end }}
+  <h1 class="hero-title">{{ $title }}{{ if $title_em }}<br><em>{{ $title_em }}</em>{{ end }}</h1>
+  {{ if $body }}<p class="hero-body">{{ $body }}</p>{{ end }}
+  {{ if or $cta_primary $cta_secondary }}
+  <div class="hero-cta-row">
+    {{ if $cta_primary }}<a href="{{ $cta_primary_url }}" class="cta-primary">{{ $cta_primary }}</a>{{ end }}
+    {{ if $cta_secondary }}<a href="{{ $cta_secondary_url }}" class="cta-secondary">{{ $cta_secondary }}</a>{{ end }}
+  </div>
+  {{ end }}
+</div>
