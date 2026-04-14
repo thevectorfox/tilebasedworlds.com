@@ -2,10 +2,10 @@
 title = "Mouse to Move"
 date = 2026-03-09T16:00:00+11:00
 weight = 1
-draft = true
+draft = false
 slug = "mouse-to-move"
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/the-quarter/isometric-view/"
+next = "/tutorial/a-tilted-world/isometric-view/"
 prev = ""
 +++
 

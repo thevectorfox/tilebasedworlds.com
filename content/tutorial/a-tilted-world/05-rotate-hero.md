@@ -2,11 +2,11 @@
 title = "Rotate Hero"
 date = 2026-03-09T20:00:00+11:00
 weight = 5
-draft = true
+draft = false
 slug = "rotate-hero"
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/the-quarter/rotate-background/"
-prev = "/tutorial/the-quarter/isometric-scroll/"
+next = "/tutorial/a-tilted-world/rotate-background/"
+prev = "/tutorial/a-tilted-world/isometric-scroll/"
 +++
 
 Ready to make your hero feel more alive? So far our character has been limited to walking in just four directions - up, down, left, and right. That's fine for a retro RPG, but what if you want to create a top-down shooter, a racing game, or a spaceship adventure? Time to unlock the magic of **360-degree movement**!

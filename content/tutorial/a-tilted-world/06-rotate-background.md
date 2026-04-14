@@ -2,11 +2,11 @@
 title = "Rotate Background"
 date = 2026-03-09T21:00:00+11:00
 weight = 6
-draft = true
+draft = false
 slug = "rotate-background"
 tags = ["advanced", "optimization", "tutorial"]
 next = ""
-prev = "/tutorial/the-quarter/rotate-hero/"
+prev = "/tutorial/a-tilted-world/rotate-hero/"
 +++
 
 Ready for some serious game magic? In the last tutorial, your hero learned to rotate and move in any direction. Now we're taking it to the next level: **the world itself will rotate around your hero!** 
