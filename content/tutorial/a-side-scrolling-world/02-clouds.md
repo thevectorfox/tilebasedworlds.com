@@ -9,7 +9,7 @@ next = "/tutorial/a-side-scrolling-world/ladders/"
 prev = "/tutorial/a-side-scrolling-world/jumping/"
 +++
 
-Time to add one of the most satisfying platform mechanics in gaming - **cloud platforms**! These one-way surfaces let you jump up through them and move through them from the sides, but when you're falling down, you land on top. Think Mario's cloud platforms or Mega Man's jump-through floors - they make platforming feel incredibly smooth and natural!
+Cloud platforms are one-way surfaces: the player can jump through them from below, pass through them from the sides, but lands on top when falling. This tutorial adds that behaviour to the jumping system from the previous tutorial.
 
 {{< pixidemo title="Clouds" >}}
 const app = new PIXI.Application();
@@ -60,7 +60,7 @@ for (let row = 0; row < map.length; row++) {
         } else if (map[row][col] === CLOUD) {
             const cloud = new PIXI.Graphics()
                 .rect(0, 0, TILE_SIZE, TILE_SIZE)
-                .fill(0x87CEEB)
+                .fill(0xFFFFFF)
                 .stroke({width: 2, color: 0x4169E1});
             cloud.x = col * TILE_SIZE;
             cloud.y = row * TILE_SIZE;
@@ -94,7 +94,12 @@ const player = {
 
 // Input handling
 const keys = {};
-window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keydown', (e) => {
+    keys[e.code] = true;
+    if (['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
+        e.preventDefault();
+    }
+});
 window.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
 // Collision detection
@@ -208,36 +213,19 @@ app.ticker.add(updatePlayer);
 
 {{< /pixidemo >}}
 
-## Understanding Cloud Platforms: The Magic of One-Way Surfaces
+## How Cloud Platforms Work
 
-See the difference? Let's break down what makes cloud platforms so special:
+A solid tile blocks movement from every direction. A cloud tile applies collision only when the player is falling downward: the player can jump through from below, pass through from the sides, but lands on top when descending.
 
-**🧱 Solid walls** = Completely impassable from ALL directions
-- Hero bounces off from left, right, above, below
-- Perfect for boundaries and obstacles
-- Creates hard stops in movement
-
-**☁️ Cloud platforms** = Selectively solid based on direction
-- ✅ Jump UP through them (from below)
-- ✅ Walk THROUGH them (from left/right)  
-- ❌ Fall DOWN through them (land on top!)
-- Creates smooth, flowing platformer movement
-
-**Why cloud platforms rock:**
-- Players can access platforms from below without complex level design
-- Creates natural "layers" in your level
-- Feels incredibly satisfying when movement flows smoothly
-- Used in classics like Super Mario World, Sonic, Mega Man
+This selective collision is what creates the layered platform structures common in platformers — the player can reach higher platforms from below without needing a separate entry path.
 
 ![Normal solid wall blocks hero from all directions](/p11_2.gif)
 
-**VS.**
-
 ![Cloud platform allows entry from sides/below, stops from above](/p11_3.gif)
 
-## Setting Up Cloud Tiles: Modern Tile Types
+## Tile Types
 
-Let's create our cloud platform tile type using modern JavaScript patterns:
+Define tile type constants rather than sprinkling literal numbers through the code:
 
 ```javascript
 // Define tile types as constants
@@ -247,7 +235,6 @@ const TILE_TYPES = {
     CLOUD: 2
 };
 
-// Tile properties - much cleaner than ActionScript prototypes!
 const tileProperties = {
     [TILE_TYPES.EMPTY]: {
         walkable: true,
@@ -287,15 +274,11 @@ function isSolidTile(x, y) {
 }
 ```
 
-**Why this approach rocks:**
-- **Clear constants** instead of magic numbers
-- **Property objects** instead of confusing prototypes
-- **Helper functions** make collision code super readable
-- **Easy to extend** - just add new tile types!
+Helper functions (`isCloudTile`, `isSolidTile`) keep the collision code readable, and adding a new tile type is a matter of adding one entry to `TILE_TYPES` and one to `tileProperties`.
 
-## Cloud Platform Collision Logic: The Smart Part!
+## Cloud Platform Collision
 
-Here's where the magic happens - making platforms solid only when falling onto them from above:
+A cloud tile is only solid when the player is falling onto it from above:
 
 ```javascript
 function canLandOnCloudPlatform(player) {
@@ -328,16 +311,11 @@ function canLandOnCloudPlatform(player) {
 }
 ```
 
-**The key insight**: Cloud platforms are only "solid" when:
-1. Player is moving **downward** (`velocityY > 0`)
-2. Player's feet are **touching** the platform
-3. Player is **above** the platform (not inside it)
-
-**Why check both feet?** This handles edge cases where your hero is partially over the platform. Much more reliable than single-point collision!
+The three conditions for landing: `velocityY > 0` (falling, not rising), the player's feet are at the platform's tile row, and the player's feet are at or above the platform surface (not already embedded inside it). Checking both feet handles the case where the player is partially over the edge.
 
 ### Integrating Cloud Collision
 
-Now we modify our main collision system:
+The collision function checks solid tiles first, then cloud tiles, then ceiling. Cloud tiles are never checked for upward movement:
 
 ```javascript
 function checkCollisions() {
@@ -357,7 +335,7 @@ function checkCollisions() {
         }
     }
     
-    // Ceiling collision (clouds don't block upward movement!)
+    // Ceiling collision — cloud tiles never block upward movement
     if (player.velocityY < 0) {
         const ceilingHit = checkCeilingCollision(); // Only solid tiles
         if (ceilingHit) {
@@ -408,16 +386,6 @@ function checkStillOnGround() {
 }
 ```
 
-**Critical detail**: When checking if we're still on a platform (for edge detection), we check **both** solid tiles AND cloud platforms. This prevents the hero from floating in mid-air after walking off any platform type.
+The edge-detection check (`checkStillOnGround`) must test for cloud tiles as well as solid tiles, otherwise the player will float in mid-air after walking off a cloud platform. When neither foot is over a solid or cloud tile, `player.onGround` becomes `false` and gravity resumes.
 
-**The flow works like this:**
-1. Player walks left/right → `checkStillOnGround()` sees they're over empty space
-2. `player.onGround = false` → gravity starts pulling them down
-3. While falling → cloud platforms are checked for landing
-4. When landing on cloud → `player.onGround = true` → can jump again!
-
-**{{< icon name="confetti" >}} Congratulations!** You now have silky-smooth cloud platforms just like the pros use! Players can flow through your levels naturally, jumping up through platforms and landing on them from above.
-
-**Try different feels**: Experiment with the `+5` inset values for feet detection, or add different cloud types with different behaviors. The foundation you've built makes these variations super easy to implement!
-
-**Next up**: Ladders that let players climb up and down at will - another classic platformer mechanic that combines perfectly with your jumping and cloud platform systems!
+Next: [Ladders](/tutorial/a-side-scrolling-world/ladders/)

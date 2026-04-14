@@ -9,7 +9,7 @@ next = "/tutorial/a-side-scrolling-world/moving-tiles/"
 prev = "/tutorial/a-side-scrolling-world/clouds/"
 +++
 
-Ready to add vertical exploration to your game world? 🪜 Ladders are one of the most iconic platformer mechanics - think Donkey Kong's construction sites, Mega Man's industrial levels, or any classic 2D adventure! You're about to give your players the freedom to climb up and down through your levels, opening up incredible possibilities for level design!
+Ladders let the player climb vertically through the level using the up and down arrow keys. While climbing, gravity is disabled and the player snaps to the ladder's centre column. This tutorial adds that system on top of the jumping mechanics from the previous tutorials.
 
 {{< pixidemo title="Ladders" >}}
 const app = new PIXI.Application();
@@ -143,7 +143,7 @@ function canClimbUp() {
     if (!canClimbHere()) return false;
     
     const centerX = player.x + player.width / 2;
-    const topY = player.y - player.speed;
+    const topY = player.y - player.climbSpeed;
     
     return isLadder(centerX, topY) || isLadder(centerX, player.y);
 }
@@ -251,60 +251,32 @@ function updatePlayer() {
 app.ticker.add(updatePlayer);
 {{< /pixidemo >}}
 
-## Understanding Ladder Types: Design Choices Matter!
+## Ladder Types
 
-Ladders might seem simple, but there are important design decisions to make! Let's break down the different types:
+There are four common ladder variants, and the choice affects level design possibilities:
 
-**🧱 Type A - Wall Ladders**: Ladder inside a solid wall tile
-- Hero can climb up/down but **cannot** move left/right
-- Perfect for tight spaces and controlled vertical movement
-- Used in games like classic Castlevania
+**Type A — Wall Ladders**: The ladder tile is inside a solid column. The player can climb but cannot move left/right. Used in Castlevania-style games with tight vertical shafts.
 
-**🚶 Type B - Walkable Ladders**: Ladder tile that's also walkable
-- Hero can climb up/down AND walk left/right through it
-- When walking off, hero falls naturally
-- Great for open level design like Mega Man
+**Type B — Walkable Ladders**: The ladder tile is passable from the sides. The player can climb or walk through it. Common in Mega Man-style open stages.
 
-**{{< icon name="arrow-up" >}} Type C - Top-only Ladders**: No ladder below, only above
-- Hero can climb up but not down
-- Perfect for one-way ascent areas
-- Creates interesting level flow patterns
+**{{< icon name="arrow-up" >}} Type C — Top-only Ladders**: The ladder extends upward only, with no tile below. The player can ascend but not descend past the bottom rung.
 
-**❓ Type D - Floating Ladders**: Ladder that ends in mid-air
-- Design choice: Can hero stand on top?
-- Some games allow it, others don't
-- Consider your game's physics consistency
+**Type D — Floating Ladders**: The ladder ends in open air. Whether the player can stand on top is a design decision — consistency with other surfaces matters here.
 
 ![Different ladder types and their behaviors](/p12_2.gif)
 
-**Why these distinctions matter**: Each type creates different gameplay feelings and level design possibilities. Choose based on how you want players to move through your world!
 
+## Ladder Rules
 
-## The Ladder Rules: Clear Gameplay Guidelines
+The rules governing this tutorial's implementation:
 
-Before we code, let's establish crystal-clear rules for how ladders work in our game:
+- The player climbs with the up/down arrow keys
+- The player can climb up if there is a ladder tile at the current position or above
+- The player can climb down if there is a ladder tile below the destination
+- The player can move left/right off the ladder if no wall blocks the path
+- The player cannot jump while in climbing mode
 
-✅ **Rule 1**: Hero climbs using Up/Down arrow keys (intuitive controls!)
-
-✅ **Rule 2**: Can climb UP if ladder exists at hero's current position OR above
-
-✅ **Rule 3**: Can climb DOWN if ladder exists below hero's destination
-
-✅ **Rule 4**: Can move LEFT/RIGHT off ladder if no walls block the path
-
-✅ **Rule 5**: Cannot jump while climbing (climbing mode vs jumping mode)
-
-**Why these rules work:**
-- **Simple controls** that players expect
-- **Predictable behavior** - no weird edge cases
-- **Smooth transitions** between climbing and normal movement
-- **Safe navigation** - prevents getting stuck in walls
-
-These rules create the solid foundation for responsive, bug-free ladder mechanics!
-
-## Creating Ladder Tiles: Modern Implementation
-
-Time to set up our ladder system using clean, modern JavaScript patterns:
+## Tile Setup
 
 ```javascript
 // Tile type constants
@@ -355,15 +327,9 @@ function isSolid(x, y) {
 }
 ```
 
-**Why this approach rocks:**
-- {{< icon name="target" >}} **Clear tile definitions** with explicit properties
-- {{< icon name="wrench" >}} **Easy to extend** - just add new tile types
-- {{< icon name="rocket-launch" >}} **Readable code** - functions that explain themselves
-- {{< icon name="shield" >}} **Type safety** - consistent property checking
+The `LADDER_SOLID` type handles the case where a ladder sits on top of a floor tile — the player can both stand on and climb from that position.
 
-## Input Handling: Climbing Controls
-
-Let's implement responsive climbing controls that feel natural:
+## Climbing Controls
 
 ```javascript
 function handleClimbingInput(player, keys) {
@@ -417,16 +383,10 @@ function tryExitLadder(player, direction) {
 }
 ```
 
-**Key features:**
-- {{< icon name="target" >}} **Auto-centering** on ladders for clean movement
-- {{< icon name="door-open" >}} **Smart exit detection** prevents wall clipping
-- {{< icon name="game-controller" >}} **Separated input modes** climbing vs normal movement
-- {{< icon name="sparkle" >}} **Smooth transitions** between movement states
+`centerPlayerOnLadder` snaps the player to the horizontal centre of the ladder column each frame, preventing drift. `tryExitLadder` checks all four corners before allowing a horizontal exit, preventing the player from stepping into a wall.
 
 
-## Ladder Detection: Smart Climbing Logic
-
-Now for the core climbing detection system that makes everything work smoothly:
+## Climb Detection
 
 ```javascript
 // Check if player can start climbing at current position
@@ -473,9 +433,7 @@ function updateClimbing(player) {
 }
 ```
 
-### Visual Feedback System
-
-Make climbing feel responsive with immediate visual feedback:
+### Visual Feedback
 
 ```javascript
 function updatePlayerVisuals(player) {
@@ -493,14 +451,6 @@ function updatePlayerVisuals(player) {
 }
 ```
 
-**The magic happens when:**
-1. {{< icon name="target" >}} **Player approaches ladder** → `canStartClimbing()` detects it
-2. {{< icon name="arrow-up" >}} **Up/Down pressed** → Enter climbing mode
-3. 🧲 **Auto-center** → Player snaps to ladder center
-4. 🚫 **Gravity disabled** → No falling while climbing  
-5. 🚶 **Left/Right pressed** → Smart exit with collision checking
-6. {{< icon name="sparkle" >}} **Visual feedback** → Player knows they're in climb mode
+The sequence when the player enters a ladder: `canStartClimbing()` detects the ladder tile at the player's centre, up/down input sets `isClimbing = true`, `velocityY` is zeroed (disabling gravity), and `centerPlayerOnLadder` aligns the player to the column. On exit, a left/right key with no wall collision sets `isClimbing = false` and normal physics resume.
 
-**{{< icon name="trophy" >}} Congratulations!** You've just implemented professional-grade ladder mechanics! Your players can now explore vertically through your levels with smooth, responsive climbing. This opens up amazing possibilities for level design - multi-story buildings, underground caverns, sky-high towers!
-
-**Next up**: Time to add some challenge with enemies! [Next: Stupid Enemy](/tutorial/world-one/12-stupid-enemy/)
+Next: [Moving Tiles](/tutorial/a-side-scrolling-world/moving-tiles/)

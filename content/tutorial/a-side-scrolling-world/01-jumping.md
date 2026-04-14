@@ -9,7 +9,7 @@ next = "/tutorial/a-side-scrolling-world/clouds/"
 prev = ""
 +++
 
-Time to add one of the most satisfying mechanics in gaming - jumping! We're switching from top-down to side-scrolling view, where your hero can run left and right with arrow keys and launch into the air with the spacebar. Let's create that perfect jump feel that makes players want to bounce around your world!
+This tutorial switches from top-down to side-scrolling view. The hero moves left and right with arrow keys and jumps with spacebar. The jump mechanic is built on two properties: an initial upward velocity and a per-frame gravity that pulls the hero back down.
 
 {{< pixidemo title="Jumping" >}}
 const app = new PIXI.Application();
@@ -75,8 +75,7 @@ const player = {
     velocityY: 0,
     speed: 2,
     jumpPower: JUMP_POWER,
-    onGround: false,
-    jumping: false
+    onGround: false
 };
 
 // Status display for educational purposes
@@ -130,11 +129,10 @@ function updatePlayer() {
     // Jumping - only when on ground!
     if (keys['Space'] && player.onGround) {
         player.velocityY = player.jumpPower;
-        player.jumping = true;
         player.onGround = false;
     }
     
-    // Apply gravity constantly = more realistic physics!
+    // Apply gravity
     player.velocityY += GRAVITY;
     
     // Update position
@@ -149,11 +147,6 @@ function updatePlayer() {
         player.y = Math.floor((player.y + player.height) / TILE_SIZE) * TILE_SIZE - player.height;
         player.velocityY = 0;
         player.onGround = true;
-        player.jumping = false;
-        
-        // Visual feedback: brief color change when landing
-        player.sprite.tint = 0xffff44; // Yellow flash
-        setTimeout(() => player.sprite.tint = 0xffffff, 100);
     } else if (!groundCheck) {
         player.onGround = false;
     }
@@ -183,9 +176,7 @@ app.ticker.add(updatePlayer);
 
 ## Jump Physics: Making It Feel Right
 
-Every great jump starts with an upward burst! In our coordinate system, moving up means **decreasing** the Y coordinate. So when you hit spacebar, we set `velocityY` to a negative value like `-15` pixels per frame.
-
-Here's where the magic happens: **gravity**! After that initial push, gravity constantly pulls your hero back down. Each frame, we add gravity (a positive value like `0.8`) to the Y velocity:
+In this coordinate system, moving up means decreasing Y. Pressing spacebar sets `velocityY` to a negative value like `-15` pixels per frame. Each frame after that, gravity increments `velocityY` back toward positive (downward):
 
 ```javascript
 // Each frame, gravity makes you fall faster
@@ -200,56 +191,44 @@ Watch this in action: Starting jump speed `-15`, gravity `0.8`:
 - ...eventually velocity = 0 (peak of jump)
 - Then velocity becomes positive and you fall!
 
-**Pro tip**: Experiment with gravity values! Low gravity (0.3) feels floaty like Mario on the moon. High gravity (1.2) feels snappy like Mega Man. Different characters can have different gravity for unique feels!
+Gravity values control fall feel: 0.3 is floaty, 1.2 is snappy. Different characters can have separate gravity values.
 
-### Collision Magic
+### Collision Response
 
-When your hero smacks into something:
+When the player contacts a surface:
 - **Hit ceiling while jumping up?** Set `velocityY = 0` and start falling
 - **Land on ground while falling?** Set `velocityY = 0` and allow jumping again
 - **Walk off a platform?** Start falling immediately!
 
-⚠️ **Speed limit warning**: Keep velocities smaller than your tile size, or your hero might teleport through walls! Fast-moving objects need more collision checks.
+Keep velocities smaller than the tile size. If `velocityY` exceeds `TILE_SIZE` in a single frame, the player can skip past a one-tile-thick floor without triggering the collision check.
 
-The beauty of physics: jumping doesn't interfere with left/right movement at all. You can run and jump simultaneously for that perfect platformer feel!
+Horizontal and vertical velocities are independent — left/right movement is unaffected by jumping or falling.
 
 
-## Your Jumping Hero Setup
+## Player Properties
 
-Let's upgrade our hero with jumping superpowers! Add these essential properties:
+The player object needs a few extra properties to support jumping:
 
 ```javascript
 const player = {
-    // Position and movement
     x: 100,
     y: 200,
     width: 12,
     height: 12,
-    
-    // Physics properties
     velocityX: 0,
     velocityY: 0,
     speed: 2,              // Left/right movement speed
-    jumpPower: -15,        // Initial upward velocity
-    gravity: 0.8,          // How fast gravity pulls down
-    
-    // State tracking
-    onGround: false,       // Can we jump right now?
-    isJumping: false       // Are we currently in the air?
+    jumpPower: -15,        // Initial upward velocity (negative = up)
+    gravity: 0.8,          // Added to velocityY each frame
+    onGround: false        // Prevents jumping while airborne
 };
 ```
 
-**Key properties explained:**
-- `jumpPower`: Negative value for upward force (try -12 to -20)
-- `gravity`: How quickly you fall back down (0.5 = floaty, 1.2 = quick)
-- `onGround`: Prevents double-jumping unless you want Moon physics!
+### Spawn Position
 
-### Spawn Position Fix
-
-When placing your hero on the map, make sure they start **on top** of a tile, not floating in mid-air:
+Place the hero on top of a floor tile rather than in open space. Start with `onGround: true` and `velocityY: 0` so the hero doesn't fall through the floor on the first frame:
 
 ```javascript
-// Place hero at bottom of starting tile
 function placeHeroOnGround(tileX, tileY) {
     player.x = tileX * TILE_SIZE;
     player.y = (tileY + 1) * TILE_SIZE - player.height;
@@ -258,21 +237,17 @@ function placeHeroOnGround(tileX, tileY) {
 }
 ```
 
-This ensures your hero starts standing properly instead of immediately falling through the world!
 
+## Input Handling
 
-## Input Handling: Launch Into Action!
-
-Time to wire up those controls! We'll use modern event listeners for smooth, responsive input:
+Track which keys are held with a `keys` object updated by event listeners:
 
 ```javascript
-// Track which keys are currently pressed
 const keys = {};
 
 window.addEventListener('keydown', (e) => {
     keys[e.code] = true;
-    
-    // Prevent browser's default behavior for game controls
+    // Prevents spacebar from scrolling the page
     if (['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
         e.preventDefault();
     }
@@ -280,151 +255,109 @@ window.addEventListener('keydown', (e) => {
 
 window.addEventListener('keyup', (e) => {
     keys[e.code] = false;
-    
-    // Prevent default for consistency
     if (['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
         e.preventDefault();
     }
 });
 
 function handleInput() {
-    // Horizontal movement
-    player.velocityX = 0; // Reset horizontal velocity
-    
-    if (keys['ArrowLeft']) {
-        player.velocityX = -player.speed;
-    }
-    if (keys['ArrowRight']) {
-        player.velocityX = player.speed;
-    }
-    
-    // Jumping - only if on ground!
+    player.velocityX = 0;
+
+    if (keys['ArrowLeft'])  player.velocityX = -player.speed;
+    if (keys['ArrowRight']) player.velocityX =  player.speed;
+
     if (keys['Space'] && player.onGround) {
         player.velocityY = player.jumpPower;
-        player.isJumping = true;
         player.onGround = false;
-        
-        // Optional: Add jump sound effect here!
-        // playSound('jump');
     }
 }
 ```
 
-**Anti-double-jump protection**: Notice how we check `player.onGround` before allowing a jump. This prevents infinite air-jumping unless you specifically want that mechanic!
+Checking `player.onGround` before applying `jumpPower` prevents the player from jumping while airborne. The `e.preventDefault()` calls prevent the browser from scrolling the page when spacebar or arrow keys are pressed — without them the page scrolls instead of the hero jumping.
 
-**🚫 Browser interference fix**: The `e.preventDefault()` calls are crucial! Without them, pressing spacebar scrolls the webpage instead of making your hero jump. Always prevent default behavior for game controls to keep focus in your game!
+## Physics Update
 
-**Pro tip**: You can create different jump feels by varying the `jumpPower` based on how long spacebar is held, or add coyote time (brief jump window after leaving a platform). These small touches make huge differences in game feel!
-
-## Physics Update: The Heart of Jumping
-
-Here's where the magic happens! Every frame, we update physics and position:
+Each frame, apply gravity and move the player by their current velocity:
 
 ```javascript
 function updatePhysics() {
-    // Apply gravity constantly
     player.velocityY += player.gravity;
-    
-    // Cap falling speed to prevent tunneling through tiles
+
+    // Cap fall speed — if velocityY exceeds TILE_SIZE the player
+    // can skip past a one-tile floor in a single frame
     const maxFallSpeed = TILE_SIZE * 0.8;
-    if (player.velocityY > maxFallSpeed) {
-        player.velocityY = maxFallSpeed;
-    }
-    
-    // Update position based on velocity
+    if (player.velocityY > maxFallSpeed) player.velocityY = maxFallSpeed;
+
     player.x += player.velocityX;
     player.y += player.velocityY;
-    
-    // Keep player in world bounds
-    player.x = Math.max(0, Math.min(player.x, worldWidth - player.width));
+
+    player.x = Math.max(0, Math.min(player.x, 300 - player.width));
 }
 ```
 
-**Why cap falling speed?** If your hero falls too fast, they might skip past collision tiles entirely. Think of it as a speed limit that prevents wall-clipping bugs!
-
-### Modern Movement System
-
-Unlike the old approach, modern games separate input, physics, and collision:
+Separating input, physics, and collision into distinct functions makes each piece straightforward to modify independently:
 
 ```javascript
 function gameLoop() {
-    handleInput();        // Read what player wants to do
-    updatePhysics();      // Apply gravity and velocity
-    checkCollisions();    // Handle hitting walls/ground
-    updateAnimation();    // Make it look pretty
-    render();            // Draw everything
+    handleInput();
+    updatePhysics();
+    checkCollisions();
 }
 ```
 
-This clean separation makes your code easier to debug and modify. Want to add power-ups that change gravity? Just modify `updatePhysics()`. Need different collision rules? Update `checkCollisions()`!
+## Collision Detection
 
-## Collision Detection: Bouncing Off Reality
+The `isSolid` helper checks a single pixel coordinate against the map array:
 
-Now for the crucial part - making your hero actually interact with the world!
+```javascript
+function isSolid(x, y) {
+    const col = Math.floor(x / TILE_SIZE);
+    const row = Math.floor(y / TILE_SIZE);
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return true;
+    return map[row][col] === 1;
+}
+```
+
+Collision runs separately for vertical and horizontal movement. Checking two points (left foot and right foot, or left and right of the head) catches contacts that a single midpoint check would miss:
 
 ```javascript
 function checkCollisions() {
-    // Check if hitting ground while falling
+    // Falling: will the player's bottom overlap a tile?
     if (player.velocityY > 0) {
-        const groundY = checkGroundCollision(player.x, player.y + player.height);
-        if (groundY !== null) {
-            player.y = groundY - player.height;
+        const newBottom = player.y + player.height + player.velocityY;
+        if (isSolid(player.x + 2, newBottom) || isSolid(player.x + player.width - 2, newBottom)) {
+            player.y = Math.floor(newBottom / TILE_SIZE) * TILE_SIZE - player.height;
             player.velocityY = 0;
             player.onGround = true;
-            player.isJumping = false;
+        } else {
+            player.y += player.velocityY;
+        }
+    } else if (player.velocityY < 0) {
+        // Rising: will the player's top overlap a tile?
+        const newTop = player.y + player.velocityY;
+        if (isSolid(player.x + 2, newTop) || isSolid(player.x + player.width - 2, newTop)) {
+            player.y = Math.ceil(newTop / TILE_SIZE) * TILE_SIZE;
+            player.velocityY = 0;
+        } else {
+            player.y += player.velocityY;
         }
     }
-    
-    // Check if hitting ceiling while jumping
-    if (player.velocityY < 0) {
-        const ceilingY = checkCeilingCollision(player.x, player.y);
-        if (ceilingY !== null) {
-            player.y = ceilingY;
-            player.velocityY = 0; // Stop upward movement
-        }
-    }
-    
-    // Check for platform edges (start falling)
-    if (player.onGround && !isStandingOnSolid()) {
-        player.onGround = false;
-        // Start falling with zero initial velocity
-    }
-}
-
-function checkGroundCollision(x, y) {
-    // Check if the player's bottom edge hits a solid tile
-    const tileX = Math.floor(x / TILE_SIZE);
-    const tileY = Math.floor(y / TILE_SIZE);
-    
-    if (map[tileY] && map[tileY][tileX] === 1) {
-        return tileY * TILE_SIZE;
-    }
-    return null;
-}
-
-function isStandingOnSolid() {
-    // Check if there's solid ground beneath the player
-    const leftFoot = checkGroundCollision(player.x, player.y + player.height + 1);
-    const rightFoot = checkGroundCollision(player.x + player.width, player.y + player.height + 1);
-    
-    return leftFoot !== null || rightFoot !== null;
 }
 ```
 
-### Edge Detection: No More Floating Heroes!
+### Edge Detection
 
-**The classic problem**: Hero walks off a platform but keeps floating in mid-air like a cartoon character who hasn't looked down yet.
-
-**The solution**: Every frame, check if there's still solid ground beneath your hero. If not, immediately start falling!
+When the player walks off a platform's edge, `onGround` needs to become `false` so gravity resumes. Check whether there is still solid ground beneath the player's feet each frame:
 
 ```javascript
-// In your main game loop, after movement:
-if (player.onGround && !isStandingOnSolid()) {
-    player.onGround = false;
-    // Hero will start falling next frame due to gravity
+if (player.onGround) {
+    if (!isSolid(player.x + 2, player.y + player.height + 1) &&
+        !isSolid(player.x + player.width - 2, player.y + player.height + 1)) {
+        player.onGround = false;
+    }
 }
 ```
 
-**Boom!** Now you have realistic jumping physics that feel responsive and natural. Your hero can run, jump, hit ceilings, land on platforms, and fall off edges just like in professional games!
+The +1 offset tests one pixel below the feet — if neither foot is over a solid tile, gravity takes over next frame.
 
-**Next up**: In the clouds tutorial, we'll add one-way platforms you can jump through from below but land on from above. The jumping foundation you just built makes this incredibly easy to add!
+Next: [Clouds](/tutorial/a-side-scrolling-world/clouds/)

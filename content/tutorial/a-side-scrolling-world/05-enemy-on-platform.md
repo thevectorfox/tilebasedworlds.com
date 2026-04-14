@@ -9,7 +9,7 @@ next = "/tutorial/a-side-scrolling-world/shoot-him/"
 prev = "/tutorial/a-side-scrolling-world/moving-tiles/"
 +++
 
-Time to make your enemies SMART! {{< icon name="brain" >}} While basic wall-bouncing enemies are useful, platform-aware enemies that don't fall off edges create much more interesting and unpredictable gameplay. Think of the Goombas in Mario that patrol platforms, or the security robots in Mega Man that never fall into pits - these enemies feel more alive and create better spatial challenges!
+A basic wall-bouncing enemy will walk off platform edges and fall. A platform-aware enemy checks for ground ahead before stepping forward and turns back if there is none. This tutorial adds that edge-detection logic to enemy movement.
 
 {{< pixidemo title="Enemy on Platform" >}}
 const app = new PIXI.Application();
@@ -214,39 +214,28 @@ function updateEnemies() {
 
 // Smart direction choosing
 function chooseNewDirection(enemy) {
-    // Was moving horizontally? Try vertical. Was vertical? Try horizontal.
-    if (enemy.moveX === 0) {
+    if (enemy.edgeDetection) {
+        // Edge-detecting enemies stay horizontal — vertical movement
+        // would bypass the ground check and send them off platforms
+        enemy.moveX = -enemy.moveX || (Math.random() < 0.5 ? -1 : 1);
+        enemy.moveY = 0;
+    } else if (enemy.moveX === 0) {
         // Was moving vertically, now try horizontal
         enemy.moveX = Math.random() < 0.5 ? -1 : 1;
         enemy.moveY = 0;
-        
-        // Test if new direction is safe
         const testX = enemy.x + enemy.moveX * enemy.speed;
-        const testY = enemy.y;
-        
-        if (wouldHitWall(testX, testY, enemy.width, enemy.height) ||
-            (enemy.edgeDetection && !hasGroundBelow(testX, testY, enemy.width, enemy.height))) {
-            enemy.moveX = -enemy.moveX; // Reverse if unsafe
+        if (wouldHitWall(testX, enemy.y, enemy.width, enemy.height)) {
+            enemy.moveX = -enemy.moveX;
         }
     } else {
         // Was moving horizontally, now try vertical
         enemy.moveX = 0;
         enemy.moveY = Math.random() < 0.5 ? -1 : 1;
-        
-        // Test if new direction is safe
-        const testX = enemy.x;
         const testY = enemy.y + enemy.moveY * enemy.speed;
-        
-        if (wouldHitWall(testX, testY, enemy.width, enemy.height)) {
-            enemy.moveY = -enemy.moveY; // Reverse if unsafe
+        if (wouldHitWall(enemy.x, testY, enemy.width, enemy.height)) {
+            enemy.moveY = -enemy.moveY;
         }
     }
-    
-    // Visual feedback when turning
-    // enemy.sprite.tint = 0xFFFF99;
-    setTimeout(() => {
-        if (enemy.sprite) enemy.sprite.tint = 0xFFFFFF;
-    }, 150);
 }
 
 // Player physics (jumping platformer)
@@ -332,240 +321,25 @@ app.ticker.add(gameLoop);
 {{< /pixidemo >}}
 
 
-## Smart Direction Changes: Adding Unpredictability 🎲
+## Random Direction Changes
 
-Basic edge detection is great, but predictable enemies get boring fast! Let's add intelligent direction changes that make enemies feel more alive:
-
-{{< pixidemo title="Smart Direction Changes" >}}
-const app2 = new Application();
-
-await app2.init({
-    width: 300,
-    height: 240,
-    backgroundColor: 0x87CEEB
-});
-
-// Simple map
-const map2 = [
-    [1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,1],
-    [1,1,1,0,0,0,0,1,1,1],
-    [1,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,1,1,1]
-];
-
-// Draw map2
-for (let row = 0; row < map2.length; row++) {
-    for (let col = 0; col < map2[row].length; col++) {
-        if (map2[row][col] === 1) {
-            const tile = new PIXI.Graphics().
-                rect(0, 0, 30, 30).
-                fill(0x8B4513);
-            tile.x = col * 30;
-            tile.y = row * 30;
-            app2.stage.addChild(tile);
-        }
-    }
-}
-
-// Smart enemies with different personalities
-const smartEnemies = [
-    {
-        sprite: new PIXI.Graphics().rect(0, 0, 10, 10).fill(0x9370DB),
-        x: 60, y: 60, moveX: 1, moveY: 0,
-        turnChance: 3, personality: 'cautious'
-    },
-    {
-        sprite: new PIXI.Graphics().rect(0, 0, 10, 10).fill(0xFF6347),
-        x: 120, y: 120, moveX: 0, moveY: 1,
-        turnChance: 12, personality: 'erratic'
-    },
-    {
-        sprite: new PIXI.Graphics().rect(0, 0, 10, 10).fill(0x32CD32),
-        x: 180, y: 60, moveX: -1, moveY: 0,
-        turnChance: 7, personality: 'explorer'
-    }
-];
-
-smartEnemies.forEach(enemy => {
-    enemy.sprite.x = enemy.x;
-    enemy.sprite.y = enemy.y;
-    app2.stage.addChild(enemy.sprite);
-});
-
-// Smart AI with personality
-function updateSmartEnemies() {
-    smartEnemies.forEach(enemy => {
-        const speed = 1;
-        const nextX = enemy.x + enemy.moveX * speed;
-        const nextY = enemy.y + enemy.moveY * speed;
-        
-        // Check walls
-        const hitWall = nextX <= 30 || nextX >= 270 || nextY <= 30 || nextY >= 210 ||
-                       (nextY >= 120 && nextY <= 150 && (nextX <= 90 || nextX >= 210));
-        
-        // Random direction change based on personality
-        const randomTurn = Math.random() * 100 < enemy.turnChance;
-        
-        if (hitWall || randomTurn) {
-            // Smart direction choosing
-            if (enemy.moveX === 0) {
-                enemy.moveX = Math.random() < 0.5 ? -1 : 1;
-                enemy.moveY = 0;
-            } else {
-                enemy.moveX = 0;
-                enemy.moveY = Math.random() < 0.5 ? -1 : 1;
-            }
-            
-            // Brief flash when changing direction
-            enemy.sprite.tint = 0xFFFF00;
-            setTimeout(() => enemy.sprite.tint = 0xFFFFFF, 100);
-        } else {
-            enemy.x = nextX;
-            enemy.y = nextY;
-        }
-        
-        enemy.sprite.x = enemy.x;
-        enemy.sprite.y = enemy.y;
-    });
-}
-
-app2.ticker.add(updateSmartEnemies);
-});
-document.body.appendChild(app2.canvas);
-{{< /pixidemo >}}
-
-### Random Direction Algorithm
+A `turnChance` percentage applied each frame creates variation between enemy types without adding new AI logic:
 
 ```javascript
-// Enemy personalities through turn chance
 const ENEMY_PERSONALITIES = {
     PREDICTABLE: { turnChance: 0 },   // Never turns randomly
-    CAUTIOUS: { turnChance: 3 },      // Rarely changes direction
-    NORMAL: { turnChance: 8 },        // Moderate unpredictability  
-    ERRATIC: { turnChance: 20 },      // Frequently changes direction
-    CHAOTIC: { turnChance: 80 }       // Almost always changing!
+    CAUTIOUS:    { turnChance: 3 },   // Rarely changes direction
+    NORMAL:      { turnChance: 8 },   // Moderate unpredictability
+    ERRATIC:     { turnChance: 20 },  // Frequently changes direction
 };
 
-function chooseNewDirection(enemy) {
-    // Smart direction logic: alternate between horizontal and vertical
-    if (enemy.moveX === 0) {
-        // Was moving vertically, now go horizontal
-        enemy.moveX = Math.random() < 0.5 ? -1 : 1;
-        enemy.moveY = 0;
-        
-        // Safety check: make sure new direction is valid
-        if (wouldHitObstacle(enemy, enemy.moveX, 0)) {
-            enemy.moveX = -enemy.moveX; // Try opposite direction
-        }
-    } else {
-        // Was moving horizontally, now go vertical
-        enemy.moveX = 0;
-        enemy.moveY = Math.random() < 0.5 ? -1 : 1;
-        
-        if (wouldHitObstacle(enemy, 0, enemy.moveY)) {
-            enemy.moveY = -enemy.moveY;
-        }
-    }
-}
-
-// Random turn check in main AI loop
-function updateEnemyAI(enemy) {
-    // ... normal movement and collision checks ...
-    
-    // Add unpredictability!
-    const randomTurn = Math.random() * 100 < enemy.turnChance;
-    if (randomTurn && !justTurned) {
-        chooseNewDirection(enemy);
-        enemy.justTurned = true; // Prevent immediate flip-flopping
-        
-        // Reset flag after a delay
-        setTimeout(() => { enemy.justTurned = false; }, 500);
-    }
+// In the main AI loop:
+if (!shouldTurn && Math.random() * 100 < enemy.turnChance) {
+    shouldTurn = true;
 }
 ```
 
-**Why this creates better gameplay:**
-- {{< icon name="target" >}} **Unpredictable but fair**: Players can't memorize exact patterns
-- {{< icon name="mask-happy" >}} **Personality variety**: Different enemies feel distinct
-- ⏳ **Spatial coverage**: Enemies explore more of the level
-- 🤔 **Adaptive challenge**: Players must stay alert and reactive
+The `chooseNewDirection` function (shown in the demo above) handles edge-detecting enemies differently from free-moving ones: edge-detecting enemies stay horizontal and simply reverse, while free-moving enemies can alternate between axes.
 
-## Complete Implementation Summary {{< icon name="trophy" >}}
-
-**{{< icon name="fire" >}} What you've built:**
-- ✅ **Platform-aware enemies** that don't fall off edges
-- ✅ **Smart direction changes** that create unpredictability
-- ✅ **Personality-based AI** through simple turn chance parameters
-- ✅ **Visual feedback** for direction changes and collisions
-- ✅ **Performance-optimized** collision detection
-
-**{{< icon name="game-controller" >}} Gameplay impact:**
-Your enemies now feel **intentional and alive** rather than mindlessly bouncing around. They patrol platforms like guards, explore areas like scouts, and create dynamic spatial challenges that keep players engaged.
-
-**{{< icon name="rocket-launch" >}} Performance tips:**
-- Limit smart enemies to 3-5 per level for smooth gameplay
-- Use different AI personalities to create variety without complexity
-- Edge detection only for horizontal movement saves processing power
-
-**Next up**: Time to give players a way to fight back against these smart enemies! [Next: Shoot Him](/tutorial/world-one/14-shoot-him/)
-
-### Random Direction Algorithm
-
-```javascript
-// Enemy personalities through turn chance
-const ENEMY_PERSONALITIES = {
-    PREDICTABLE: { turnChance: 0 },   // Never turns randomly
-    CAUTIOUS: { turnChance: 3 },      // Rarely changes direction
-    NORMAL: { turnChance: 8 },        // Moderate unpredictability  
-    ERRATIC: { turnChance: 20 },      // Frequently changes direction
-    CHAOTIC: { turnChance: 80 }       // Almost always changing!
-};
-
-function chooseNewDirection(enemy) {
-    // Smart direction logic: alternate between horizontal and vertical
-    if (enemy.moveX === 0) {
-        // Was moving vertically, now go horizontal
-        enemy.moveX = Math.random() < 0.5 ? -1 : 1;
-        enemy.moveY = 0;
-        
-        // Safety check: make sure new direction is valid
-        if (wouldHitObstacle(enemy, enemy.moveX, 0)) {
-            enemy.moveX = -enemy.moveX; // Try opposite direction
-        }
-    } else {
-        // Was moving horizontally, now go vertical
-        enemy.moveX = 0;
-        enemy.moveY = Math.random() < 0.5 ? -1 : 1;
-        
-        if (wouldHitObstacle(enemy, 0, enemy.moveY)) {
-            enemy.moveY = -enemy.moveY;
-        }
-    }
-}
-
-// Random turn check in main AI loop
-function updateEnemyAI(enemy) {
-    // ... normal movement and collision checks ...
-    
-    // Add unpredictability!
-    const randomTurn = Math.random() * 100 < enemy.turnChance;
-    if (randomTurn && !justTurned) {
-        chooseNewDirection(enemy);
-        enemy.justTurned = true; // Prevent immediate flip-flopping
-        
-        // Reset flag after a delay
-        setTimeout(() => { enemy.justTurned = false; }, 500);
-    }
-}
-```
-
-**Why this creates better gameplay:**
-- {{< icon name="target" >}} **Unpredictable but fair**: Players can't memorize exact patterns
-- {{< icon name="mask-happy" >}} **Personality variety**: Different enemies feel distinct
-- ⏳ **Spatial coverage**: Enemies explore more of the level
-- 🤔 **Adaptive challenge**: Players must stay alert and reactive
+Next: [Shoot Him](/tutorial/a-side-scrolling-world/shoot-him/)
 

@@ -9,7 +9,7 @@ next = "/tutorial/a-side-scrolling-world/enemy-on-platform/"
 prev = "/tutorial/a-side-scrolling-world/ladders/"
 +++
 
-Moving platforms! 🏃‍♂️ They're in every great platformer - the swinging platforms in Donkey Kong Country, the cloud lifts in Mario, the crumbling bridges in Crash Bandicoot. They transform a flat level into a dynamic puzzle that rewards timing and skill. Let's build them!
+Moving platforms appear in most platformers — the swinging platforms in Donkey Kong Country, the cloud lifts in Mario, the crumbling bridges in Crash Bandicoot. They transform a flat level into a dynamic obstacle that rewards timing. Here's how to build them.
 
 {{< pixidemo title="Moving Tiles" >}}
 const app = new PIXI.Application();
@@ -260,7 +260,7 @@ function gameLoop() {
         }
     }
 
-    player.x = Math.max(0, Math.min(player.x, 288));
+    player.x = Math.max(0, Math.min(player.x, 300 - player.width));
     player.sprite.x = player.x;
     player.sprite.y = player.y;
 }
@@ -278,7 +278,7 @@ Before we start coding, let's agree on the rules. Moving platforms in this tutor
 - Walls still block the hero even while riding a moving tile
 - When a tile pushes the hero into a wall, the hero detaches and falls
 
-## DEFINING MOVING TILE TYPES 📐
+## Defining Moving Tile Types
 
 Instead of static map tiles, moving tiles need a set of behavior properties. Define them as plain objects - one entry per tile type:
 
@@ -303,7 +303,7 @@ const MOVING_TILE_TYPES = {
 
 `dirX`/`dirY` tell the tile which way to start moving. The range values are **relative to the starting tile position**, so you can place the same tile type anywhere in a map and its travel range will follow it. The tile bounces when it hits either boundary.
 
-## PLACING MOVING TILES {{< icon name="map-trifold" >}}
+## Placing Moving Tiles {{< icon name="map-trifold" >}}
 
 Like enemies and items, moving tiles are stored in a data array per room:
 
@@ -355,9 +355,9 @@ function buildMovingTiles() {
 }
 ```
 
-Storing absolute boundaries avoids recalculating `start + range` on every frame. That may not sound like much, but at 60fps with many tiles it adds up!
+Storing absolute pixel boundaries avoids recalculating `start + range` on every frame.
 
-## LANDING ON A MOVING TILE {{< icon name="target" >}}
+## Landing on a Moving Tile {{< icon name="target" >}}
 
 The landing check has one critical rule: **the hero must have been above the tile on the previous frame**. Without this, the hero would teleport to the top of any tile they happen to overlap with from the side.
 
@@ -413,7 +413,7 @@ if (player.velocityY > 0) {
 }
 ```
 
-## MOVING ALL THE TILES {{< icon name="arrows-clockwise" >}}
+## Moving All Tiles {{< icon name="arrows-clockwise" >}}
 
 The `updateMovingTiles()` function runs once per frame **before** player input. It handles three jobs:
 
@@ -490,7 +490,7 @@ function updateMovingTiles() {
 }
 ```
 
-## WRAPPING IT INTO THE GAME LOOP 🔁
+## Game Loop Integration
 
 Two small changes to your existing game loop:
 
@@ -524,11 +524,11 @@ function handleJump() {
 }
 ```
 
-That's it! Notice that `movingTiles` doesn't need saving when changing rooms - unlike items, platforms always reset to their starting position when you re-enter a room.
+Note that `movingTiles` doesn't need saving when changing rooms — unlike items, platforms always reset to their starting position when you re-enter a room.
 
-## DESIGN TIPS 💡
+## Design Notes
 
-Now that you can build moving platforms, here's how pros use them:
+Common patterns for moving platforms:
 
 **Pacing and rhythm**: Platforms that move at the same speed as the player's walk speed create satisfying sync. Try `speed: 2` for tiles in a world where the hero also moves at 2 pixels/frame.
 
@@ -536,4 +536,4 @@ Now that you can build moving platforms, here's how pros use them:
 
 **Multiple tiles**: Add more entries to `myMovingTiles` to fill a room. A gauntlet of precisely timed platforms at different speeds creates the kind of challenge players remember.
 
-**Next up**: Your world is getting dynamic - now let's make it *big*. [Next: Scrolling](/tutorial/world-one/17-scrolling/)
+Next: [Enemy on Platform](/tutorial/a-side-scrolling-world/enemy-on-platform/)
