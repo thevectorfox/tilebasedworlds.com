@@ -2,11 +2,11 @@
 title = "Scrolling"
 date = 2026-03-09T13:00:00+11:00
 weight = 11
-draft = true
+draft = false
 slug = "scrolling"
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/world-one/more-scrolling/"
-prev = "/tutorial/world-one/pushing-tiles/"
+next = "/tutorial/a-side-scrolling-world/more-scrolling/"
+prev = "/tutorial/a-side-scrolling-world/pushing-tiles/"
 +++
 
 Your world is bigger than one screen. Scrolling is how you show it - it's the technique behind every side-scroller ever made, from the original Super Mario Bros to Hollow Knight. The camera follows the hero, and the whole world slides past. Let's build it!

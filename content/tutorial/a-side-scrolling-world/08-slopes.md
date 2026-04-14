@@ -2,11 +2,11 @@
 title = "Slopes"
 date = 2026-03-10T00:00:00+11:00
 weight = 8
-draft = true
+draft = false
 slug = "slopes"
 tags = ["advanced", "optimization", "tutorial"]
 next = ""
-prev = "/tutorial/the-keep/depth/"
+prev = "/tutorial/a-side-scrolling-world/depth/"
 +++
 
 {{< icon name="confetti" >}} **Welcome to the GRAND FINALE!** {{< icon name="confetti" >}}

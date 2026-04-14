@@ -2,11 +2,11 @@
 title = "Shoot Him"
 date = 2026-03-09T10:00:00+11:00
 weight = 6
-draft = true
+draft = false
 slug = "shoot-him"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/the-keep/depth/"
-prev = "/tutorial/the-keep/enemy-on-platform/"
+next = "/tutorial/a-side-scrolling-world/depth/"
+prev = "/tutorial/a-side-scrolling-world/enemy-on-platform/"
 +++
 
 Time to fight back! 🔫 There's nothing quite like the satisfaction of blasting enemies that have been chasing you around! Whether you're firing arrows like Link, blasting with a mega buster like Mega Man, or launching fireballs like Mario - giving players offensive weapons transforms passive avoidance into active, strategic combat!

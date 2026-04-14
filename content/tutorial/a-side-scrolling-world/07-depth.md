@@ -2,11 +2,11 @@
 title = "Depth"
 date = 2026-03-09T15:00:00+11:00
 weight = 7
-draft = true
+draft = false
 slug = "depth"
 tags = ["advanced", "optimization", "tutorial"]
-next = "/tutorial/the-keep/slopes/"
-prev = "/tutorial/the-keep/shoot-him/"
+next = "/tutorial/a-side-scrolling-world/slopes/"
+prev = "/tutorial/a-side-scrolling-world/shoot-him/"
 +++
 
 Walk below a pillar and you're in front of it. Walk above and the pillar covers you. That's depth - a 2D trick that makes your top-down world feel solid and three-dimensional. Try it:

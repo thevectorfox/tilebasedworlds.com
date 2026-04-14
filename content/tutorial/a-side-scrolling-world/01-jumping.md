@@ -5,7 +5,7 @@ weight = 1
 draft = false
 slug = "jumping"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/the-keep/clouds/"
+next = "/tutorial/a-side-scrolling-world/clouds/"
 prev = ""
 +++
 

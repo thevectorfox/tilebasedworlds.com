@@ -5,8 +5,8 @@ weight = 3
 draft = false
 slug = "ladders"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/the-keep/moving-tiles/"
-prev = "/tutorial/the-keep/clouds/"
+next = "/tutorial/a-side-scrolling-world/moving-tiles/"
+prev = "/tutorial/a-side-scrolling-world/clouds/"
 +++
 
 Ready to add vertical exploration to your game world? 🪜 Ladders are one of the most iconic platformer mechanics - think Donkey Kong's construction sites, Mega Man's industrial levels, or any classic 2D adventure! You're about to give your players the freedom to climb up and down through your levels, opening up incredible possibilities for level design!

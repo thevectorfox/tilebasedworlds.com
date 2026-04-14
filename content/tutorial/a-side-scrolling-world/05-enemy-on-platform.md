@@ -2,11 +2,11 @@
 title = "Enemy on Platform"
 date = 2026-03-09T09:00:00+11:00
 weight = 5
-draft = true
+draft = false
 slug = "enemy-on-platform"
 tags = ["intermediate", "gameplay", "tutorial"]
-next = "/tutorial/the-keep/shoot-him/"
-prev = "/tutorial/the-keep/moving-tiles/"
+next = "/tutorial/a-side-scrolling-world/shoot-him/"
+prev = "/tutorial/a-side-scrolling-world/moving-tiles/"
 +++
 
 Time to make your enemies SMART! {{< icon name="brain" >}} While basic wall-bouncing enemies are useful, platform-aware enemies that don't fall off edges create much more interesting and unpredictable gameplay. Think of the Goombas in Mario that patrol platforms, or the security robots in Mega Man that never fall into pits - these enemies feel more alive and create better spatial challenges!

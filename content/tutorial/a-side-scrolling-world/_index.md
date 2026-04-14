@@ -21,5 +21,5 @@ Assumes familiarity with the basics from World One.
 - [Slopes](/tutorial/a-side-scrolling-world/slopes/)
 - [Scrolling](/tutorial/a-side-scrolling-world/scrolling/)
 - [More Scrolling](/tutorial/a-side-scrolling-world/more-scrolling/)
-- Bringing it Together *(coming soon)*
-- Going Further *(coming soon)*
+- [Bringing it Together](/tutorial/a-side-scrolling-world/bringing-it-together)
+- [Going Further](/tutorial/a-side-scrolling-world/going-further)
