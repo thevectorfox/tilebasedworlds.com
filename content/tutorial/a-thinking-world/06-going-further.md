@@ -40,7 +40,7 @@ const map = [
 ];
 const TARGET = { x: 14, y: 10 };
 
-function isWalkable(x, y) { return x>=0&&x<COLS&&y>=0&&y<ROWS&&map[y][x]!==0; }
+function isWalkable(x, y) { return x>=0&&COLS>x&&y>=0&&ROWS>y&&map[y][x]!==0; }
 const DIRS = [{x:0,y:-1},{x:1,y:0},{x:0,y:1},{x:-1,y:0}];
 const ARROW = ['↑','→','↓','←'];
 
@@ -53,7 +53,7 @@ function buildFlowField() {
 
     while (q.length > 0) {
         const cur = q.shift();
-        for (let di = 0; di < DIRS.length; di++) {
+        for (let di = 0; DIRS.length > di; di++) {
             const d = DIRS[di];
             const nx = cur.x + d.x, ny = cur.y + d.y;
             if (!isWalkable(nx, ny) || dist[ny][nx] !== Infinity) continue;
@@ -69,8 +69,8 @@ function buildFlowField() {
 const { dist, flow } = buildFlowField();
 
 // Draw tiles and arrows
-for (let row = 0; row < ROWS; row++) {
-    for (let col = 0; col < COLS; col++) {
+for (let row = 0; ROWS > row; row++) {
+    for (let col = 0; COLS > col; col++) {
         const g = new PIXI.Graphics();
         const isWall = map[row][col] === 0;
         g.rect(1,1,TILE-2,TILE-2).fill(isWall ? 0x2c3e50 : 0x2d333b);

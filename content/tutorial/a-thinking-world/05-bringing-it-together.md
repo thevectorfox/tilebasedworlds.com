@@ -167,7 +167,7 @@ function manhattan(x1, y1, x2, y2) { return Math.abs(x1 - x2) + Math.abs(y1 - y2
 class PNode {
     constructor(x, y, parent, g, h) {
         this.x = x; this.y = y; this.parent = parent;
-        this.g = g ?? 0; this.h = h ?? 0; this.f = this.g + this.h;
+        this.g = g !== undefined ? g : 0; this.h = h !== undefined ? h : 0; this.f = this.g + this.h;
     }
     key() { return `${this.x},${this.y}`; }
 }
@@ -419,7 +419,7 @@ app.ticker.add((ticker) => {
 
     // Guard colour by state
     const guardColors = { sleeping: 0x444444, patrol: C.guard, alert: 0xffab00, chase: 0xff0000 };
-    guardSprite.clear().circle(TILE / 2, TILE / 2, 7).fill(guardColors[guardState.state] ?? C.guard);
+    guardSprite.clear().circle(TILE / 2, TILE / 2, 7).fill(guardColors[guardState.state] || C.guard);
     if (guardState.alertFlash > 0) {
         guardState.alertFlash--;
         guardSprite.clear().circle(TILE / 2, TILE / 2, 7 + Math.sin(guardState.alertFlash * 0.5) * 3).fill(0xffab00);
@@ -445,7 +445,7 @@ app.ticker.add((ticker) => {
     // Status
     if (guardState.state !== 'sleeping' && !gameOver) {
         const stateLabels = { patrol: 'Patrolling', alert: '⚠ Searching!', chase: '🔴 CHASING!' };
-        statusText.text = `Guard: ${stateLabels[guardState.state] ?? ''} [${selectedAlgo}]  |  WASD to move`;
+        statusText.text = `Guard: ${stateLabels[guardState.state] || ''} [${selectedAlgo}]  |  WASD to move`;
         window.parent.postMessage({ type: 'status', text:
             `Guard [${selectedAlgo}]: ${guardState.state}  |  Use WASD to sneak to the exit` }, '*');
     }

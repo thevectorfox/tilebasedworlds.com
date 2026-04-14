@@ -82,7 +82,7 @@ for (let row = 0; row < ROWS; row++) {
     for (let col = 0; col < COLS; col++) {
         const g = new PIXI.Graphics();
         const t = map[row][col];
-        g.rect(0, 0, TILE_SIZE, TILE_SIZE).fill(TERRAIN_COLOR[t] ?? TERRAIN_COLOR[TERRAIN.WALL]);
+        g.rect(0, 0, TILE_SIZE, TILE_SIZE).fill(TERRAIN_COLOR[t] || TERRAIN_COLOR[TERRAIN.WALL]);
         if (t !== TERRAIN.WALL) g.stroke({ color: 0xcccccc, width: 0.5 });
         g.x = col * TILE_SIZE;
         g.y = row * TILE_SIZE;
@@ -132,7 +132,7 @@ function resetMap() {
             const t = map[row][col];
             tileGraphics[row][col].clear()
                 .rect(0, 0, TILE_SIZE, TILE_SIZE)
-                .fill(TERRAIN_COLOR[t] ?? TERRAIN_COLOR[TERRAIN.WALL]);
+                .fill(TERRAIN_COLOR[t] || TERRAIN_COLOR[TERRAIN.WALL]);
             if (t !== TERRAIN.WALL) tileGraphics[row][col].stroke({ color: 0xcccccc, width: 0.5 });
         }
     }
@@ -186,7 +186,7 @@ function runDijkstra(tx, ty) {
         for (const d of DIRS) {
             const nx = cur.x + d.x, ny = cur.y + d.y;
             if (!isWalkable(nx, ny)) continue;
-            const tileCost = TERRAIN_COST[map[ny][nx]] ?? 1;
+            const tileCost = TERRAIN_COST[map[ny][nx]] || 1;
             const newCost = cur.cost + tileCost;
             const key = `${nx},${ny}`;
             if (dist[key] === undefined || newCost < dist[key]) {

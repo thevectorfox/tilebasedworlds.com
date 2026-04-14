@@ -337,13 +337,13 @@ app.stage.on('pointerdown', (event) => {
         leftDemo.tiles[startY][startX].clear().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0xffff00);
         rightDemo.tiles[startY][startX].clear().rect(0, 0, TILE_SIZE, TILE_SIZE).fill(0xffff00);
         
-        updateStatus('{{< icon name="rocket-launch" >}} Starting algorithm race!');
+        updateStatus('🚀 Starting algorithm race!');
         animateBreadthFirst(startX, startY, tileX, tileY);
     }
 });
 
 // Initialize
-updateStatus('{{< icon name="target" >}} Click anywhere on the maze to start the pathfinding race!');
+updateStatus('🎯 Click anywhere on the maze to start the pathfinding race!');
 {{< /pixidemo >}}
 
 

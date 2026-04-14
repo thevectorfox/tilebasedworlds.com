@@ -137,7 +137,7 @@ function animateSearch(queue, visited, target, step = 0) {
     
     // Check if we reached the target
     if (current.x === target.x && current.y === target.y) {
-        updateStatus('{{< icon name="confetti" >}} Path found! Building route...');
+        updateStatus('🎉 Path found! Building route...');
         buildPath(current);
         return;
     }
@@ -238,7 +238,7 @@ function clearVisualization() {
 
 function findPath(startX, startY, targetX, targetY) {
     clearVisualization();
-    updateStatus('{{< icon name="target" >}} Starting pathfinding...');
+    updateStatus('🎯 Starting pathfinding...');
     
     const startNode = new PathfindingNode(startX, startY);
     const queue = [startNode];
