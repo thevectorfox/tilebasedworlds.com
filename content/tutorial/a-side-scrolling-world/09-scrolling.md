@@ -9,7 +9,7 @@ next = "/tutorial/a-side-scrolling-world/more-scrolling/"
 prev = "/tutorial/a-side-scrolling-world/pushing-tiles/"
 +++
 
-Your world is bigger than one screen. Scrolling is how you show it - it's the technique behind every side-scroller ever made, from the original Super Mario Bros to Hollow Knight. The camera follows the hero, and the whole world slides past. Let's build it!
+Your world is bigger than one screen. The camera follows the hero, and the whole world slides past — that's the technique behind every side-scroller from the original Super Mario Bros to Hollow Knight.
 
 {{< pixidemo title="Scrolling" >}}
 const app = new PIXI.Application();
@@ -78,7 +78,7 @@ function isSolid(x, y) {
 }
 
 const keys = {};
-window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keydown', (e) => { keys[e.code] = true; e.preventDefault(); });
 window.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
 function gameLoop() {
@@ -129,7 +129,7 @@ app.ticker.add(gameLoop);
 
 Notice that the hero stays near the center of the screen while the world slides around them. That's the illusion of scrolling - the hero isn't really moving on screen, the world is.
 
-## THE THEORY 🎥
+## The theory
 
 Without scrolling, the hero moves across the screen and eventually hits the edge. With scrolling, you keep the hero roughly centered and shift *everything else* in the opposite direction.
 
@@ -141,13 +141,11 @@ screen position = world position - camera position
 
 When the hero is at world x=450, and the camera is at x=300, the hero appears at screen x=150 (center of a 300px wide screen). The container shifts left by 300px and everything inside appears shifted left by that amount.
 
-## SETTING UP THE WORLD CONTAINER 🌍
+## Setting up the world container
 
 The only structural change from earlier tutorials: instead of adding tiles directly to `app.stage`, add them to a `Container` called `world`. The stage itself stays empty except for UI elements like a score display.
 
 ```js
-import { Application, Graphics, Container } from 'https://unpkg.com/pixi.js@8.0.0/dist/pixi.min.mjs';
-
 const world = new PIXI.Container();
 app.stage.addChild(world);
 
@@ -175,7 +173,7 @@ app.stage.addChild(scoreText); // ← stage, so it stays fixed
 
 Your collision detection (`isSolid`) doesn't change at all - it still uses the player's world coordinates to check the map array. The camera offset is invisible to the game logic.
 
-## THE CAMERA 📷
+## The camera
 
 The camera is just two numbers: `camX` and `camY`. You set `world.x = -camX` and `world.y = -camY` each frame to shift everything into view.
 
@@ -192,7 +190,7 @@ function updateCamera() {
 }
 ```
 
-**Smooth version** - eases toward the player position for that polished feel:
+**Smooth version** - eases toward the player position each frame:
 
 ```js
 let camX = 0;
@@ -213,7 +211,7 @@ function updateCamera() {
 }
 ```
 
-This easing makes the camera feel like it has weight - it chases the player but slightly lags behind, which looks professional. Try values between `0.08` (floaty) and `0.2` (snappy).
+The camera moves a fraction of the remaining distance to the target each frame, so it naturally slows as it closes in. Values between `0.08` (floaty) and `0.2` (snappy) cover most use cases.
 
 Call `updateCamera()` at the end of your game loop, after all positions are updated:
 
@@ -226,13 +224,13 @@ function gameLoop() {
 }
 ```
 
-## LARGE MAPS: TILE RECYCLING ♻️
+## Large maps: tile recycling
 
 For most games - maps up to around 100×100 tiles - just render all tiles into the world container. PixiJS automatically skips drawing anything outside the viewport, so performance is not a problem.
 
 For truly massive maps (thousands of tiles), you can recycle tile sprites as they scroll off-screen: take the column of tiles that just left the left edge and move those same sprites to the right edge, updating their appearance to match the new map data. This keeps the sprite count constant no matter how large the map is.
 
-The pattern works like this:
+The pattern — this is a description of the approach, not drop-in code; a full implementation requires tracking `tileSprites` (a `Map` keyed by column/row), `firstVisibleRow`, and `lastVisibleRow` based on the current camera position:
 
 ```js
 // Only create sprites for the visible window + 1 tile buffer on each edge
@@ -261,4 +259,4 @@ function recycleColumn(oldCol, newCol) {
 
 **When do you need this?** If you can't feel your game stuttering, you don't need it. Premature optimization is the root of all evil - start with the simple container approach, and only add recycling if you hit a real performance problem.
 
-**Next up**: The camera works, but walk to the edge of the map and you'll see the problem. [Next: More Scrolling](/tutorial/world-one/18-more-scrolling/)
+**Next up**: The camera works, but walk to the edge of the map and you'll see the problem. [Next: More Scrolling](/tutorial/a-side-scrolling-world/more-scrolling/)
