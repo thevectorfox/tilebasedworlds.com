@@ -9,8 +9,7 @@ next = "/tutorial/world-one/hit-the-wall/"
 prev = "/tutorial/world-one/the-hero/"
 +++
 
-
-Time to bring your hero to LIFE! {{< icon name="game-controller" >}} This is the moment where your game transforms from a static picture into an interactive experience. Player control is what separates games from movies - and you're about to master it! By the end of this chapter, your hero will respond to your every command, moving smoothly through your tile-based world.
+Keyboard input in the browser works via two events: `keydown` fires when a key is pressed, `keyup` fires when it's released. Store the current state of each key in an object, then read that state each frame in the game loop.
 
 {{< pixidemo title="Keys to Move" >}}
     // Create PixiJS application for movement demo
@@ -24,7 +23,6 @@ Time to bring your hero to LIFE! {{< icon name="game-controller" >}} This is the
     
     document.body.appendChild(app.canvas);
     
-    // Our game map
     const gameMap = [
         [1, 1, 1, 1, 1, 1, 1, 1],
         [1, 0, 0, 0, 0, 0, 0, 1],
@@ -36,7 +34,6 @@ Time to bring your hero to LIFE! {{< icon name="game-controller" >}} This is the
     
     const TILE_SIZE = 30;
     
-    // Render the map
     function createTileGraphics(tileType) {
         const graphics = new PIXI.Graphics();
         graphics.beginFill(tileType === 1 ? 0x00ff41 : 0x003311);
@@ -56,7 +53,6 @@ Time to bring your hero to LIFE! {{< icon name="game-controller" >}} This is the
         }
     }
     
-    // Create our moveable hero
     const hero = {
         tileX: 3,
         tileY: 2,
@@ -68,7 +64,6 @@ Time to bring your hero to LIFE! {{< icon name="game-controller" >}} This is the
         direction: 'down'
     };
     
-    // Create hero sprite
     const heroSprite = new PIXI.Graphics();
     heroSprite.beginFill(0xff4444);
     heroSprite.drawRect(-8, -8, 16, 16);
@@ -79,7 +74,6 @@ Time to bring your hero to LIFE! {{< icon name="game-controller" >}} This is the
     hero.sprite = heroSprite;
     app.stage.addChild(heroSprite);
     
-    // Position hero initially
     function updateHeroPosition() {
         hero.x = (hero.tileX * TILE_SIZE) + (TILE_SIZE / 2);
         hero.y = (hero.tileY * TILE_SIZE) + (TILE_SIZE / 2);
@@ -88,7 +82,6 @@ Time to bring your hero to LIFE! {{< icon name="game-controller" >}} This is the
     }
     updateHeroPosition();
     
-    // Keyboard input
     const keys = {
         ArrowUp: false,
         ArrowDown: false, 
@@ -96,7 +89,6 @@ Time to bring your hero to LIFE! {{< icon name="game-controller" >}} This is the
         ArrowRight: false
     };
     
-    // Listen for key events
     window.addEventListener('keydown', (e) => {
         if (keys.hasOwnProperty(e.code)) {
             keys[e.code] = true;
@@ -111,7 +103,6 @@ Time to bring your hero to LIFE! {{< icon name="game-controller" >}} This is the
         }
     });
     
-    // Movement logic
     function updateMovement() {
         let moved = false;
         
@@ -140,81 +131,51 @@ Time to bring your hero to LIFE! {{< icon name="game-controller" >}} This is the
             hero.isMoving = false;
         }
         
-        // Visual feedback for direction
         hero.sprite.tint = hero.isMoving ? 0xffff00 : 0xffffff;
     }
     
-    // Game loop
     app.ticker.add(updateMovement);
 {{< /pixidemo >}}
 
-**Try it!** Use your arrow keys to move the red square around! {{< icon name="arrow-left" >}}{{< icon name="arrow-right" >}}{{< icon name="arrow-up" >}}{{< icon name="arrow-down" >}}
+## Character setup
 
-*Notice how the hero changes color when moving and stays within the boundaries!*
+The hero object from the previous tutorial, with direction and movement state added:
 
-## MODERN CHARACTER SETUP {{< icon name="paint-brush" >}}
-
-Forget complex movie clips and keyframes! Modern game development uses much simpler, more powerful approaches. Let's build a character system that's both easier to understand and more flexible than the old Flash methods.
-
-**Enhanced Hero Object:**
 ```js
 const hero = {
-    // Position in tile coordinates
     tileX: 3,
     tileY: 2,
-    
-    // Pixel coordinates (calculated from tile position)
     x: 0,
     y: 0,
-    
-    // Movement properties
-    speed: 2,              // How fast we move (pixels per frame)
-    isMoving: false,       // Are we currently moving?
-    direction: 'down',     // Which way are we facing?
-    
-    // Visual representation
-    sprite: null,          // Our PixiJS sprite
-    
-    // Animation (we'll enhance this!)
-    animationFrame: 0,
-    animationSpeed: 0.2
+    speed: 2,
+    direction: 'down',
+    isMoving: false,
+    sprite: null
 };
 ```
 
-**Why this is better than Flash:**
-- ✅ **Simpler**: No complex keyframe management
-- ✅ **Flexible**: Easy to add new properties and behaviors  
-- ✅ **Modern**: Uses current web standards
-- ✅ **Performant**: No movie clip overhead
-- ✅ **Debuggable**: Easy to inspect and modify
+`direction` and `isMoving` aren't used by the movement logic itself — they exist so that animation code (which runs separately) can read the hero's state without needing to know how movement works.
 
-## KEYBOARD INPUT: THE MODERN WAY {{< icon name="target" >}}
+## Keyboard input
 
-**Step 1: Set Up Input Tracking**
-
-Modern games use event listeners to track keyboard input. This is much more reliable and flexible than Flash's old Key.isDown method:
+Track which keys are currently held with an event listener pair:
 
 ```js
-// Create an object to track which keys are currently pressed
 const keys = {
     ArrowUp: false,
     ArrowDown: false,
     ArrowLeft: false,
     ArrowRight: false,
-    // You can easily add more keys later!
-    Space: false,
-    KeyZ: false
+    Space: false   // add any keys you need
 };
 
-// Listen for key presses
 window.addEventListener('keydown', (event) => {
     if (keys.hasOwnProperty(event.code)) {
         keys[event.code] = true;
-        event.preventDefault(); // Prevent browser scroll
+        event.preventDefault();  // Prevent browser scroll on arrow keys
     }
 });
 
-// Listen for key releases
 window.addEventListener('keyup', (event) => {
     if (keys.hasOwnProperty(event.code)) {
         keys[event.code] = false;
@@ -223,155 +184,86 @@ window.addEventListener('keyup', (event) => {
 });
 ```
 
-**Why this rocks:**
-- {{< icon name="game-controller" >}} **Multiple keys**: Handle multiple simultaneous key presses
-- {{< icon name="rocket-launch" >}} **Responsive**: Immediate reaction to input
-- {{< icon name="wrench" >}} **Flexible**: Easy to add new controls
-- {{< icon name="globe" >}} **Standard**: Works across all modern browsers
+`hasOwnProperty` means the handler only processes keys that are explicitly listed — any unrelated key press is ignored. `event.preventDefault()` stops the browser from scrolling the page when arrow keys are pressed.
 
-## MOVEMENT LOGIC: CLEAN & POWERFUL {{< icon name="rocket-launch" >}}
+## Movement logic
 
-**Step 2: Create the Movement System**
-
-Let's create a clean movement system that's easy to understand and modify:
+Read the key state once per frame and update tile position accordingly:
 
 ```js
 function updateMovement() {
     let moved = false;
     let newDirection = hero.direction;
-    
-    // Check each direction
-    if (keys.ArrowUp) {
-        hero.tileY--;
-        newDirection = 'up';
-        moved = true;
-    } else if (keys.ArrowDown) {
-        hero.tileY++;
-        newDirection = 'down';
-        moved = true;
-    } else if (keys.ArrowLeft) {
-        hero.tileX--;
-        newDirection = 'left';
-        moved = true;
-    } else if (keys.ArrowRight) {
-        hero.tileX++;
-        newDirection = 'right';
-        moved = true;
-    }
-    
-    // Update hero state
+
+    if (keys.ArrowUp)    { hero.tileY--; newDirection = 'up';    moved = true; }
+    else if (keys.ArrowDown)  { hero.tileY++; newDirection = 'down';  moved = true; }
+    else if (keys.ArrowLeft)  { hero.tileX--; newDirection = 'left';  moved = true; }
+    else if (keys.ArrowRight) { hero.tileX++; newDirection = 'right'; moved = true; }
+
     if (moved) {
         hero.direction = newDirection;
         hero.isMoving = true;
-        updateHeroPosition();  // Convert tile pos to pixels
+        updateHeroPosition();
     } else {
         hero.isMoving = false;
     }
-    
-    // Update visual direction (we'll enhance this!)
-    updateHeroAppearance();
 }
 
-// Convert tile coordinates to pixel coordinates
 function updateHeroPosition() {
     hero.x = (hero.tileX * TILE_SIZE) + (TILE_SIZE / 2);
     hero.y = (hero.tileY * TILE_SIZE) + (TILE_SIZE / 2);
-    
-    // Update sprite position
     hero.sprite.x = hero.x;
     hero.sprite.y = hero.y;
 }
 
-// Update hero appearance based on direction
-function updateHeroAppearance() {
-    // Simple visual feedback (you can make this more sophisticated!)
-    if (hero.isMoving) {
-        hero.sprite.tint = 0xffff00;  // Yellow when moving
-    } else {
-        hero.sprite.tint = 0xffffff;  // White when still
-    }
-}
-```
-
-**Connect to the Game Loop:**
-```js
-// In PixiJS, add this to your ticker for 60fps updates
 app.ticker.add(updateMovement);
 ```
 
-**What makes this awesome:**
-- {{< icon name="target" >}} **Clear logic**: Easy to understand what each part does
-- {{< icon name="arrows-clockwise" >}} **Reusable**: Same pattern works for any moving object
-- {{< icon name="chart-line-up" >}} **Scalable**: Easy to add features like acceleration, animation
-- {{< icon name="shield" >}} **Reliable**: Consistent 60fps updates with PixiJS ticker
+This version has no boundary or collision checks — the hero can walk off the edge of the map. The next tutorial adds collision detection to fix that.
 
-## ADDING VISUAL DIRECTION {{< icon name="paint-brush" >}}
+## Visual direction
 
-**Make Your Hero Face the Right Way:**
+For a simple directional indicator, flip or rotate the sprite based on `hero.direction`:
 
 ```js
 function updateHeroAppearance() {
     const sprite = hero.sprite;
-    
-    // Reset transformations
+
     sprite.scale.x = 1;
     sprite.rotation = 0;
-    
-    // Update visual based on direction
+
     switch (hero.direction) {
-        case 'left':
-            sprite.scale.x = -1;  // Flip horizontally
-            break;
-        case 'right':
-            // Default orientation (no change needed)
-            break;
-        case 'up':
-            sprite.rotation = -Math.PI / 2;  // Rotate 90° counter-clockwise
-            break;
-        case 'down':
-            sprite.rotation = Math.PI / 2;   // Rotate 90° clockwise
-            break;
-    }
-    
-    // Movement feedback
-    sprite.tint = hero.isMoving ? 0xffff00 : 0xffffff;
-    
-    // Optional: Add subtle scale animation when moving
-    if (hero.isMoving) {
-        const pulse = Math.sin(Date.now() * 0.01) * 0.05 + 1;
-        sprite.scale.y = pulse;
+        case 'left':  sprite.scale.x = -1;             break;
+        case 'up':    sprite.rotation = -Math.PI / 2;  break;
+        case 'down':  sprite.rotation =  Math.PI / 2;  break;
     }
 }
 ```
 
-## ADVANCED: SMOOTH MOVEMENT {{< icon name="rocket-launch" >}}
+## Smooth movement
 
-**Want buttery-smooth movement instead of tile-by-tile jumping?**
+Tile-by-tile movement jumps instantly from one grid position to the next. For smooth sliding, interpolate toward the target pixel position each frame instead:
 
 ```js
 function updateSmoothMovement() {
-    let targetX = (hero.tileX * TILE_SIZE) + (TILE_SIZE / 2);
-    let targetY = (hero.tileY * TILE_SIZE) + (TILE_SIZE / 2);
-    
-    // Smooth interpolation
+    const targetX = (hero.tileX * TILE_SIZE) + (TILE_SIZE / 2);
+    const targetY = (hero.tileY * TILE_SIZE) + (TILE_SIZE / 2);
+
     const lerpSpeed = 0.2;
     hero.x += (targetX - hero.x) * lerpSpeed;
     hero.y += (targetY - hero.y) * lerpSpeed;
-    
+
     hero.sprite.x = hero.x;
     hero.sprite.y = hero.y;
 }
 ```
 
-{{< icon name="trophy" >}} **MOVEMENT MASTERY ACHIEVED!**
+The tile coordinates are still updated immediately on keypress — the smooth movement is only visual. Collision checks still run against `tileX`/`tileY`.
 
-You've just built a complete movement system that rivals professional games! Your hero responds instantly to input, faces the right direction, and moves smoothly through your world.
+**What you built:**
 
-**What you've conquered:**
-- ✅ Modern keyboard input handling
-- ✅ Clean movement logic
-- ✅ Visual direction feedback  
-- ✅ Smooth animation techniques
-- ✅ The foundation for ALL game interactions!
+- A key-state object updated by `keydown`/`keyup` event listeners
+- A movement function that reads that state each frame and updates tile coordinates
+- A `updateHeroPosition` function that translates tile coordinates to pixel position
 
-Ready for the next challenge? Let's add collision detection so your hero can't walk through walls! [Next: Hit the Wall](/tutorial/world-one/07-hit-the-wall/)
+[Next: Hit the Wall](/tutorial/world-one/hit-the-wall/)

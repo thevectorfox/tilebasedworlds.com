@@ -9,7 +9,7 @@ next = "/tutorial/world-one/bringing-it-together/"
 prev = "/tutorial/world-one/pushing-tiles/"
 +++
 
-Time to add some DANGER to your world! {{< icon name="alien" >}} A game without enemies is like a movie without conflict - technically possible, but nowhere near as exciting! You're about to breathe life into your levels with patrolling enemies that turn peaceful exploration into heart-pounding challenge. Even "stupid" enemies can create incredible tension and satisfaction!
+A wall-bouncing enemy is the simplest moving threat: each frame, advance by `moveX`/`moveY`; if the next position hits a solid tile, reverse direction. That's the entire AI.
 
 {{< pixidemo title="Stupid Enemy" >}}
 const app = new PIXI.Application();
@@ -129,32 +129,20 @@ function createEnemies() {
 
 // Input handling
 const keys = {};
-window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+window.addEventListener('keydown', (e) => { keys[e.code] = true; e.preventDefault(); });
 window.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
 // Collision detection
 function isSolid(x, y) {
     const col = Math.floor(x / TILE_SIZE);
     const row = Math.floor(y / TILE_SIZE);
-    
-    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) {
-        return true; // Treat out of bounds as solid
-    }
-    
+    if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return true;
     return map[row][col] === 1;
 }
 
-// Check if moving to position would hit wall
 function wouldHitWall(x, y, width, height) {
     return isSolid(x, y) || isSolid(x + width, y) ||
            isSolid(x, y + height) || isSolid(x + width, y + height);
-}
-
-// Distance between two points
-function distance(obj1, obj2) {
-    const dx = obj1.x - obj2.x;
-    const dy = obj1.y - obj2.y;
-    return Math.sqrt(dx * dx + dy * dy);
 }
 
 // Update player
@@ -164,20 +152,14 @@ function updatePlayer() {
     let newX = player.x;
     let newY = player.y;
     
-    if (keys['ArrowLeft']) newX -= player.speed;
+    if (keys['ArrowLeft'])  newX -= player.speed;
     if (keys['ArrowRight']) newX += player.speed;
-    if (keys['ArrowUp']) newY -= player.speed;
-    if (keys['ArrowDown']) newY += player.speed;
+    if (keys['ArrowUp'])    newY -= player.speed;
+    if (keys['ArrowDown'])  newY += player.speed;
     
-    // Check wall collisions
-    if (!wouldHitWall(newX, player.y, player.width, player.height)) {
-        player.x = newX;
-    }
-    if (!wouldHitWall(player.x, newY, player.width, player.height)) {
-        player.y = newY;
-    }
+    if (!wouldHitWall(newX, player.y, player.width, player.height)) player.x = newX;
+    if (!wouldHitWall(player.x, newY, player.width, player.height)) player.y = newY;
     
-    // Keep in bounds
     player.x = Math.max(0, Math.min(player.x, 300 - player.width));
     player.y = Math.max(0, Math.min(player.y, 240 - player.height));
     
@@ -185,30 +167,27 @@ function updatePlayer() {
     player.sprite.y = player.y;
 }
 
-// Enemy AI - simple but effective!
+// Enemy movement
 function updateEnemies() {
     enemies.forEach(enemy => {
-        // Calculate next position
         const nextX = enemy.x + enemy.moveX * enemy.speed;
         const nextY = enemy.y + enemy.moveY * enemy.speed;
         
-        // Check if next position hits wall
         if (wouldHitWall(nextX, nextY, enemy.width, enemy.height)) {
-            // Hit wall - reverse direction!
             enemy.moveX = -enemy.moveX;
             enemy.moveY = -enemy.moveY;
         } else {
-            // Safe to move
             enemy.x = nextX;
             enemy.y = nextY;
         }
         
-        // Update sprite position
         enemy.sprite.x = enemy.x;
         enemy.sprite.y = enemy.y;
         
-        // Check collision with player
-        if (player.alive && distance(enemy, player) < (enemy.width + player.width) / 2 + 2) {
+        // AABB collision with player
+        if (player.alive &&
+            enemy.x < player.x + player.width  && enemy.x + enemy.width  > player.x &&
+            enemy.y < player.y + player.height && enemy.y + enemy.height > player.y) {
             playerDie();
         }
     });
@@ -217,9 +196,8 @@ function updateEnemies() {
 // Game over
 function playerDie() {
     player.alive = false;
-    player.sprite.tint = 0x666666; // Gray out dead player
+    player.sprite.tint = 0x666666;
     
-    // Show game over message
     setTimeout(() => {
         player.alive = true;
         player.sprite.tint = 0xFFFFFF;
@@ -239,292 +217,163 @@ createEnemies();
 app.ticker.add(gameLoop);
 {{< /pixidemo >}}
 
-## Why "Stupid" Enemies Are Actually Genius! {{< icon name="brain" >}}
+## Why simple enemies work
 
-Before you think your game needs super-intelligent AI, let's talk strategy! Many legendary games use beautifully simple enemy patterns:
+Pac-Man's ghosts use simple chase and scatter rules. Mario's Goombas walk in straight lines. Space Invaders move in formation. None of these are complex behaviours, but all of them create spatial and timing challenges for the player.
 
-**- Pac-Man ghosts**: Simple chase/scatter patterns that create complex emergent gameplay
-**- Sonic badniks**: Basic back-and-forth patrolling that's predictable yet challenging  
-**- Mario Goombas**: Walk in straight lines, but placement makes them deadly
-**{{< icon name="alien" >}} Space Invaders**: Move in formation - simple rules, intense gameplay
+Predictable patterns are fair — players can learn them and improve. Simple movement is also cheap to compute, so you can run large numbers of enemies without performance concerns. The challenge in enemy design comes almost entirely from placement, not from the AI itself.
 
-**Why simple enemies work:**
-- {{< icon name="target" >}} **Predictable = Fair**: Players can learn patterns and improve
-- {{< icon name="lightning" >}} **Performance friendly**: Hundreds of simple enemies > few complex ones
-- {{< icon name="mask-happy" >}} **Personality through movement**: Each pattern creates different feelings
-- {{< icon name="puzzle-piece" >}} **Placement matters more than AI**: Smart level design beats smart AI
+## Enemy type definitions
 
-**The wisdom**: Players don't need enemies to surprise them with complex decisions. They need enemies that create interesting spatial puzzles, timing challenges, and satisfying patterns to overcome!
+Store enemy properties in a lookup object, one entry per type:
 
-### Our Enemy Types
-
-We'll create two fundamental enemy archetypes:
-
-**{{< icon name="arrows-clockwise" >}} Horizontal Patroller**
-- Walks left ↔ right between walls
-- Creates timing-based challenges
-- Perfect for corridor and platform sections
-
-**⬆⬇ Vertical Patroller**  
-- Moves up ↔ down between barriers
-- Controls vertical space effectively
-- Great for ladder and climbing sections
-
-These simple behaviors combine to create surprisingly complex level challenges!
-
-
-## Setting Up Enemy Types: Modern Class Design
-
-Let's create a clean, flexible enemy system using contemporary JavaScript patterns:
-
-```javascript
-// Enemy type definitions - easy to extend!
+```js
 const ENEMY_TYPES = {
     HORIZONTAL_PATROL: {
-        color: 0x8A2BE2,    // Purple
-        moveX: 1,           // Moves right initially
-        moveY: 0,           // No vertical movement
-        speed: 1,           // Pixels per frame
-        size: 10            // Square size
-    },
-    
-    VERTICAL_PATROL: {
-        color: 0x00CED1,    // Dark turquoise
-        moveX: 0,           // No horizontal movement
-        moveY: 1,           // Moves down initially
+        color: 0x8A2BE2,
+        moveX: 1,   // Moves right initially
+        moveY: 0,
         speed: 1,
         size: 10
     },
-    
+    VERTICAL_PATROL: {
+        color: 0x00CED1,
+        moveX: 0,
+        moveY: 1,   // Moves down initially
+        speed: 1,
+        size: 10
+    },
     FAST_HORIZONTAL: {
-        color: 0x32CD32,    // Lime green
+        color: 0x32CD32,
         moveX: 1,
         moveY: 0,
-        speed: 2,           // Twice as fast!
-        size: 8             // Smaller but faster
+        speed: 2,
+        size: 8
     }
 };
+```
 
-// Enemy spawn configuration for each level
+Store spawn positions separately — one per-level array describing which type appears at which tile:
+
+```js
 const levelEnemies = {
     1: [
         { type: 'HORIZONTAL_PATROL', tileX: 2, tileY: 1 },
-        { type: 'VERTICAL_PATROL', tileX: 8, tileY: 1 },
-        { type: 'FAST_HORIZONTAL', tileX: 1, tileY: 5 }
-    ],
-    
-    2: [
-        { type: 'HORIZONTAL_PATROL', tileX: 3, tileY: 3 },
-        { type: 'HORIZONTAL_PATROL', tileX: 6, tileY: 4 }
+        { type: 'VERTICAL_PATROL',   tileX: 8, tileY: 1 },
+        { type: 'FAST_HORIZONTAL',   tileX: 1, tileY: 5 }
     ]
 };
 ```
 
-**Why this approach rocks:**
-- {{< icon name="package" >}} **Organized data**: All enemy properties in one place
-- {{< icon name="rocket-launch" >}} **Easy expansion**: Add new types without touching existing code
-- {{< icon name="target" >}} **Level-specific**: Different enemy layouts per level
-- {{< icon name="wrench" >}} **Tweakable**: Change speeds, colors, sizes instantly
+## Spawning enemies
 
+Convert spawn data to live enemy objects and add them to the stage:
 
-## Spawning Enemies: Bringing Danger to Life
-
-Let's create a robust enemy spawning system:
-
-```javascript
-// Active enemies array
+```js
 const enemies = [];
-let nextEnemyId = 0;
 
-// Spawn enemies for current level
-function spawnEnemiesForLevel(levelId) {
-    // Clear existing enemies
-    enemies.forEach(enemy => enemy.sprite.destroy());
-    enemies.length = 0;
-    
-    // Get enemy spawn data for this level
-    const spawns = levelEnemies[levelId] || [];
-    
-    spawns.forEach(spawnData => {
-        createEnemy(spawnData.type, spawnData.tileX, spawnData.tileY);
-    });
-}
-
-// Create individual enemy
 function createEnemy(typeName, tileX, tileY) {
     const type = ENEMY_TYPES[typeName];
-    if (!type) {
-        console.warn(`Unknown enemy type: ${typeName}`);
-        return;
-    }
-    
-    // Create enemy sprite
-    const sprite = new Graphics()
+    if (!type) return;
+
+    const sprite = new PIXI.Graphics()
         .rect(0, 0, type.size, type.size)
-        .fill(type.color)
-        .stroke({width: 1, color: 0x000000}); // Black outline
-    
-    // Create enemy object
+        .fill(type.color);
+
     const enemy = {
-        id: nextEnemyId++,
-        sprite: sprite,
+        sprite,
         type: typeName,
-        
-        // Position (convert tile coords to pixels)
         x: tileX * TILE_SIZE + (TILE_SIZE - type.size) / 2,
         y: tileY * TILE_SIZE + (TILE_SIZE - type.size) / 2,
-        width: type.size,
+        width:  type.size,
         height: type.size,
-        
-        // Movement properties
         moveX: type.moveX,
-        moveY: type.moveY, 
-        speed: type.speed,
-        
-        // State
-        active: true
+        moveY: type.moveY,
+        speed: type.speed
     };
-    
-    // Position sprite
+
     sprite.x = enemy.x;
     sprite.y = enemy.y;
-    
-    // Add to stage and tracking
     app.stage.addChild(sprite);
     enemies.push(enemy);
-    
-    return enemy;
 }
 ```
 
-**Smart spawning features:**
-- {{< icon name="target" >}} **Tile-based positioning**: Place enemies precisely on grid
-- 🆔 **Unique IDs**: Track individual enemies for special behaviors
-- {{< icon name="broom" >}} **Clean lifecycle**: Proper creation and cleanup
-- {{< icon name="paint-brush" >}} **Visual variety**: Different colors and sizes per type
+## Enemy movement
 
+Each frame: calculate next position, check for a wall, reverse direction if blocked, otherwise move:
 
-## Enemy AI: Simple Brains, Effective Results! {{< icon name="robot" >}}
-
-Time to give our enemies the intelligence to patrol and threaten the player:
-
-```javascript
-// Main enemy AI update function
+```js
 function updateEnemies() {
     enemies.forEach(enemy => {
-        if (!enemy.active) return;
-        
-        // Calculate next position
         const nextX = enemy.x + enemy.moveX * enemy.speed;
         const nextY = enemy.y + enemy.moveY * enemy.speed;
-        
-        // Check for wall collision
+
         if (wouldHitWall(nextX, nextY, enemy.width, enemy.height)) {
-            // Hit wall - reverse direction!
+            // Reverse on the same axis
             enemy.moveX = -enemy.moveX;
             enemy.moveY = -enemy.moveY;
-            
-            // Optional: Add turning animation or sound here
-            enemy.sprite.tint = 0xFFAAAA; // Brief flash
-            setTimeout(() => {
-                if (enemy.active) enemy.sprite.tint = 0xFFFFFF;
-            }, 100);
         } else {
-            // Safe to move - update position
             enemy.x = nextX;
             enemy.y = nextY;
         }
-        
-        // Update sprite to match position
+
         enemy.sprite.x = enemy.x;
         enemy.sprite.y = enemy.y;
-        
-        // Check collision with player
-        checkEnemyPlayerCollision(enemy);
     });
-}
-
-// Collision detection between enemy and player
-function checkEnemyPlayerCollision(enemy) {
-    if (!player.alive) return;
-    
-    const distance = getDistance(enemy, player);
-    const minDistance = (enemy.width + player.width) / 2;
-    
-    if (distance < minDistance) {
-        handlePlayerHit(enemy);
-    }
-}
-
-// Handle what happens when player gets hit
-function handlePlayerHit(enemy) {
-    player.alive = false;
-    
-    // Visual feedback
-    player.sprite.tint = 0xFF0000; // Flash red
-    enemy.sprite.tint = 0xFFFF00;  // Enemy flashes yellow
-    
-    // Respawn after delay
-    setTimeout(() => {
-        respawnPlayer();
-    }, 1500);
-}
-
-function respawnPlayer() {
-    player.alive = true;
-    player.sprite.tint = 0xFFFFFF;
-    
-    // Reset to starting position
-    player.x = 60;
-    player.y = 180;
-    
-    // Reset enemy colors
-    enemies.forEach(enemy => {
-        enemy.sprite.tint = 0xFFFFFF;
-    });
-}
-
-// Utility: Distance between two objects
-function getDistance(obj1, obj2) {
-    const dx = (obj1.x + obj1.width/2) - (obj2.x + obj2.width/2);
-    const dy = (obj1.y + obj1.height/2) - (obj2.y + obj2.height/2);
-    return Math.sqrt(dx * dx + dy * dy);
 }
 ```
 
-### The Magic of Simple AI
+The direction vector (`moveX`, `moveY`) starts at `(1, 0)` for a horizontal patroller. On hitting a wall it becomes `(-1, 0)`, then `(1, 0)` again. The enemy oscillates between its two boundary walls indefinitely.
 
-**What makes this "stupid" AI actually brilliant:**
+## Player collision
 
-{{< icon name="arrows-clockwise" >}} **Predictable patterns**: Players can learn and plan around enemy movements
+Check AABB overlap between each enemy and the player after positions are updated:
 
-{{< icon name="lightning" >}} **Instant feedback**: Enemies react immediately to walls with direction changes
+```js
+function checkEnemyPlayerCollision(enemy) {
+    if (!player.alive) return;
 
-{{< icon name="target" >}} **Consistent threat**: Always moving, always dangerous, never idle
+    const hit = enemy.x < player.x + player.width  &&
+                enemy.x + enemy.width  > player.x  &&
+                enemy.y < player.y + player.height &&
+                enemy.y + enemy.height > player.y;
 
-{{< icon name="paint-brush" >}} **Visual personality**: Different colors and speeds create distinct "characters"
+    if (hit) handlePlayerHit();
+}
 
-**Performance benefits:**
-- {{< icon name="chart-bar" >}} **Efficient**: Simple math operations, no complex pathfinding
-- {{< icon name="rocket-launch" >}} **Scalable**: Can handle dozens of enemies without lag
-- {{< icon name="puzzle-piece" >}} **Modular**: Easy to add new behaviors or modify existing ones
+function handlePlayerHit() {
+    player.alive = false;
+    player.sprite.tint = 0x666666;
 
-**Design wisdom**: The best enemy AI doesn't try to outsmart the player - it creates interesting spatial and temporal puzzles for them to solve!
+    setTimeout(() => {
+        player.alive = true;
+        player.sprite.tint = 0xFFFFFF;
+        player.x = 60;
+        player.y = 180;
+    }, 1500);
+}
+```
 
-### Integration with Game Loop
+AABB (axis-aligned bounding box) tests whether two rectangles overlap. It's more accurate for rectangular sprites than a circular distance check and avoids the `Math.sqrt` call.
 
-```javascript
-// Add to your main game loop
+## Game loop integration
+
+```js
 function gameLoop() {
-    handleInput();      // Player movement
-    updateEnemies();    // Enemy AI and movement
-    updatePhysics();    // Gravity, collisions, etc.
-    render();          // Draw everything
+    handleInput();
+    updateEnemies();
+    updatePhysics();
 }
 
 app.ticker.add(gameLoop);
 ```
 
-**{{< icon name="confetti" >}} Boom!** Your peaceful world is now alive with danger and challenge! These simple patrolling enemies transform static levels into dynamic puzzles. Players must now time their movements, find safe paths, and feel the thrill of narrowly avoiding threats!
+**What you built:**
 
-**Coming next**: We'll make these enemies even smarter by adding platform awareness and more sophisticated patrol behaviors! [Next: Enemy on Platform](/tutorial/world-one/13-enemy-on-platform/)
+- Enemy type definitions with movement direction and speed
+- A spawning function that converts tile coordinates to pixel positions
+- Wall-reversal movement: advance, check for solid tile, reverse if blocked
+- AABB collision detection between enemies and the player
+
+[Next: Bringing it Together](/tutorial/world-one/bringing-it-together/)

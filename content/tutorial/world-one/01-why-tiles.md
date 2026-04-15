@@ -9,9 +9,7 @@ next = "/tutorial/world-one/map-format/"
 prev = ""
 +++
 
-Ever wondered how games like Super Mario Bros, The Legend of Zelda, or even modern hits like Stardew Valley create their massive worlds? The secret sauce is TILES! You're about to discover one of game development's most powerful techniques - and by the time we're done, you'll be building your own game worlds faster than you can say "1-Up!"
-
-Tiles aren't just a retro throwback - they're still the backbone of modern game development! While we don't worry about kilobytes anymore, tiles give us something even better: the power to create massive, interactive worlds with lightning-fast performance and surprisingly little code.
+Games like Super Mario Bros, The Legend of Zelda, and Stardew Valley build their worlds from tiles — small, reusable images arranged on a grid. The technique has been around since the early arcade era, and it's still standard practice because it solves a real problem efficiently.
 
 So if you want to put a nice background into your game, but the picture would be too large and make the game very slow. What to do? Slice the picture into tiles!
 
@@ -21,14 +19,10 @@ In the picture you can see that parts of picture are exactly same. 1 is same as 
 
 Another nice feature about tiles is, when you might want to replace part of your background, then you don't have to redraw everything, you can only replace 1 tile. You can reuse the tiles with different objects too. For example you might have tile with grass and another tile with flower on the grass, then you can take same grass background and only draw the flower.
 
-## But Here's Where Tiles Get REALLY Exciting!
+## Tiles as game logic
 
-Tiles aren't just about graphics - they're about GAMEPLAY! Each tile can have properties: "Can the player walk on this? Does it kill enemies? Can you break it with your sword?" Suddenly you're not just drawing pretty pictures - you're building interactive worlds where every square has meaning!
+Tiles aren't just graphics. Each tile in the map array is a number, and that number can mean anything: walkable floor, solid wall, damage zone, collectible, switch. The same rendering loop that draws the world can drive all of your collision detection, interaction, and game logic — because the map array *is* the game state.
 
-Imagine creating:
-- **Platform games** where each tile knows if it's solid, bouncy, or deadly
-- **RPG worlds** where tiles trigger battles, treasure, or secret passages  
-- **Puzzle games** where tiles can be pushed, destroyed, or transformed
-- **Infinite runners** that generate new challenges on the fly
+That's why tile-based design scales so well. A platform game where each tile knows whether it's solid or deadly. An RPG where tiles trigger encounters or open passages. A puzzle game where tiles can be pushed or destroyed. In every case, the underlying system is the same: a grid of numbers with defined meanings.
 
-Ready to start building? Let's dive into how we store and organize these magical tile-based worlds! [Next: Map Format](/tutorial/world-one/02-map-format)
+[Next: Map Format](/tutorial/world-one/map-format/)

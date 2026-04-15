@@ -9,7 +9,7 @@ next = "/tutorial/world-one/locked-doors/"
 prev = "/tutorial/world-one/getting-items/"
 +++
 
-Ready to build your first WORLD? {{< icon name="map-trifold" >}} One room was just the beginning - now you're about to create interconnected spaces like the dungeons in Zelda, the sprawling stations in Metroid, or the mysterious houses in classic RPGs. You're about to become a world builder! {{< icon name="sparkle" >}}
+A single room is a demo. A connected world — rooms that lead to other rooms — is a game. This tutorial adds a multi-room system: each room is a map stored in an object, and door tiles trigger transitions between them.
 
 {{< pixidemo title="Multi-Room World Explorer" >}}
     // Create PixiJS application for room transition demo
@@ -215,13 +215,11 @@ Ready to build your first WORLD? {{< icon name="map-trifold" >}} One room was ju
     buildRoom(1);
 {{< /pixidemo >}}
 
-**Try it!** Move around with arrow keys and walk into the yellow doors to explore different rooms! {{< icon name="door-open" >}}{{< icon name="sparkle" >}}
+Walk into the yellow door tiles to move between rooms.
 
-## CREATING MULTIPLE ROOMS {{< icon name="castle" >}}
+## Multiple rooms
 
-**Modern Room System:**
-
-Let's build a clean, flexible system for managing multiple rooms:
+Each room is an entry in a `rooms` object keyed by room ID. The map array lives inside each room, alongside any other per-room data you need:
 
 ```js
 // Our room database - easy to expand!
@@ -279,15 +277,11 @@ const gameState = {
 };
 ```
 
-**Why this approach rocks:**
-- {{< icon name="package" >}} **Organized**: All room data in one place
-- {{< icon name="rocket-launch" >}} **Scalable**: Easy to add new rooms and properties  
-- {{< icon name="wrench" >}} **Flexible**: Each room can have unique settings
-- {{< icon name="brain" >}} **Clear**: Simple object structure anyone can understand
+All room data is in one place and each room can carry its own settings — background colour, music track, particle effects — without any other room needing to know about them.
 
-## ROOM TRANSITIONS: SMOOTH & PROFESSIONAL {{< icon name="rocket-launch" >}}
+## Room transitions
 
-**Step 1: Door Detection**
+**Step 1: Door detection**
 
 ```js
 // Check if player is standing on a door
@@ -304,7 +298,7 @@ function checkForDoors(hero, currentRoom) {
 }
 ```
 
-**Step 2: Room Transition System**
+**Step 2: Transition system**
 
 ```js
 function transitionToRoom(doorData, hero, gameState, app) {
@@ -335,7 +329,7 @@ function transitionToRoom(doorData, hero, gameState, app) {
 
 function showTransitionEffect(message) {
     // Simple fade effect or message display
-    console.log(`🚀 ${message}`);
+    console.log(message);
     
     // You could add visual effects here:
     // - Screen fade
@@ -345,7 +339,7 @@ function showTransitionEffect(message) {
 }
 ```
 
-**Step 3: Integration with Movement**
+**Step 3: Integration with movement**
 
 ```js
 function updateMovement(hero, keys, gameState, app) {
@@ -359,58 +353,41 @@ function updateMovement(hero, keys, gameState, app) {
 }
 ```
 
-## ADVANCED FEATURES {{< icon name="shooting-star" >}}
+## Extended door types
 
-**Enhanced Room System:**
+The `buildRoom` function can read per-room properties to set background colour, start music, or trigger effects:
 
 ```js
-// Advanced room building with atmosphere
 function buildRoom(roomId, app) {
     const room = rooms[roomId];
     
-    // Clear previous room
     app.stage.removeChildren();
-    
-    // Change background color based on room
     app.renderer.background.color = room.background || 0x2c3e50;
     
-    // Render the map
     renderMap(room.map, app);
     
-    // Add atmospheric effects
-    if (room.particles) {
-        addParticleEffects(room.particles, app);
-    }
+    if (room.particles) addParticleEffects(room.particles, app);
+    if (room.music)     playBackgroundMusic(room.music);
     
-    // Play room music
-    if (room.music) {
-        playBackgroundMusic(room.music);
-    }
-    
-    // Add room title
     displayRoomTitle(room.name, app);
-    
-    console.log(`🏠 Entered: ${room.name}`);
 }
 
-// Different door types with special effects
+// Doors with conditions
 const specialDoors = {
     LOCKED: {
         canUse: (hero) => hero.hasKey,
-        message: "This door is locked. You need a key!",
+        message: "This door is locked.",
         sound: "door_locked.ogg"
     },
     
     MAGIC: {
         canUse: (hero) => hero.mana >= 10,
         cost: { mana: 10 },
-        message: "The magical portal shimmers as you pass through...",
         effect: "sparkle"
     },
     
     TELEPORTER: {
         canUse: () => true,
-        message: "*WHOOSH* Instant teleportation!", 
         effect: "flash"
     }
 };
@@ -443,15 +420,11 @@ function tryUseDoor(tileType, hero) {
 }
 ```
 
-{{< icon name="trophy" >}} **WORLD BUILDER ACHIEVED!**
+**What you built:**
 
-You've just mastered the art of creating interconnected game worlds! This is the same system used in classic RPGs, adventure games, and modern indies. Your players can now explore rich, connected environments that feel alive and purposeful.
+- A `rooms` object that stores each map alongside per-room settings
+- A `doors` lookup that maps tile values to destination rooms and spawn positions
+- A `buildRoom` function that clears the stage and renders the new room
+- A transition guard (`transitionInProgress`) to prevent double-triggers
 
-**What you've built:**
-- ✅ Multi-room game world system
-- ✅ Smooth room transition mechanics
-- ✅ Flexible door/portal architecture
-- ✅ Professional state management
-- ✅ The foundation for epic adventures!
-
-Ready to add some vertical action to your world? Next up: jumping mechanics that'll make your hero soar! [Next: Jumping](/tutorial/world-one/09-jumping/)
+[Next: Locked Doors](/tutorial/world-one/locked-doors/)

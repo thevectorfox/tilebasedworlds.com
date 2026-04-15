@@ -167,7 +167,7 @@ app.ticker.add(gameLoop);
 
 The gold circle is the key. The red door on the right won't let you through until you've picked it up — then it turns green and you can pass. Try walking into it without the key first.
 
-## THE KEY AS A SPECIAL ITEM
+## The key as a special item
 
 A key is just an item with a side effect: it sets a flag on your game state. Add `hasKey` to your `game` object alongside anything else you're tracking:
 
@@ -200,7 +200,7 @@ function checkKeyPickup() {
 }
 ```
 
-## THE LOCKED DOOR TILE
+## The locked door tile
 
 In your map, use a new tile value for the locked door — say `4`. How you handle it depends on two things: whether the player can walk into it, and whether it triggers a room transition.
 
@@ -253,7 +253,7 @@ function checkDoors() {
 
 The key is consumed (`game.hasKey = false`) when the door is used. That's optional — some games let one key open many doors, others are single-use. It's a design decision, not a technical one.
 
-## VISUAL FEEDBACK
+## Visual feedback
 
 A locked door that looks the same as an open one is confusing. The simplest approach is to render tile `4` differently depending on game state:
 
@@ -277,7 +277,7 @@ function renderTile(tileType, col, row) {
 
 Call `buildMap()` after the player picks up the key so the door redraws immediately. That instant colour change gives the player a clear signal that something has changed.
 
-## KEEPING ITEMS ACROSS ROOMS
+## Keeping items across rooms
 
 Now that items and doors exist in the same world, you need to persist item state when the player moves between rooms. Add this to your `changeMap` function:
 

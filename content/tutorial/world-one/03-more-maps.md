@@ -9,11 +9,11 @@ next = "/tutorial/world-one/rendering-a-map/"
 prev = "/tutorial/world-one/map-format/"
 +++
 
-Now that you know how 2D arrays work, let's explore your options! Different games need different map strategies - choosing the right one can save you hundreds of hours of development time and make your game run like butter. By the end of this chapter, you'll know exactly which approach fits your dream game!
+2D arrays work well for most tile-based games, but the format has trade-offs. Different game structures call for different storage strategies — this section covers the main options and when each makes sense.
 
-## FRAME-BASED MAPPING: The Simple & Sweet Approach
+## Frame-based mapping
 
-This is the classic approach used in many indie games! Instead of complex tile objects, each number in your array directly represents a sprite frame or tile type. Super simple and perfect for many game types.
+Each number in the array directly represents a sprite frame or tile type. No separate type definitions required — the number *is* the tile identity.
 
 ```js
 // Each number = a different tile graphic
@@ -32,14 +32,13 @@ const TileRanges = {
 };
 ```
 
-**Perfect for:** Retro platformers, puzzle games, simple RPGs  
-**Pros:** Lightning fast, easy to understand, great for pixel art  
-**Cons:** Hard to add complex tile behaviors later
+**Good for:** Retro platformers, puzzle games, simple RPGs  
+**Trade-off:** Fast to implement and reason about; harder to attach complex behaviour to individual tile types later.
 
 
-## SPARSE OBJECT MAPPING: When Less is More
+## Sparse object mapping
 
-Imagine you're building a platformer where 95% of the level is empty sky, with just a few floating platforms scattered around. Or maybe an open-world RPG with vast empty plains dotted with occasional villages. Storing all that "empty space" in a 2D array is wasteful!
+If most of a level is the same background tile — open sky, ocean, empty plains — a full 2D array spends most of its memory on identical values. Sparse mapping stores only the non-default objects:
 
 ```js
 // Instead of a massive array full of zeros...
@@ -55,15 +54,14 @@ const levelObjects = [
 const defaultTile = 'sky'; // or 'grass', 'water', etc.
 ```
 
-**Real-world example:** Think *Super Mario Bros* - mostly empty sky with platforms and enemies at specific positions!
+*Super Mario Bros* works this way — mostly empty sky, with platforms and enemies stored as positioned objects.
 
-**Perfect for:** Open-world games, infinite runners, space shooters  
-**Pros:** Incredibly memory efficient, easy to add/remove objects  
-**Cons:** More complex collision detection, harder to visualize the full level
+**Good for:** Open-world games, infinite runners, space shooters  
+**Trade-off:** Memory-efficient and easy to add or remove objects; collision detection is more involved because there's no grid to index into.
 
-## MODERN DATA FORMATS: Level Up Your Game
+## Structured data formats
 
-As your games grow more complex, you'll want more sophisticated map storage. Modern game developers use JSON files, visual level editors, and even procedural generation!
+As levels get more complex, plain 2D arrays become harder to manage. JSON files, visual editors, and procedural generation are the common next steps.
 
 ### JSON Map Files
 Perfect for complex RPGs or adventure games:
@@ -87,8 +85,8 @@ Perfect for complex RPGs or adventure games:
 }
 ```
 
-### Visual Level Editors
-Modern tools like **Tiled Map Editor** let you paint levels visually and export to any format you need. No more typing arrays by hand!
+### Visual level editors
+Tools like **Tiled Map Editor** let you paint levels visually and export to any format you need.
 
 ### Procedural Generation
 ```js
@@ -106,21 +104,14 @@ function generateChunk(chunkX, chunkY) {
 }
 ```
 
-**Perfect for:** Large RPGs, rogue-likes, sandbox games  
-**Pros:** Incredibly powerful, professional workflow, infinite possibilities  
-**Cons:** More complex to implement, requires additional tools
+**Good for:** Large RPGs, rogue-likes, sandbox games  
+**Trade-off:** Scales to large, complex levels and integrates with visual editors; more infrastructure to set up.
 
-## WHICH APPROACH SHOULD YOU CHOOSE?
+## Choosing an approach
 
-**Starting out?** Stick with 2D arrays and tile objects (like we showed in the previous chapter). They're perfect for learning and most indie games.
+Start with 2D arrays — they cover most indie game structures and are easy to reason about. If you find yourself storing large maps where most tiles are identical, sparse mapping is worth considering. If levels become complex enough to justify tooling, JSON export from a visual editor like Tiled is the natural next step.
 
-**Building a retro platformer?** Frame-based mapping might be perfect for that authentic old-school feel.
+These formats aren't mutually exclusive; many games use a JSON file to store the 2D tile grid alongside a separate list of entity positions.
 
-**Creating vast open worlds?** Consider sparse object mapping to save memory and improve performance.
-
-**Planning something ambitious?** Modern JSON formats and level editors will scale with your vision.
-
-The best part? You can always start simple and upgrade later! Many successful games began with basic 2D arrays and evolved as they grew.
-
-Ready to see your maps come to life? Let's move on to rendering these data structures as actual game worlds! [Next: Rendering a Map](/tutorial/world-one/04-rendering-a-map/)
+[Next: Rendering a Map](/tutorial/world-one/04-rendering-a-map/)
 

@@ -9,11 +9,11 @@ next = "/tutorial/world-one/more-maps/"
 prev = "/tutorial/world-one/why-tiles/"
 +++
 
-Let's build our first game world! Maps in tile-based games are stored as **2D arrays** - think of them as blueprints that tell your game exactly where to place walls, floors, enemies, and treasure. You're about to learn how to store entire game levels in just a few lines of code!
+Maps in tile-based games are stored as **2D arrays** — grids of numbers where each value identifies a tile type. The position of each number in the array corresponds directly to its position in the world.
 
-## TWO DIMENSIONAL ARRAYS: YOUR GAME WORLD IN CODE
+## 2D arrays
 
-Don't worry - 2D arrays aren't from another dimension! They're just arrays containing other arrays. Think of it like this: each row in your game world is an array, and your map is an array of those rows. Let's start simple!
+A 2D array is an array whose elements are themselves arrays. Each inner array is a row, and the outer array holds all the rows. Starting simple:
 
 A basic array might store your player's inventory:
 ```js
@@ -22,7 +22,7 @@ const playerInventory = ["sword", "shield", "potion", "key"];
 
 Easy! You get the first item with `playerInventory[0]` ("sword"), second with `playerInventory[1]` ("shield"), and so on.
 
-Now here's where it gets EXCITING! What if instead of storing simple strings, we store arrays that represent rows of our game world? Check this out:
+If the elements are themselves arrays, you get a grid:
 
 ```js
 // Each array represents one row of tiles in our game world
@@ -32,9 +32,7 @@ const botRow = [1, 1, 1, 1, 1];    // All walls across the bottom
 const gameMap = [topRow, midRow, botRow];
 ```
 
-Now `gameMap` contains three arrays, each representing a row! The first element `gameMap[0]` is our top row `[1, 1, 1, 1, 1]`, the second is our middle row with the empty space.
-
-**But here's the magic part!** You can access any specific tile in your world using two coordinates:
+`gameMap[0]` is the top row `[1, 1, 1, 1, 1]`, `gameMap[1]` is the middle row with the empty space. Any specific tile is reachable with two indices:
 
 ```js
 const topLeftTile = gameMap[0][0];     // Gets 1 (wall)
@@ -42,19 +40,19 @@ const centerTile = gameMap[1][2];      // Gets 0 (empty space)
 const bottomRightTile = gameMap[2][4]; // Gets 1 (wall)
 ```
 
-Think of it like this: `gameMap[row][column]` - just like battleship coordinates! The first number picks which row (going down), the second picks which column (going across).
+`gameMap[row][column]` — the first index picks the row (vertical), the second picks the column (horizontal).
 
-**Visual Connection:**
+**Visual connection:**
 ```
 gameMap[0] = [1, 1, 1, 1, 1]  →  [🧱][🧱][🧱][🧱][🧱]
 gameMap[1] = [1, 0, 0, 0, 1]  →  [🧱][  ][  ][  ][🧱]  
 gameMap[2] = [1, 1, 1, 1, 1]  →  [🧱][🧱][🧱][🧱][🧱]
 ```
 
-Cool, right? Each number in your array becomes a tile in your game world!
+Each number in the array corresponds to one tile position in the world.
 
 
-## BUILDING YOUR FIRST GAME LEVEL
+## A simple level
 
 Now let's create a real game level! Here's how we'll store our map data:
 
@@ -69,9 +67,7 @@ const myMap = [
 ];
 ```
 
-**What you just created:** A complete game level that's 8 tiles wide and 6 tiles tall! Picture your hero starting at the top-left corner - they could explore 8 steps right and 6 steps down before reaching the edge of your world.
-
-**Visualize your level:**
+An 8×6 level. Visualised:
 ```
 🧱🧱🧱🧱🧱🧱🧱🧱
 🧱  🌟      🌟  🧱
@@ -82,9 +78,9 @@ const myMap = [
 ```
 *(Where 🧱 = walls, 🌟 = walkable floors)*
 
-## WHAT DO THESE NUMBERS MEAN?
+## Tile values
 
-Great question! Each number represents a different type of tile with its own properties and behavior. We'll use modern JavaScript objects to define what each number means:
+Each number represents a tile type. A JavaScript object maps those numbers to their properties:
 
 ```js
 // Modern tile type definitions
@@ -111,16 +107,7 @@ const TileTypes = {
 };
 ```
 
-**Here's how it works:**
-- When your game sees a `0` in the map, it creates a floor tile that players can walk on
-- When it sees a `1`, it creates a wall that blocks movement  
-- A `2` might spawn an enemy that can hurt your player!
+A `0` in the map renders a walkable floor, a `1` renders a solid wall, a `2` could spawn an enemy. The `walkable`, `sprite`, `harmful`, and `color` properties define what the renderer and game logic do with each tile type.
 
-**Key Properties:**
-- **walkable**: Can your player move through this tile? 
-- **sprite**: What image should be displayed?
-- **harmful**: Does touching this tile damage the player?
-- **color**: What color to use for simple graphics (like our demos)
-
-This system lets you design complex levels by just changing numbers in your array. Want to add a treasure chest? Just define tile type `3` and place some `3`s in your map!
+To add a new tile — a treasure chest, a hazard, a door — define it in `TileTypes` and place its number in the array.
 

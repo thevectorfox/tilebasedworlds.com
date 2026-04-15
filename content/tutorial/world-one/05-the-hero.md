@@ -9,8 +9,7 @@ next = "/tutorial/world-one/keys-to-move/"
 prev = "/tutorial/world-one/rendering-a-map/"
 +++
 
-Time to create your HERO! {{< icon name="person-simple-run" >}} Every legendary game needs a protagonist - someone the player connects with, controls, and cheers for. Whether it's Mario jumping through pipes, Link exploring Hyrule, or Celeste climbing mountains, the hero makes the game come alive. You're about to bring your first character into your tile-based world!
-
+The hero is a data object that stores position, size, and a reference to its sprite. Separating data from visuals keeps the game logic independent of how things are drawn.
 
 {{< pixidemo title="The Hero" >}}
 
@@ -62,13 +61,13 @@ Time to create your HERO! {{< icon name="person-simple-run" >}} Every legendary 
         }
     }
     
-    // NOW FOR THE HERO! {{< icon name="person-simple-run" >}}
+    // Hero sprite
     const hero = new PIXI.Graphics();
-    hero.beginFill(0xff4444);  // Bright red hero
-    hero.drawRect(-10, -10, 20, 20);  // 20x20 square, centered
+    hero.beginFill(0xff4444);
+    hero.drawRect(-10, -10, 20, 20);
     hero.endFill();
     
-    // Position hero at tile (2, 1) - that's column 2, row 1
+    // Position hero at tile (2, 1) — column 2, row 1
     const heroTileX = 2;
     const heroTileY = 1;
     
@@ -76,95 +75,58 @@ Time to create your HERO! {{< icon name="person-simple-run" >}} Every legendary 
     hero.x = (heroTileX * TILE_SIZE) + (TILE_SIZE / 2);
     hero.y = (heroTileY * TILE_SIZE) + (TILE_SIZE / 2);
     
-    // Add hero to stage (it appears on top of tiles!)
     app.stage.addChild(hero);
-    
-    // Add a subtle pulse animation to make it feel alive
-    let pulseDirection = 1;
-    app.ticker.add(() => {
-        hero.scale.x += pulseDirection * 0.002;
-        hero.scale.y += pulseDirection * 0.002;
-        
-        if (hero.scale.x > 1.1 || hero.scale.x < 0.9) {
-            pulseDirection *= -1;
-        }
-    });
 {{< /pixidemo >}}
 
-Look at that! Your hero (the red square) is standing proudly in your game world! {{< icon name="fire" >}}
+## The hero object
 
-## CREATING YOUR HERO OBJECT
-
-What doesn't look mighty? That red square is your HERO! {{< icon name="hand-fist" >}} Sure, they might not look like Link or Mario yet, but every legendary character started as simple shapes. The beauty of game development is that you can make this hero uniquely yours!
-
-**Modern Hero Setup:**
-Let's create a hero object that holds all our character's data:
+The hero stores two coordinate systems alongside its sprite reference:
 
 ```js
-// Hero object - the star of your game!
 const hero = {
-    // Tile-based position (which tile are we standing on?)
+    // Which tile the hero occupies
     tileX: 2,
     tileY: 1,
-    
-    // Pixel position (exact screen coordinates)
+
+    // Exact pixel coordinates (calculated from tile position)
     x: 0,
     y: 0,
-    
-    // Size (for collision detection)
+
+    // Collision box size in pixels
     width: 20,
     height: 20,
-    
-    // PixiJS sprite (we'll create this next)
+
+    // PixiJS sprite (assigned when created)
     sprite: null,
-    
-    // Game properties
-    speed: 2,
-    health: 100,
-    
-    // We'll add more awesome properties later!
+
+    speed: 2
 };
 ```
 
-**Why tile AND pixel positions?** Great question! 
-- **tileX/tileY**: Which game tile are we standing on? Super useful for collision detection and game logic
-- **x/y**: Exact pixel coordinates for smooth movement and precise positioning
+`tileX`/`tileY` are used for collision checks — "is the tile at (3, 2) a wall?" — because that requires an array index, not a pixel value. `x`/`y` are used for rendering, because PixiJS works in pixels. Both are needed; they serve different parts of the system.
 
-Think of it like this: tile position is your "address" ("I'm at tile 2,1"), pixel position is your exact location ("I'm at pixel 75,45")!
+## Placing the hero on screen
 
-## BRINGING YOUR HERO TO LIFE! {{< icon name="rocket-launch" >}}
-
-Time to make your hero appear in the world! Add this amazing function to your game:
+The sprite is a separate object from the data. Create it, attach it to the hero, then position it:
 
 ```js
 function createHero(heroData, tileSize) {
-    // Create the visual representation
-    const heroSprite = new PIXI.Graphics();
-    
-    // Draw a simple but mighty hero (you can customize this!)
-    heroSprite.beginFill(0xff4444);  // Epic red color
-    heroSprite.drawRect(-heroData.width/2, -heroData.height/2, heroData.width, heroData.height);
-    heroSprite.endFill();
-    
-    // Add a cool border
-    heroSprite.lineStyle(2, 0xffffff, 0.8);
-    heroSprite.drawRect(-heroData.width/2, -heroData.height/2, heroData.width, heroData.height);
-    
-    // Save reference to the sprite
+    const heroSprite = new PIXI.Graphics()
+        .rect(-heroData.width / 2, -heroData.height / 2, heroData.width, heroData.height)
+        .fill(0xff4444);
+
     heroData.sprite = heroSprite;
-    
+
     // Calculate pixel position from tile position
     updateHeroPosition(heroData, tileSize);
-    
+
     return heroSprite;
 }
 
 function updateHeroPosition(heroData, tileSize) {
-    // Convert tile coordinates to pixel coordinates
     heroData.x = (heroData.tileX * tileSize) + (tileSize / 2);
     heroData.y = (heroData.tileY * tileSize) + (tileSize / 2);
-    
-    // Update the sprite position
+
     if (heroData.sprite) {
         heroData.sprite.x = heroData.x;
         heroData.sprite.y = heroData.y;
@@ -172,59 +134,35 @@ function updateHeroPosition(heroData, tileSize) {
 }
 ```
 
-**The magic formula:** `(tileX * tileSize) + (tileSize / 2)`
+The pixel calculation: `tileX * tileSize` reaches the left edge of the tile, `+ tileSize / 2` centres it. A hero at tile (2, 1) with 30px tiles appears at pixel (75, 45).
 
-**Why this works:**
-- `tileX * tileSize` = Gets us to the left edge of the tile
-- `+ (tileSize / 2)` = Moves us to the center of the tile
-- **Result**: Hero appears perfectly centered in their tile! ⭐
+After rendering the map, add the hero sprite to the stage:
 
-**Adding to your buildMap function:**
 ```js
-// After rendering all your tiles, add this:
 const heroSprite = createHero(hero, game.tileW);
 app.stage.addChild(heroSprite);
 ```
 
-## LEVEL UP YOUR HERO! {{< icon name="paint-brush" >}}
+## Customising the sprite
 
-Want to make your hero look more epic? Here are some ideas to try:
+The sprite can be any shape. Change the `.fill()` colour, use `.circle()` for a round hero, or load a texture:
 
-**Custom Colors:**
 ```js
-// Try these hero colors!
-heroSprite.beginFill(0x00ff00);  // Green hero
-heroSprite.beginFill(0x0066ff);  // Blue hero  
-heroSprite.beginFill(0xff6600);  // Orange hero
-heroSprite.beginFill(0x9932cc);  // Purple hero
-```
+// Circle
+new PIXI.Graphics().circle(0, 0, 10).fill(0xff4444);
 
-**Different Shapes:**
-```js
-// Circle hero
-heroSprite.drawCircle(0, 0, 10);
-
-// Diamond hero
-heroSprite.drawPolygon([-10, 0, 0, -10, 10, 0, 0, 10]);
-```
-
-**Loading Custom Sprites:**
-```js
-// Advanced: Load your own hero image
+// Loaded sprite
 const heroTexture = await PIXI.Assets.load('hero.png');
 const heroSprite = new PIXI.Sprite(heroTexture);
-// Set anchor to center
-heroSprite.anchor.set(0.5);
+heroSprite.anchor.set(0.5);  // Centre the sprite on its position
 ```
 
-{{< icon name="trophy" >}} **ACHIEVEMENT UNLOCKED: First Hero Created!**
+The rest of the hero system — movement, collision, state — doesn't care which approach you use.
 
-You've just accomplished something amazing - you created your first interactive game character! Your hero now exists in your tile-based world, perfectly positioned and ready for adventure.
+**What you built:**
 
-**What you've mastered:**
-- ✅ Character object design
-- ✅ Tile-to-pixel coordinate conversion
-- ✅ PixiJS sprite creation and positioning
-- ✅ The foundation for ALL character movement!
+- A hero data object with both tile and pixel coordinates
+- A `createHero` function that builds the sprite and positions it
+- A `updateHeroPosition` function that converts tile coordinates to pixels for rendering
 
-Ready to make your hero MOVE? Next up: keyboard controls that'll bring your character to life! [Next: Keys to Move](/tutorial/world-one/06-keys-to-move/)
+[Next: Keys to Move](/tutorial/world-one/keys-to-move/)

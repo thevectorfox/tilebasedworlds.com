@@ -9,7 +9,7 @@ next = "/tutorial/world-one/open-the-door/"
 prev = "/tutorial/world-one/hit-the-wall/"
 +++
 
-Time to get rewarded! 🌟 Collectibles are the heartbeat of so many classic games - coins in Mario, rupees in Zelda, rings in Sonic. That satisfying *ding* when your score ticks up? Pure dopamine. Let's build that item pickup system!
+Collectibles are a staple of tile-based games — coins in Mario, rupees in Zelda, rings in Sonic. The pickup system needs to do three things: track what items exist and where, detect when the player steps on one, and remove it permanently so it doesn't reappear.
 
 {{< pixidemo title="Getting Items" >}}
 const app = new PIXI.Application();
@@ -137,7 +137,7 @@ document.body.appendChild(app.canvas);
 
 Items are different in what they do - coins add a little to your score, gems are worth ten times more. That's the same trick games use to reward you for exploring off the beaten path. In this tutorial all items just give points, but the same pattern works for health potions, ammo pickups, power-ups, or anything else you want to create!
 
-## TRACKING YOUR SCORE {{< icon name="currency-dollar" >}}
+## Tracking your score
 
 Add a `points` property to your `game` object:
 
@@ -164,7 +164,7 @@ app.stage.addChild(pointsDisplay);
 pointsDisplay.text = `Points: ${game.points}`;
 ```
 
-## SOMETHING TO PICK UP {{< icon name="coin" >}}{{< icon name="diamond" >}}
+## Something to pick up
 
 Like enemies, items are stored in a data array - one sub-array per room. Each item is three numbers: `[type, tileX, tileY]`.
 
@@ -187,9 +187,9 @@ const ITEM_TYPES = {
 };
 ```
 
-The type number in `myItems` is the key into `ITEM_TYPES`. So `[2,6,3]` means "a gem (type 2) at tile column 6, row 3". Type 1 gives 1 point, type 2 gives 10 - go hunt those gems!
+The type number in `myItems` is the key into `ITEM_TYPES`. So `[2,6,3]` means "a gem (type 2) at tile column 6, row 3". Type 1 gives 1 point, type 2 gives 10.
 
-## PLACING ITEMS ON THE MAP {{< icon name="map-trifold" >}}
+## Placing items on the map
 
 When you call `buildMap()`, loop through the items for the current room and create a PixiJS graphic for each one. Store everything in a JavaScript `Map` object keyed by tile position so you can do instant lookups during pickup checks.
 
@@ -226,7 +226,7 @@ function buildItems() {
 
 The key is just `"tileX_tileY"` - for example a gem at column 6, row 3 gets the key `"6_3"`. When the hero steps on that tile you can check `activeItems.get("6_3")` instantly, no looping required.
 
-## COLLECTING ITEMS {{< icon name="target" >}}
+## Collecting items
 
 Add this check at the end of your movement function. After every step, look up the player's current tile in `activeItems`:
 
@@ -239,7 +239,7 @@ function checkItemPickup() {
     const item = activeItems.get(`${tileX}_${tileY}`);
 
     if (item) {
-        // 🎉 Got one! Add points and update display
+        // Got one — add points and update display
         game.points += item.pointValue;
         pointsDisplay.text = `Points: ${game.points}`;
 
@@ -266,12 +266,13 @@ Each collected item needs to vanish from **three places**:
 That third step is the critical one. Without it the item reappears every time the player re-enters the room!
 
 
-**What you've built:**
-- ✅ **Score tracking** that persists across a session
-- ✅ **Multiple item types** with different point values
-- ✅ **Instant pickup detection** using tile-position lookup
-- ✅ **Permanent collection** - items don't respawn once collected
+**What you built:**
 
-Items aren't just about score — they teach players to explore. Hidden gems reward curious players, scattered coins build a trail that guides beginners. The same pattern works for health potions, ammo, power-ups, or anything else you want to create.
+- Score tracking in the `game` object, updated on pickup
+- Multiple item types defined in a single lookup table
+- Instant pickup detection via tile-position Map key
+- Permanent removal from screen, tracking Map, and source data
+
+Items don't have to give points. The same pattern works for health pickups, ammo, power-ups, or anything else — the item type definition determines the effect.
 
 **Next up**: [Open the Door](/tutorial/world-one/open-the-door/) — build a multi-room world your items can live across.
