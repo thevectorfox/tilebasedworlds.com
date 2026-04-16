@@ -262,7 +262,6 @@ pre {
   font-size: 0.875rem;
   font-weight: 400;
   background: var(--surface-2);
-  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 1.25em 1.5em;
   overflow-x: auto;
@@ -339,6 +338,29 @@ pre code {
   color: var(--muted);
   letter-spacing: 0.03em;
 }
+
+
+/* .kbd button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1;
+  padding: 5px 11px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--accent);
+  box-shadow: 0 1px 0 var(--border);
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  text-decoration: none;
+}
+
 
 /* ── Nav ───────────────────────────────────────────────────── */
 nav {
@@ -497,33 +519,24 @@ nav a:hover {
 }
 .nav-links {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   gap: 1em;
+  width: 100%;
 }
-.prev-link,
-.next-link,
+
+.prev-link {
+  align-items: start;
+  margin-right: auto;
+}
 .index-link {
-  padding: 10px 20px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  text-decoration: none;
-  color: var(--accent);
-  font-family: var(--font-ui);
-  font-weight: bold;
-  text-shadow: var(--glow-link);
-  transition: all 0.3s ease;
 }
-.prev-link:hover,
-.next-link:hover,
-.index-link:hover {
-  background: var(--surface-3);
-  color: var(--accent-hover);
-  text-shadow: var(--glow-link-hover);
-  box-shadow: var(--shadow-btn-hover);
+.next-link {
+  align-items: end;
+  margin-left: auto;
 }
+
 .tutorial-series {
   background: var(--surface-2);
   padding: 4px 8px;
@@ -787,13 +800,6 @@ nav a:hover {
   display: flex;
   gap: 0.5rem;
   flex-shrink: 0;
-}
-
-/* .kbd at action-button size — larger than the default keyboard chip */
-.sandpack-island__btn {
-  font-size: 0.8rem;
-  padding: 5px 11px;
-  line-height: 1.4;
 }
 
 .sandpack-island__status {

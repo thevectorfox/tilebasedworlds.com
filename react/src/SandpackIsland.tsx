@@ -90,13 +90,13 @@ export function SandpackIsland({ code, title }: Props) {
         {title && <h3 className="sandpack-island__title">{title}</h3>}
         <div className="sandpack-island__controls">
           <button
-            className="kbd sandpack-island__btn"
+            className="kbd btn"
             onClick={() => setShowStatus(s => !s)}
           >
             {showStatus ? '◉ hide status' : '◎ status'}
           </button>
           <button
-            className="kbd sandpack-island__btn"
+            className="kbd btn"
             onClick={() => setIsFullscreen(f => !f)}
           >
             {isFullscreen ? '⚏ exit' : '⛶ fullscreen'}

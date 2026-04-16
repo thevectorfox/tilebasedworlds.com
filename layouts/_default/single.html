@@ -23,13 +23,13 @@
             <nav class="tutorial-nav">
                 <div class="nav-links">
                     {{ if .Params.prev }}
-                        <a href="{{ .Params.prev }}" class="prev-link">← Previous</a>
+                        <a href="{{ .Params.prev }}" class="prev-link btn"> <i class="ph ph-arrow-fat-left"></i> Previous</a>
                     {{ end }}
                     
-                    <a href="{{ .Parent.RelPermalink }}" class="index-link">Series Index</a>
+                    <a href="{{ .Parent.RelPermalink }}" class="index-link btn">Series Index</a>
                     
                     {{ if .Params.next }}
-                        <a href="{{ .Params.next }}" class="next-link">Next →</a>
+                        <a href="{{ .Params.next }}" class="next-link btn">Next <i class="ph ph-arrow-fat-right"></i></a>
                     {{ end }}
                 </div>
             </nav>
