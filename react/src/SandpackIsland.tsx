@@ -4,6 +4,7 @@ import {
   SandpackCodeEditor,
   SandpackPreview,
 } from '@codesandbox/sandpack-react'
+import type { SandpackThemeProp } from '@codesandbox/sandpack-react'
 import { useState, useEffect } from 'react'
 
 interface Props {
@@ -11,11 +12,56 @@ interface Props {
   title?: string
 }
 
+// Green-on-black theme for the retro site mode
+const retroTheme: SandpackThemeProp = {
+  colors: {
+    surface1: '#0a0a0a',
+    surface2: '#0d1117',
+    surface3: '#141414',
+    clickable: '#00ff41',
+    base: '#cccccc',
+    disabled: '#444444',
+    hover: '#39ff14',
+    accent: '#00ff41',
+    error: '#ff4444',
+    errorSurface: '#1a0000',
+  },
+  syntax: {
+    plain: '#00ff41',
+    comment: { color: '#4a9e54', fontStyle: 'italic' },
+    keyword: '#39ff14',
+    tag: '#00ff41',
+    punctuation: '#00cc33',
+    definition: '#5efb6e',
+    property: '#5efb6e',
+    static: '#00ff41',
+    string: '#00cc33',
+  },
+  font: {
+    body: '"puffin-display-soft", sans-serif',
+    mono: '"space-mono", "Monaco", "Consolas", monospace',
+    size: '13px',
+    lineHeight: '1.6',
+  },
+}
+
+function getSandpackTheme(siteTheme: string): SandpackThemeProp {
+  if (siteTheme === 'retro') return retroTheme
+  if (siteTheme === 'dark') return 'dark'
+  return 'light'
+}
+
 export function SandpackIsland({ code, title }: Props) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showStatus, setShowStatus] = useState(false)
   const [statusText, setStatusText] = useState('')
+  const [siteTheme, setSiteTheme] = useState(() =>
+    typeof document !== 'undefined'
+      ? (document.documentElement.dataset.theme ?? 'light')
+      : 'light'
+  )
 
+  // Receive status messages posted from the sandboxed preview
   useEffect(() => {
     function handleMessage(e: MessageEvent) {
       if (e.data?.type === 'pixidemo-status') {
@@ -26,50 +72,38 @@ export function SandpackIsland({ code, title }: Props) {
     return () => window.removeEventListener('message', handleMessage)
   }, [])
 
-  const buttonStyle = {
-    background: '#2c3e50',
-    color: '#fff',
-    border: 'none',
-    padding: '0.5rem 1rem',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontFamily: 'monospace',
-    fontSize: '0.8rem'
-  }
+  // Keep Sandpack theme in sync with the site's theme switcher
+  useEffect(() => {
+    const root = document.documentElement
+    const observer = new MutationObserver(() => {
+      setSiteTheme(root.dataset.theme ?? 'light')
+    })
+    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => observer.disconnect()
+  }, [])
+
+  const layoutHeight = isFullscreen ? 'calc(100vh - 5rem)' : '300px'
 
   return (
-    <div
-      style={{
-        margin: '2rem 0',
-        ...(isFullscreen && {
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 9999,
-          backgroundColor: '#1e1e1e',
-          margin: 0,
-          padding: '1rem'
-        })
-      }}
-    >
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: '0.5rem'
-      }}>
-        {title && <p style={{ fontFamily: 'monospace', opacity: 0.6, margin: 0 }}>{title}</p>}
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button onClick={() => setShowStatus(s => !s)} style={buttonStyle}>
-            {showStatus ? '◉ Hide Status' : '◎ Show Status'}
+    <div className={`sandpack-island${isFullscreen ? ' sandpack-island--fullscreen' : ''}`}>
+      <div className="sandpack-island__header">
+        {title && <h3 className="sandpack-island__title">{title}</h3>}
+        <div className="sandpack-island__controls">
+          <button
+            className="kbd sandpack-island__btn"
+            onClick={() => setShowStatus(s => !s)}
+          >
+            {showStatus ? '◉ hide status' : '◎ status'}
           </button>
-          <button onClick={() => setIsFullscreen(f => !f)} style={buttonStyle}>
-            {isFullscreen ? '⚏ Exit Fullscreen' : '⛶ Fullscreen'}
+          <button
+            className="kbd sandpack-island__btn"
+            onClick={() => setIsFullscreen(f => !f)}
+          >
+            {isFullscreen ? '⚏ exit' : '⛶ fullscreen'}
           </button>
         </div>
       </div>
+
       <SandpackProvider
         template="vanilla"
         files={{ '/index.js': code }}
@@ -78,25 +112,16 @@ export function SandpackIsland({ code, title }: Props) {
           recompileMode: 'delayed',
           recompileDelay: 500,
         }}
-        theme="dark"
+        theme={getSandpackTheme(siteTheme)}
       >
-        <SandpackLayout style={{ height: isFullscreen ? 'calc(100vh - 4rem)' : '400px' }}>
+        <SandpackLayout style={{ height: layoutHeight }}>
           <SandpackCodeEditor />
           <SandpackPreview showOpenInCodeSandbox={false} />
         </SandpackLayout>
       </SandpackProvider>
+
       {showStatus && (
-        <div style={{
-          marginTop: '0.5rem',
-          padding: '0.5rem 1rem',
-          background: '#0d1117',
-          border: '1px solid #2c3e50',
-          borderRadius: '4px',
-          fontFamily: 'monospace',
-          fontSize: '0.8rem',
-          color: '#00ff41',
-          minHeight: '2rem',
-        }}>
+        <div className="sandpack-island__status">
           {statusText || '— no status —'}
         </div>
       )}
