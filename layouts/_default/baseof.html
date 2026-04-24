@@ -29,6 +29,7 @@
     <!-- kbar mounts itself into this portal root -->
     <div id="kbar-root"></div>
 
+    <div class="page-wrap">
     <nav>
         <a href="{{ "/" | relURL }}" class="home-link"><i class="ph ph-puzzle-piece"></i></a>
         <a href="{{ "/tutorial" | relURL }}">Tutorials</a>
@@ -42,11 +43,36 @@
     <main class="content">
         {{ block "main" . }}{{ end }}
     </main>
-    <div class="tech-footer">
-        ◢ {{ site.Title }} ◣ - {{ site.Params.description }}
-        &nbsp;·&nbsp;
-        Spawned by <a href="https://alexishope.dev" target="_blank" rel="noopener">Alexis Hope</a> on Layer 0
-    </div>
+    </div><!-- /.page-wrap -->
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+
+            <div class="footer-col footer-col--links">
+                <p class="footer-label">Navigate</p>
+                <nav class="footer-nav">
+                    <a href="{{ "/" | relURL }}">Home</a>
+                    <a href="{{ "/tutorial" | relURL }}">Tutorials</a>
+                    <a href="{{ "/articles" | relURL }}">Articles</a>
+                </nav>
+            </div>
+
+            <div class="footer-col footer-col--brand">
+                <a href="{{ "/" | relURL }}" class="footer-logo">
+                    <i class="ph ph-puzzle-piece"></i>
+                    {{ site.Title }}
+                </a>
+                <p class="footer-about">{{ site.Params.description }}. From raw tile maps to spatial algorithms — built for developers who want to understand the systems, not just copy them.</p>
+            </div>
+
+            <div class="footer-col footer-col--credit">
+                <p class="footer-label">Credit</p>
+                <p class="footer-credit">Designed &amp; built by<br><a href="https://alexishope.dev" target="_blank" rel="noopener">Alexis Hope</a></p>
+                <p class="footer-copy">&copy; {{ now.Format "2006" }} {{ site.Title }}.<br>All rights reserved.</p>
+            </div>
+
+        </div>
+    </footer>
 
     <!-- Phosphor Icons web components -->
     <script type="module" src="https://esm.sh/@phosphor-icons/web@2.1.1"></script>
