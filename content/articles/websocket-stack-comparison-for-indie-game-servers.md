@@ -1,8 +1,12 @@
 +++
 title = 'WebSocket Stack Comparison for Indie Game Servers'
 date = 2026-04-25T15:02:33+10:00
-draft = true
+draft = false
 +++
+
+Disclaimer: This is really a level above the kind of content I was intending to publish, but while researching for the multiple player gamer series I found these numbers genuinely interesting. 
+
+TLDR: Use Node/Socket.io when starting out, its simply well documented, tonnes of examples and support. This makes AI support effective also.
 
 Choosing a WebSocket server stack for an indie game is not primarily a performance decision. At the connection counts a small game reaches, every stack on this list is fast enough. A Slither-style game at peak might hold 500 concurrent players in a single room. At Node.js + Socket.io's 150KB per connection, that's 75MB — trivial on any VPS.
 
