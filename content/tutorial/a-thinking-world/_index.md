@@ -11,9 +11,9 @@ Pathfinding foundations — from simple flood-fill search through to A*.
 
 ## Posts
 
-- BFS — Breadth-First Search *(coming soon)*
-- Dijkstra's — Terrain Costs *(coming soon)*
-- Greedy Best-First *(coming soon)*
-- A* *(coming soon)*
-- Bringing it Together *(coming soon)*
-- Going Further *(coming soon)*
+- BFS — Breadth-First Search
+- Dijkstra's — Terrain Costs
+- Greedy Best-First
+- A*
+- Bringing it Together
+- Going Further
