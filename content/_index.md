@@ -28,7 +28,7 @@ Inspired by the Tonypa tile-based game tutorials — the most influential game d
 
 {{< worlds-grid label="The worlds" >}}
 
-  {{< world-card num="World 01" name="A Top-Down World" status="available" tags="rendering|collision" url="/tutorial/world-one/" >}}Grid, movement, collision, interaction, and enemies. The foundation everything else builds on.{{< /world-card >}}
+  {{< world-card num="World 01" name="World One" status="available" tags="rendering|collision" url="/tutorial/world-one/" >}}Grid, movement, collision, interaction, and enemies. The foundation everything else builds on.{{< /world-card >}}
 
   {{< world-card num="World 02" name="A Side-Scrolling World" status="available" tags="physics|platforms" url="/tutorial/a-side-scrolling-world/" >}}Gravity, jumping, ladders, moving platforms, slopes, and combat.{{< /world-card >}}
 
