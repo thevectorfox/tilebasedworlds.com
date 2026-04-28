@@ -11,13 +11,13 @@ RPG systems — inventory, crafting, stats, turn-based combat, dialogue, quests,
 
 ## Posts
 
-- Inventory and Item Data *(coming soon)*
-- Crafting Recipes *(coming soon)*
-- Stat Systems *(coming soon)*
-- Turn-Based Combat *(coming soon)*
-- NPC Dialogue Trees *(coming soon)*
-- Quest Tracking *(coming soon)*
-- Save and Load State *(coming soon)*
-- Experience and Levelling *(coming soon)*
-- Bringing it Together *(coming soon)*
-- Going Further *(coming soon)*
+- Inventory and Item Data
+- Crafting Recipes
+- Stat Systems
+- Turn-Based Combat
+- NPC Dialogue Trees
+- Quest Tracking
+- Save and Load State
+- Experience and Levelling
+- Bringing it Together
+- Going Further

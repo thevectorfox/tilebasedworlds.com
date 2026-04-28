@@ -11,10 +11,10 @@ Advanced pathfinding algorithms for complex, dynamic environments.
 
 ## Posts
 
-- Flow Fields *(coming soon)*
-- Jump Point Search *(coming soon)*
-- Bidirectional A* *(coming soon)*
-- D* Lite *(coming soon)*
-- HPA* *(coming soon)*
-- Bringing it Together *(coming soon)*
-- Going Further *(coming soon)*
+- Flow Fields
+- Jump Point Search
+- Bidirectional A*
+- D* Lite
+- HPA*
+- Bringing it Together
+- Going Further
