@@ -5,7 +5,7 @@ import {
   SandpackPreview,
 } from '@codesandbox/sandpack-react'
 import type { SandpackThemeProp } from '@codesandbox/sandpack-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 
 interface Props {
   code: string
@@ -54,18 +54,19 @@ function getSandpackTheme(siteTheme: string): SandpackThemeProp {
 export function SandpackIsland({ code, title }: Props) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showStatus, setShowStatus] = useState(false)
-  const [statusText, setStatusText] = useState('')
   const [siteTheme, setSiteTheme] = useState(() =>
     typeof document !== 'undefined'
       ? (document.documentElement.dataset.theme ?? 'light')
       : 'light'
   )
 
-  // Receive status messages posted from the sandboxed preview
+  // Status is written directly to the DOM — no React state, no re-render.
+  // The game posts at 60fps; going through setState would reset Sandpack every frame.
+  const statusRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     function handleMessage(e: MessageEvent) {
-      if (e.data?.type === 'pixidemo-status') {
-        setStatusText(e.data.text)
+      if (e.data?.type === 'pixidemo-status' && statusRef.current) {
+        statusRef.current.textContent = e.data.text
       }
     }
     window.addEventListener('message', handleMessage)
@@ -83,6 +84,16 @@ export function SandpackIsland({ code, title }: Props) {
   }, [])
 
   const layoutHeight = isFullscreen ? 'calc(100vh - 5rem)' : '300px'
+
+  // Stable references so Sandpack never sees new prop objects from unrelated
+  // state changes (fullscreen toggle, theme switch, etc.)
+  const sandpackFiles   = useMemo(() => ({ '/index.js': code }), [code])
+  const sandpackOptions = useMemo(() => ({
+    externalResources: ['https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js'],
+    recompileMode: 'delayed' as const,
+    recompileDelay: 500,
+  }), [])
+  const sandpackTheme = useMemo(() => getSandpackTheme(siteTheme), [siteTheme])
 
   return (
     <div className={`sandpack-island${isFullscreen ? ' sandpack-island--fullscreen' : ''}`}>
@@ -106,13 +117,9 @@ export function SandpackIsland({ code, title }: Props) {
 
       <SandpackProvider
         template="vanilla"
-        files={{ '/index.js': code }}
-        options={{
-          externalResources: ['https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js'],
-          recompileMode: 'delayed',
-          recompileDelay: 500,
-        }}
-        theme={getSandpackTheme(siteTheme)}
+        files={sandpackFiles}
+        options={sandpackOptions}
+        theme={sandpackTheme}
       >
         <SandpackLayout style={{ height: layoutHeight }}>
           <SandpackCodeEditor />
@@ -121,8 +128,8 @@ export function SandpackIsland({ code, title }: Props) {
       </SandpackProvider>
 
       {showStatus && (
-        <div className="sandpack-island__status">
-          {statusText || '— no status —'}
+        <div className="sandpack-island__status" ref={statusRef}>
+          — no status —
         </div>
       )}
     </div>

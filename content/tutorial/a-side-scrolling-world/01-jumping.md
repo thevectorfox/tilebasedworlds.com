@@ -25,7 +25,7 @@ document.body.appendChild(app.canvas);
 // Game constants
 const TILE_SIZE = 30;
 const GRAVITY = 0.8;
-const JUMP_POWER = -15;
+const JUMP_POWER = -11;
 
 // Load all three spritesheets — PixiJS resolves each PNG relative to the JSON URL.
 const tileSheet = await PIXI.Assets.load(`https://tilebasedworlds.com/kenney_pixel-platformer/Tilemap/tilemap_packed.json`);
@@ -237,10 +237,10 @@ player.velocityY += gravity;
 player.y += player.velocityY;
 ```
 
-Watch this in action: Starting jump speed `-15`, gravity `0.8`:
-- Frame 1: velocity = -15, move up 15 pixels
-- Frame 2: velocity = -14.2, move up 14.2 pixels  
-- Frame 3: velocity = -13.4, move up 13.4 pixels
+Watch this in action: Starting jump speed `-11`, gravity `0.8`:
+- Frame 1: velocity = -11, move up 11 pixels
+- Frame 2: velocity = -10.2, move up 10.2 pixels
+- Frame 3: velocity = -9.4, move up 9.4 pixels
 - ...eventually velocity = 0 (peak of jump)
 - Then velocity becomes positive and you fall!
 
@@ -271,7 +271,7 @@ const player = {
     velocityX: 0,
     velocityY: 0,
     speed: 2,              // Left/right movement speed
-    jumpPower: -15,        // Initial upward velocity (negative = up)
+    jumpPower: -11,        // Initial upward velocity (negative = up)
     gravity: 0.8,          // Added to velocityY each frame
     onGround: false        // Prevents jumping while airborne
 };
