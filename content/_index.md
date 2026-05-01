@@ -19,6 +19,12 @@ draft = false
 Inspired by the Tonypa tile-based game tutorials — the most influential game dev writing on the early web — and rebuilt from scratch for modern JavaScript and PixiJS. The same depth, none of the Flash.
 {{< /lineage-block >}}
 
+## Why TypeScript and PixiJS
+
+PixiJS sits between the raw HTML Canvas API and a full game engine. It handles asset loading, sprite batching, and the render loop without making decisions about how your game is structured. That balance is intentional: enough abstraction to stay focused on concepts, not enough to obscure them.
+
+A game engine is a reasonable choice for shipping a game. For learning how games work, it solves the problems before you understand them. The systems in these tutorials — tilemaps, collision, pathfinding, lighting — are implemented directly, so the mechanism is visible at every step. Once you understand a concept, you can carry it into Python, Rust, or any environment you work in. The ideas transfer. The code doesn't need to.
+
 {{< learn-grid label="What you'll actually learn" >}}
   {{< learn-item title="Rendering fundamentals" >}}Grid systems, camera, layers, depth sorting, isometric projection.{{< /learn-item >}}
   {{< learn-item title="Movement and physics" >}}Collision, gravity, slopes, platforms, and character controllers.{{< /learn-item >}}
