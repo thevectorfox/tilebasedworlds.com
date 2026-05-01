@@ -27,7 +27,38 @@ const TILE_SIZE = 30;
 const GRAVITY = 0.8;
 const JUMP_POWER = -15;
 
-// Create a simple map
+// Load all three spritesheets — PixiJS resolves each PNG relative to the JSON URL.
+const tileSheet = await PIXI.Assets.load(`https://tilebasedworlds.com/kenney_pixel-platformer/Tilemap/tilemap_packed.json`);
+const bgSheet   = await PIXI.Assets.load(`https://tilebasedworlds.com/kenney_pixel-platformer/Tilemap/tilemap-backgrounds_packed.json`);
+const charSheet = await PIXI.Assets.load(`https://tilebasedworlds.com/kenney_pixel-platformer/Tilemap/tilemap-characters_packed.json`);
+const PACKED_TILE_SIZE = 18; // tilemap_packed tiles are 18×18px
+const BG_TILE_SIZE     = 24; // background and character atlas tiles are 24×24px
+
+// Background layer — rendered behind tiles and characters.
+// Row 6 (directly above the floor) gets empty_ground.
+// Row 5 gets the landscape strip, cycling across four frames.
+// Every other row gets empty_sky.
+const bgContainer = new PIXI.Container();
+app.stage.addChild(bgContainer);
+
+const landscapeFrames = ['landscape_one', 'landscape_two', 'landscape_three', 'landscape_four'];
+
+for (let bgRow = 0; bgRow < 8; bgRow++) {
+    for (let bgCol = 0; bgCol < 10; bgCol++) {
+        let frameName;
+        if (bgRow === 6)      frameName = 'empty_ground';
+        else if (bgRow === 5) frameName = landscapeFrames[bgCol % 4];
+        else                  frameName = 'empty_sky';
+
+        const bg = new PIXI.Sprite(bgSheet.textures[frameName]);
+        bg.scale.set(TILE_SIZE / BG_TILE_SIZE);
+        bg.x = bgCol * TILE_SIZE;
+        bg.y = bgRow * TILE_SIZE;
+        bgContainer.addChild(bg);
+    }
+}
+
+// Create a simple map (using background tile IDs)
 const map = [
     [1,1,1,1,1,1,1,1,1,1],
     [0,0,0,0,0,0,0,0,0,0],
@@ -39,6 +70,17 @@ const map = [
     [1,1,1,1,1,1,1,1,1,1]
 ];
 
+// Pick the right grass frame based on horizontal neighbours.
+// A tile with nothing to the left starts with an edge, and so on.
+function getTileFrame(row, col) {
+    const hasLeft  = col > 0 && map[row][col - 1] === 1;
+    const hasRight = col < map[0].length - 1 && map[row][col + 1] === 1;
+    if (!hasLeft && !hasRight) return 'grass_single';
+    if (!hasLeft)              return 'grass_left_edge';
+    if (!hasRight)             return 'grass_right_edge';
+    return 'grass_mid';
+}
+
 // Create map display
 const mapContainer = new PIXI.Container();
 app.stage.addChild(mapContainer);
@@ -46,20 +88,20 @@ app.stage.addChild(mapContainer);
 for (let row = 0; row < map.length; row++) {
     for (let col = 0; col < map[row].length; col++) {
         if (map[row][col] === 1) {
-            const tile = new PIXI.Graphics()
-                .rect(0, 0, TILE_SIZE, TILE_SIZE)
-                .fill(0x8B4513);
-            tile.x = col * TILE_SIZE;
-            tile.y = row * TILE_SIZE;
-            mapContainer.addChild(tile);
+            const frameName = getTileFrame(row, col);
+            const sprite = new PIXI.Sprite(tileSheet.textures[frameName]);
+            // Scale 18px atlas tiles up to the 30px TILE_SIZE used by the demo
+            sprite.scale.set(TILE_SIZE / PACKED_TILE_SIZE);
+            sprite.x = col * TILE_SIZE;
+            sprite.y = row * TILE_SIZE;
+            mapContainer.addChild(sprite);
         }
     }
 }
 
-// Create hero
-const hero = new PIXI.Graphics()
-    .rect(0, 0, 12, 12)
-    .fill(0xff4444);
+// Create hero — starts in standing pose, scaled from 24px to 12px
+const hero = new PIXI.Sprite(charSheet.textures['green_stand']);
+hero.scale.set(0.5);
 hero.x = 60;
 hero.y = map.length * TILE_SIZE - TILE_SIZE - 12;
 app.stage.addChild(hero);
@@ -75,7 +117,8 @@ const player = {
     velocityY: 0,
     speed: 2,
     jumpPower: JUMP_POWER,
-    onGround: false
+    onGround: false,
+    walkTimer: 0
 };
 
 // Status display for educational purposes
@@ -161,10 +204,20 @@ function updatePlayer() {
     player.x = Math.max(0, Math.min(player.x, 300 - player.width));
     player.y = Math.max(0, player.y);
     
-    // Update sprite visuals
+    // Update sprite position
     player.sprite.x = player.x;
     player.sprite.y = player.y;
-    
+
+    // Walk animation — cycle between stand and walk every 12 frames while moving
+    if (player.velocityX !== 0) {
+        player.walkTimer++;
+        const frame = Math.floor(player.walkTimer / 12) % 2 === 0 ? 'green_stand' : 'green_walk';
+        player.sprite.texture = charSheet.textures[frame];
+    } else {
+        player.walkTimer = 0;
+        player.sprite.texture = charSheet.textures['green_stand'];
+    }
+
     // Educational status display
     updateStatus();
 }
