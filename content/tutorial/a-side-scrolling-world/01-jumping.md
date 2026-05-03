@@ -60,11 +60,11 @@ for (let bgRow = 0; bgRow < 8; bgRow++) {
 
 // Create a simple map (using background tile IDs)
 const map = [
-    [1,1,1,1,1,1,1,1,1,1],
     [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,1,1,0,0,1,1,0],
+    [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,1,1,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
     [0,0,1,1,0,0,0,0,1,0],
     [0,0,0,0,0,0,0,0,0,0],
     [1,1,1,1,1,1,1,1,1,1]
@@ -99,20 +99,19 @@ for (let row = 0; row < map.length; row++) {
     }
 }
 
-// Create hero — starts in standing pose, scaled from 24px to 12px
+// Create hero — rendered at native 24×24px (no scale)
 const hero = new PIXI.Sprite(charSheet.textures['green_stand']);
-hero.scale.set(0.5);
 hero.x = 60;
-hero.y = map.length * TILE_SIZE - TILE_SIZE - 12;
+hero.y = map.length * TILE_SIZE - TILE_SIZE - 24;
 app.stage.addChild(hero);
 
 // Hero properties
 const player = {
     sprite: hero,
     x: 60,
-    y: map.length * TILE_SIZE - TILE_SIZE - 12,
-    width: 12,
-    height: 12,
+    y: map.length * TILE_SIZE - TILE_SIZE - 24,
+    width: 24,
+    height: 24,
     velocityX: 0,
     velocityY: 0,
     speed: 2,
@@ -211,7 +210,7 @@ function updatePlayer() {
     // Walk animation — cycle between stand and walk every 12 frames while moving
     if (player.velocityX !== 0) {
         player.walkTimer++;
-        const frame = Math.floor(player.walkTimer / 12) % 2 === 0 ? 'green_stand' : 'green_walk';
+        const frame = Math.floor(player.walkTimer / 6) % 2 === 0 ? 'green_stand' : 'green_walk';
         player.sprite.texture = charSheet.textures[frame];
     } else {
         player.walkTimer = 0;
